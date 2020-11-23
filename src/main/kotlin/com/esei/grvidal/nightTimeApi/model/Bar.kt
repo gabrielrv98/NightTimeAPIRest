@@ -21,7 +21,7 @@ class Bar(
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    var id:Long = 0
+    var id: Long = 0
 
 }
 
@@ -38,8 +38,8 @@ class Schedule(
         var friday: Boolean,
         var saturday: Boolean,
         var sunday: Boolean,
-){
+) {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    var id:Long = 0
+    var id: Long = 0
 }

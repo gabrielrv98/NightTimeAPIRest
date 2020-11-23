@@ -1,7 +1,9 @@
 package com.esei.grvidal.nightTimeApi
 
 import com.esei.grvidal.nightTimeApi.dao.BarRepository
+import com.esei.grvidal.nightTimeApi.dao.EventRepository
 import com.esei.grvidal.nightTimeApi.model.Bar
+import com.esei.grvidal.nightTimeApi.model.Event
 import com.esei.grvidal.nightTimeApi.model.Schedule
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
@@ -9,6 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.runApplication
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
+import java.time.LocalDate
 
 @SpringBootApplication
 @EnableJpaRepositories("com.esei.grvidal.nightTimeApi.dao")
@@ -18,8 +21,8 @@ class NightTimeApiApplication : CommandLineRunner {
     @Autowired
     val barRepository: BarRepository? = null
 
-    //@Autowired
-    //val eventRepositories: EventRepository? = null
+    @Autowired
+    val eventRepositories: EventRepository? = null
 
     override fun run(vararg args: String?) {
 
@@ -35,15 +38,17 @@ class NightTimeApiApplication : CommandLineRunner {
         bar2.schedule = Schedule(monday = true, tuesday = false, wednesday = false,
                 thursday = true, friday = false, saturday = true, sunday = true)
         barRepository!!.save(bar2)
-/*
-
-        val event1 = Event("copas baratas", "copas a menos de 1 euro", bar = bar1)
-        val event2 = Event("Fardos gratis", "Fardos gratis", bar = bar1)
-        val event3 = Event("Algo habra", "No lo tenemos muy claro", bar = bar2)
 
 
- */
-        //eventRepositories!!.save(event1)
+        val event1 = Event( "copas a menos de 1 euro",date = LocalDate.now(), bar = bar1)
+        val event2 = Event( "Fardos gratis", bar = bar1)
+        val event3 = Event( "No lo tenemos muy claro", bar = bar2)
+
+
+
+        eventRepositories!!.save(event1)
+        eventRepositories!!.save(event2)
+        eventRepositories!!.save(event3)
 
 
     }

@@ -1,7 +1,7 @@
 package com.esei.grvidal.nightTimeApi.business
 
 import com.esei.grvidal.nightTimeApi.model.Bar
-//import com.esei.grvidal.nightTimeApi.model.BarWithEvents
+import com.esei.grvidal.nightTimeApi.model.Event
 
 /**
  * DAO Interface for Bars
@@ -11,7 +11,7 @@ interface IBarBusiness {
     //List all the bars
     fun list(): List<Bar>
 
-    //fun listWithEvents(idBar: Long): BarWithEvents
+    fun listWithEvents(idBar: Long): List<Event>
 
     //Show one bar
     fun load(idBar: Long): Bar

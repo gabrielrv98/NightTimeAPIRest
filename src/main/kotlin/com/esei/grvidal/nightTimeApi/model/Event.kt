@@ -8,14 +8,14 @@ import javax.persistence.*
  * @param owner is the owner of the bar
  * @param address is the address of the bar
  */
-/*
+
 @Entity
 @Table(name = "event")
 class Event(
-        var title: String,
         var description: String,
         var date: LocalDate? = null,
         @ManyToOne
+        @JoinColumn(name = "bar_id")
         var bar: Bar? = null,
 ) {
 
@@ -23,10 +23,3 @@ class Event(
     @GeneratedValue(strategy = GenerationType.AUTO)
     var id:Long = 0
 }
-
-class BarWithEvents(
-        var bar: Bar,
-        var events: List<Event>
-)
-
- */

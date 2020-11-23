@@ -1,9 +1,9 @@
 package com.esei.grvidal.nightTimeApi.web
 
 import com.esei.grvidal.nightTimeApi.business.IBarBusiness
+import com.esei.grvidal.nightTimeApi.business.IEventBusiness
 import com.esei.grvidal.nightTimeApi.exception.BusinessException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
-import com.esei.grvidal.nightTimeApi.model.Bar
 import com.esei.grvidal.nightTimeApi.model.Event
 import com.esei.grvidal.nightTimeApi.utlis.Constants
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,35 +13,41 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 /**
- * This is the Bar Controller
+ * This is the Event Controller
  */
 @RestController
-@RequestMapping(Constants.URL_BASE_BAR)
-class BarRestController {
+@RequestMapping(Constants.URL_BASE_EVENT)
+class EventRestController {
+
+    @Autowired
+    val eventBusiness: IEventBusiness? = null
 
     @Autowired
     val barBusiness: IBarBusiness? = null
 
 
     /**
-     * Listen to a Get with the [Constants.URL_BASE_BAR] to show all Bars
+     * Listen to a Get with the [Constants.URL_BASE_EVENT] to show all Events
      */
     @GetMapping("")
-    fun list(): ResponseEntity<List<Bar>> {
+    fun list(): ResponseEntity<List<Event>> {
         return try {
-            ResponseEntity(barBusiness!!.list(), HttpStatus.OK)
+            ResponseEntity(eventBusiness!!.list(), HttpStatus.OK)
         } catch (e: Exception) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 
-    //mejor manera
-    @GetMapping("/{id}/events")
-    fun listWithEvents(@PathVariable("id") idBar: Long) : ResponseEntity<List<Event>> {
+    //no tan bien manera, pero pensar en algo
+    @GetMapping("/bar/{id}")
+    fun listByBar(@PathVariable("id") idBar: Long) : ResponseEntity<List<Event>> {
         return try {
 
-            ResponseEntity(barBusiness!!.listWithEvents(idBar), HttpStatus.OK)
+            val bar = barBusiness!!.load(idBar)
+            ResponseEntity(eventBusiness!!.listEventByBar(bar), HttpStatus.OK)
 
+        }catch (e: NotFoundException){
+            ResponseEntity(HttpStatus.NOT_FOUND)
         } catch (e: Exception) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -49,12 +55,12 @@ class BarRestController {
 
 
     /**
-     * Listen to a Get with the [Constants.URL_BASE_BAR] and an Id as a parameter to show one Bar
+     * Listen to a Get with the [Constants.URL_BASE_EVENT] and an Id as a parameter to show one Event
      */
     @GetMapping("/{id}")
-    fun load(@PathVariable("id") idBar: Long): ResponseEntity<Any> {
+    fun load(@PathVariable("id") idEvent: Long): ResponseEntity<Any> {
         return try {
-            ResponseEntity(barBusiness!!.load(idBar), HttpStatus.OK)
+            ResponseEntity(eventBusiness!!.load(idEvent), HttpStatus.OK)
         } catch (e: BusinessException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         } catch (e: NotFoundException) {
@@ -63,14 +69,14 @@ class BarRestController {
     }
 
     /**
-     * Listen to a Post with the [Constants.URL_BASE_BAR] and a requestBody with a Bar to create a bar
+     * Listen to a Post with the [Constants.URL_BASE_EVENT] and a requestBody with a Event to create a Event
      */
     @PostMapping("")
-    fun insert(@RequestBody bar: Bar): ResponseEntity<Any> {
+    fun insert(@RequestBody event: Event): ResponseEntity<Any> {
         return try {
-            barBusiness!!.save(bar)
+            eventBusiness!!.save(event)
             val responseHeader = HttpHeaders()
-            responseHeader.set("location", Constants.URL_BASE_BAR + "/" + bar.id)
+            responseHeader.set("location", Constants.URL_BASE_EVENT + "/" + event.id)
             ResponseEntity(responseHeader, HttpStatus.CREATED)
         } catch (e: BusinessException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -78,14 +84,14 @@ class BarRestController {
     }
 
     /**
-     * Listen to a Put with the [Constants.URL_BASE_BAR] and a requestBody with a Bar to update a Bar
+     * Listen to a Put with the [Constants.URL_BASE_EVENT] and a requestBody with a Event to update a Event
+     * //todo si le pasas un Event con id = null crea uno nuevo
      */
-    @PatchMapping("/{id}")
-    fun update(@PathVariable("id") idBar: Long, @RequestBody bar: Bar): ResponseEntity<Any> {
+    @PutMapping("")
+    fun update(@RequestBody Event: Event): ResponseEntity<Any> {
         return try {
-            //todo comprobar atributos y actualizar
-            //todo https://www.youtube.com/watch?v=bQPv89t2oqc#20:35
-            barBusiness!!.save(bar)
+
+            eventBusiness!!.save(Event)
             ResponseEntity(HttpStatus.OK)
         } catch (e: BusinessException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -93,12 +99,12 @@ class BarRestController {
     }
 
     /**
-     * Listen to a Delete with the [Constants.URL_BASE_BAR] and a Id as a paramter to delete a Bar
+     * Listen to a Delete with the [Constants.URL_BASE_EVENT] and a Id as a paramter to delete a Event
      */
     @DeleteMapping("/{id}")
-    fun delete(@PathVariable("id") idBar: Long): ResponseEntity<Any> {
+    fun delete(@PathVariable("id") idEvent: Long): ResponseEntity<Any> {
         return try {
-            barBusiness!!.remove(idBar)
+            eventBusiness!!.remove(idEvent)
             ResponseEntity(HttpStatus.OK)
         } catch (e: BusinessException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)

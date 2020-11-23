@@ -16,41 +16,40 @@ import kotlin.jvm.Throws
  *
  */
 @Service
-class BarBusiness : IBarBusiness {
+class EventBusiness : IEventBusiness {
 
     /**
      *Dependency injection with autowired
      */
     @Autowired
-    val barRepository: BarRepository? = null
-
-
-    @Autowired
     val eventRepository: EventRepository? = null
 
 
     /**
-     * This will list all the bars, if not, will throw a BusinessException
+     * This will list all the events, if not, will throw a BusinessException
      */
     @Throws(BusinessException::class)
-    override fun list(): List<Bar> {
+    override fun list(): List<Event> {
 
         try {
-            return barRepository!!.findAll()
+            return eventRepository!!.findAll()
         } catch (e: Exception) {
             throw BusinessException(e.message)
         }
     }
 
-    @Throws(BusinessException::class)
-    override fun listWithEvents(idBar: Long): List<Event> {
+
+    @Throws(BusinessException::class, NotFoundException::class)
+    override fun listEventByBar(bar: Bar): List<Event> {
 
         try {
-            val bar = load(idBar)
-            return eventRepository!!.findAllByBar(bar)
-                    //.apply { this.forEach { it.bar = null } }
 
-        } catch (e: Exception) {
+            return eventRepository!!.findAllByBar(bar)
+                //.apply { this.forEach { it.bar = null } }
+
+        } catch (e: NotFoundException){
+            throw e
+        }catch (e: Exception) {
             throw BusinessException(e.message)
         }
 
@@ -61,16 +60,16 @@ class BarBusiness : IBarBusiness {
      * This will show one bar, if not, will throw a BusinessException or if the object cant be found, it will throw a NotFoundException
      */
     @Throws(BusinessException::class, NotFoundException::class)
-    override fun load(idBar: Long): Bar {
-        val op: Optional<Bar>
+    override fun load(idEvent: Long): Event {
+        val op: Optional<Event>
         try {
-            op = barRepository!!.findById(idBar)
+            op = eventRepository!!.findById(idEvent)
         } catch (e: Exception) {
             throw BusinessException(e.message)
         }
 
         if (!op.isPresent) {
-            throw NotFoundException("No se encontro al bar con el id $idBar")
+            throw NotFoundException("No se encontro al evento con el id $idEvent")
         }
 
         return op.get()
@@ -81,10 +80,10 @@ class BarBusiness : IBarBusiness {
      * This will save a new bar, if not, will throw an Exception
      */
     @Throws(BusinessException::class)
-    override fun save(bar: Bar): Bar {
+    override fun save(event: Event): Event {
 
         try {
-            return barRepository!!.save(bar)
+            return eventRepository!!.save(event)
         } catch (e: Exception) {
             throw BusinessException(e.message)
         }
@@ -94,21 +93,21 @@ class BarBusiness : IBarBusiness {
      * This will remove a bars through its id, if not, will throw an Exception, or if it cant find it, it will throw a NotFoundException
      */
     @Throws(BusinessException::class, NotFoundException::class)
-    override fun remove(idBar: Long) {
-        val op: Optional<Bar>
+    override fun remove(idEvent: Long) {
+        val op: Optional<Event>
 
         try {
-            op = barRepository!!.findById(idBar)
+            op = eventRepository!!.findById(idEvent)
         } catch (e: Exception) {
             throw BusinessException(e.message)
         }
 
         if (!op.isPresent) {
-            throw NotFoundException("No se encontro al bar con el id $idBar")
+            throw NotFoundException("No se encontro al evento con el id $idEvent")
         } else {
 
             try {
-                barRepository!!.deleteById(idBar)
+                eventRepository!!.deleteById(idEvent)
             } catch (e: Exception) {
                 throw BusinessException(e.message)
             }
