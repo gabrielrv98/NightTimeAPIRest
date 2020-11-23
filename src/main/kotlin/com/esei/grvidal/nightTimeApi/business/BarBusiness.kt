@@ -22,6 +22,12 @@ class BarBusiness : IBarBusiness {
     @Autowired
     val barRepository: BarRepository? = null
 
+    /*
+    @Autowired
+    val eventRepository: EventRepository? = null
+
+
+     */
     /**
      * This will list all the bars, if not, will throw a BusinessException
      */
@@ -34,6 +40,21 @@ class BarBusiness : IBarBusiness {
             throw BusinessException(e.message)
         }
     }
+/*
+    @Throws(BusinessException::class)
+    override fun listWithEvents(idBar: Long): BarWithEvents {
+
+        try{
+            val bar = load(idBar)
+            return BarWithEvents(bar, eventRepository!!.findAllByBar(bar) )
+        } catch (e: Exception) {
+            throw BusinessException(e.message)
+        }
+
+    }
+
+ */
+
 
     /**
      * This will show one bar, if not, will throw a BusinessException or if the object cant be found, it will throw a NotFoundException
@@ -46,8 +67,9 @@ class BarBusiness : IBarBusiness {
         } catch (e: Exception) {
             throw BusinessException(e.message)
         }
+
         if (!op.isPresent) {
-            throw NotFoundException("No se encontro la persona con el id $idBar")
+            throw NotFoundException("No se encontro al bar con el id $idBar")
         }
 
         return op.get()
@@ -81,7 +103,7 @@ class BarBusiness : IBarBusiness {
         }
 
         if (!op.isPresent) {
-            throw NotFoundException("No se encontro la persona con el id $idBar")
+            throw NotFoundException("No se encontro al bar con el id $idBar")
         } else {
 
             try {

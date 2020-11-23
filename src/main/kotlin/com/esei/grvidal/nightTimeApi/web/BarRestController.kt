@@ -4,6 +4,7 @@ import com.esei.grvidal.nightTimeApi.business.IBarBusiness
 import com.esei.grvidal.nightTimeApi.exception.BusinessException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Bar
+//import com.esei.grvidal.nightTimeApi.model.BarWithEvents
 import com.esei.grvidal.nightTimeApi.utlis.Constants
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
@@ -22,6 +23,7 @@ class BarRestController {
     @Autowired
     val barBusiness: IBarBusiness? = null
 
+
     /**
      * Listen to a Get with the [Constants.URL_BASE_BAR] to show all Bars
      */
@@ -33,11 +35,24 @@ class BarRestController {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
+/*
+    @GetMapping("/{id}")
+    fun listWithEvents(@PathVariable("id") idBar: Long) : ResponseEntity<BarWithEvents> {
+        return try {
+
+            ResponseEntity(barBusiness!!.listWithEvents(idBar), HttpStatus.OK)
+
+        } catch (e: Exception) {
+            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
+ */
 
     /**
      * Listen to a Get with the [Constants.URL_BASE_BAR] and an Id as a parameter to show one Bar
      */
-    @GetMapping("/{id}")
+    @GetMapping("/events/{id}")
     fun load(@PathVariable("id") idBar: Long): ResponseEntity<Any> {
         return try {
             ResponseEntity(barBusiness!!.load(idBar), HttpStatus.OK)
@@ -65,10 +80,12 @@ class BarRestController {
 
     /**
      * Listen to a Put with the [Constants.URL_BASE_BAR] and a requestBody with a Bar to update a Bar
+     * //todo si le pasas un bar con id = null crea uno nuevo
      */
     @PutMapping("")
     fun update(@RequestBody bar: Bar): ResponseEntity<Any> {
         return try {
+
             barBusiness!!.save(bar)
             ResponseEntity(HttpStatus.OK)
         } catch (e: BusinessException) {

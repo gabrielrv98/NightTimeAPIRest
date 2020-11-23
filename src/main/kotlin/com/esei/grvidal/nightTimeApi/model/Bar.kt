@@ -4,14 +4,19 @@ import javax.persistence.*
 
 /**
  * Entity of the Bar, this holds the data that the DB can save
+ * @param owner is the owner of the bar
+ * @param address is the address of the bar
  */
 @Entity
 @Table(name = "bar")
 class Bar(
         var name: String,
-        var jefe: String,
-        var direccion: String,
-        //@OnetoOne var sheduleId :Schedule
+        var owner: String,
+        var address: String,
+
+        @OneToOne(cascade = [CascadeType.ALL])
+        @JoinColumn(name = "schedule_id")
+        var schedule: Schedule? = null,
 ) {
 
     @Id
@@ -20,7 +25,11 @@ class Bar(
 
 }
 
+/**
+ * Entity of the Schedule, this holds the data that the DB can save
+ */
 @Entity
+@Table(name = "schedule")
 class Schedule(
         var monday: Boolean,
         var tuesday: Boolean,
