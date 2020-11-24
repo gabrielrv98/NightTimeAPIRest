@@ -14,6 +14,9 @@ class Bar(
         var owner: String,
         var address: String,
 
+        @ManyToOne//(cascade = [CascadeType.PERSIST])
+        @JoinColumn(name = "city_id")
+        var city: City? = null,
         @OneToOne(cascade = [CascadeType.ALL])
         @JoinColumn(name = "schedule_id")
         var schedule: Schedule? = null,

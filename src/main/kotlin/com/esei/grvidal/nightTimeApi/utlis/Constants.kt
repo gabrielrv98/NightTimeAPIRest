@@ -13,5 +13,6 @@ class Constants {
         //BaseAPI endpoint for bars
         const val URL_BASE_BAR = "$URL_BASE/bar"
         const val URL_BASE_EVENT = "$URL_BASE/event"
+        const val URL_BASE_USER = "$URL_BASE/user"
     }
 }

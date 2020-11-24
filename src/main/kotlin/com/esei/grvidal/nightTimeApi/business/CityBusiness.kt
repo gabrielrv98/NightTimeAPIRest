@@ -1,11 +1,9 @@
 package com.esei.grvidal.nightTimeApi.business
 
-import com.esei.grvidal.nightTimeApi.dao.BarRepository
-import com.esei.grvidal.nightTimeApi.dao.EventRepository
+import com.esei.grvidal.nightTimeApi.dao.CityRepository
 import com.esei.grvidal.nightTimeApi.exception.BusinessException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
-import com.esei.grvidal.nightTimeApi.model.Bar
-import com.esei.grvidal.nightTimeApi.model.Event
+import com.esei.grvidal.nightTimeApi.model.City 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.*
@@ -16,61 +14,44 @@ import kotlin.jvm.Throws
  *
  */
 @Service
-class BarBusiness : IBarBusiness {
+class CityBusiness : ICityBusiness {
 
     /**
      *Dependency injection with autowired
      */
     @Autowired
-    val barRepository: BarRepository? = null
-
-
-    @Autowired
-    val eventRepository: EventRepository? = null
+    val cityRepository: CityRepository? = null
 
 
     /**
      * This will list all the bars, if not, will throw a BusinessException
      */
     @Throws(BusinessException::class)
-    override fun list(): List<Bar> {
+    override fun list(): List<City> {
 
         try {
-            return barRepository!!.findAll()
+            return cityRepository!!.findAll()
         } catch (e: Exception) {
             throw BusinessException(e.message)
         }
-    }
-
-    @Throws(BusinessException::class)
-    override fun listWithEvents(idBar: Long): List<Event> {
-
-        try {
-            val bar = load(idBar)
-            return eventRepository!!.findAllByBar(bar)//todo algo hay raro aqui
-                    //.apply { this.forEach { it.bar = null } }
-
-        } catch (e: Exception) {
-            throw BusinessException(e.message)
-        }
-
     }
 
 
     /**
-     * This will show one bar, if not, will throw a BusinessException or if the object cant be found, it will throw a NotFoundException
+     * This will show one City, if not, will throw a BusinessException or 
+     * if the object cant be found, it will throw a NotFoundException
      */
     @Throws(BusinessException::class, NotFoundException::class)
-    override fun load(idBar: Long): Bar {
-        val op: Optional<Bar>
+    override fun load(idCity: Long): City {
+        val op: Optional<City>
         try {
-            op = barRepository!!.findById(idBar)
+            op = cityRepository!!.findById(idCity)
         } catch (e: Exception) {
             throw BusinessException(e.message)
         }
 
         if (!op.isPresent) {
-            throw NotFoundException("No se encontro al bar con el id $idBar")
+            throw NotFoundException("No se encontro al bar con el id $idCity")
         }
 
         return op.get()
@@ -81,10 +62,10 @@ class BarBusiness : IBarBusiness {
      * This will save a new bar, if not, will throw an Exception
      */
     @Throws(BusinessException::class)
-    override fun save(bar: Bar): Bar {
+    override fun save(City: City): City {
 
         try {
-            return barRepository!!.save(bar)
+            return cityRepository!!.save(City)
         } catch (e: Exception) {
             throw BusinessException(e.message)
         }
@@ -94,21 +75,21 @@ class BarBusiness : IBarBusiness {
      * This will remove a bars through its id, if not, will throw an Exception, or if it cant find it, it will throw a NotFoundException
      */
     @Throws(BusinessException::class, NotFoundException::class)
-    override fun remove(idBar: Long) {
-        val op: Optional<Bar>
+    override fun remove(idCity: Long) {
+        val op: Optional<City>
 
         try {
-            op = barRepository!!.findById(idBar)
+            op = cityRepository!!.findById(idCity)
         } catch (e: Exception) {
             throw BusinessException(e.message)
         }
 
         if (!op.isPresent) {
-            throw NotFoundException("No se encontro al bar con el id $idBar")
+            throw NotFoundException("No se encontro al bar con el id $idCity")
         } else {
 
             try {
-                barRepository!!.deleteById(idBar)
+                cityRepository!!.deleteById(idCity)
             } catch (e: Exception) {
                 throw BusinessException(e.message)
             }

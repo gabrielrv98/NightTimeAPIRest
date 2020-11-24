@@ -35,9 +35,11 @@ class BarRestController {
         }
     }
 
-    //mejor manera
+    /**
+     * Returns a list with the events of the bar that matches the ID
+     */
     @GetMapping("/{id}/events")
-    fun listWithEvents(@PathVariable("id") idBar: Long) : ResponseEntity<List<Event>> {
+    fun listWithEvents(@PathVariable("id") idBar: Long): ResponseEntity<List<Event>> {
         return try {
 
             ResponseEntity(barBusiness!!.listWithEvents(idBar), HttpStatus.OK)
@@ -64,6 +66,7 @@ class BarRestController {
 
     /**
      * Listen to a Post with the [Constants.URL_BASE_BAR] and a requestBody with a Bar to create a bar
+     * @param bar new Bar to insert in the database
      */
     @PostMapping("")
     fun insert(@RequestBody bar: Bar): ResponseEntity<Any> {
@@ -79,21 +82,61 @@ class BarRestController {
 
     /**
      * Listen to a Put with the [Constants.URL_BASE_BAR] and a requestBody with a Bar to update a Bar
+     *
+     * @param idBar id of the bar that will be updated
+     * @param fields attributes to modify
+     *
+     * If there is any mistake in Schedule object it will just omit the pair key value
+     * //TODO editar city del bar
      */
     @PatchMapping("/{id}")
-    fun update(@PathVariable("id") idBar: Long, @RequestBody bar: Bar): ResponseEntity<Any> {
+    fun update(@PathVariable("id") idBar: Long, @RequestBody fields: Map<String, Any>): ResponseEntity<Any> {
+        val responseHeader = HttpHeaders()
         return try {
-            //todo comprobar atributos y actualizar
-            //todo https://www.youtube.com/watch?v=bQPv89t2oqc#20:35
+
+            val bar = barBusiness!!.load(idBar)
+            fields.forEach { (k, v) ->
+                when (k) {
+                    "name" -> bar.name = v.toString()
+                    "owner" -> bar.owner = v.toString()
+                    "address" -> bar.address = v.toString()
+                    "schedule" -> {
+                           try{
+
+                               val regex = """(monday|tuesday|wednesday|thursday|friday|saturday|sunday)=(true|false)""".toRegex()
+                               val matchResult =regex.findAll(v.toString())
+
+
+                               matchResult.iterator().forEach {
+
+                                   when(it.groupValues[1]){
+                                       "monday" ->  bar.schedule?.monday = it.groupValues[2] == "true"
+                                       "tuesday" ->  bar.schedule?.tuesday = it.groupValues[2] == "true"
+                                       "wednesday" ->  bar.schedule?.wednesday = it.groupValues[2] == "true"
+                                       "thursday" ->  bar.schedule?.thursday = it.groupValues[2] == "true"
+                                       "friday" ->  bar.schedule?.friday = it.groupValues[2] == "true"
+                                       "saturday" ->  bar.schedule?.saturday = it.groupValues[2] == "true"
+                                       "sunday" ->  bar.schedule?.sunday = it.groupValues[2] == "true"
+
+                                   }
+                               }
+
+                           }catch(e:Exception){
+                               responseHeader.set("ScheduleError", "no properly format "+e.message)
+                           }
+                    }
+                }
+            }
             barBusiness!!.save(bar)
-            ResponseEntity(HttpStatus.OK)
+            ResponseEntity(responseHeader, HttpStatus.OK)
+
         } catch (e: BusinessException) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+            ResponseEntity(responseHeader,HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 
     /**
-     * Listen to a Delete with the [Constants.URL_BASE_BAR] and a Id as a paramter to delete a Bar
+     * Listen to a Delete with the [Constants.URL_BASE_BAR] and a Id as a parameter to delete a Bar
      */
     @DeleteMapping("/{id}")
     fun delete(@PathVariable("id") idBar: Long): ResponseEntity<Any> {

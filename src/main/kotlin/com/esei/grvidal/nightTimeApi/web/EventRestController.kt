@@ -38,6 +38,7 @@ class EventRestController {
         }
     }
 
+    //todo eliminar
     //no tan bien manera, pero pensar en algo
     @GetMapping("/bar/{id}")
     fun listByBar(@PathVariable("id") idBar: Long) : ResponseEntity<List<Event>> {
