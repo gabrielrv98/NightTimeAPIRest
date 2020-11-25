@@ -3,7 +3,7 @@ package com.esei.grvidal.nightTimeApi.business
 import com.esei.grvidal.nightTimeApi.dao.UserRepository
 import com.esei.grvidal.nightTimeApi.exception.BusinessException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
-import com.esei.grvidal.nightTimeApi.model.User 
+import com.esei.grvidal.nightTimeApi.model.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.*
@@ -31,6 +31,13 @@ class UserBusiness : IUserBusiness {
 
         try {
             return userRepository!!.findAll()
+                    /*//todo ver en el futuro
+                    .onEach { user ->
+                user.friends?.forEach { it.friends = null }
+            }
+
+
+                     */
         } catch (e: Exception) {
             throw BusinessException(e.message)
         }
@@ -38,7 +45,7 @@ class UserBusiness : IUserBusiness {
 
 
     /**
-     * This will show one user, if not, will throw a BusinessException or 
+     * This will show one user, if not, will throw a BusinessException or
      * if the object cant be found, it will throw a NotFoundException
      */
     @Throws(BusinessException::class, NotFoundException::class)

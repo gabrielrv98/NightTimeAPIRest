@@ -107,7 +107,11 @@ class BarBusiness : IBarBusiness {
             throw NotFoundException("No se encontro al bar con el id $idBar")
         } else {
 
+
             try {
+                eventRepository!!.findAllByBar(op.get()).forEach {
+                    eventRepository!!.deleteById(it.id)
+                }
                 barRepository!!.deleteById(idBar)
             } catch (e: Exception) {
                 throw BusinessException(e.message)

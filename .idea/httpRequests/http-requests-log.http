@@ -1,3 +1,27 @@
+GET http://192.168.1.11:8080/api/v1/user
+Accept: */*
+Cache-Control: no-cache
+
+<> 2020-11-25T124034.200.json
+
+###
+
+GET http://192.168.1.11:8080/api/v1/user
+Accept: */*
+Cache-Control: no-cache
+
+<> 2020-11-25T122931.200.json
+
+###
+
+GET http://192.168.1.11:8080/api/v1/user
+Accept: */*
+Cache-Control: no-cache
+
+<> 2020-11-25T122032.200.json
+
+###
+
 GET http://192.168.1.11:8080/api/v1/user/13
 Accept: */*
 Cache-Control: no-cache

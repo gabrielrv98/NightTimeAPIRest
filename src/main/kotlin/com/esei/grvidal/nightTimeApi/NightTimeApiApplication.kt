@@ -78,12 +78,23 @@ class NightTimeApiApplication : CommandLineRunner {
         val user4 = User("Jose Negro","joseju","Todo lo que se pueda decir es irrelevante")
 
         userRepositories!!.save(user1)
-            //user2.friends?.plus(user1)
-        //user1.friends?.plus(user2)
-
         userRepositories!!.save(user2)
         userRepositories!!.save(user3)
         userRepositories!!.save(user4)
+
+        if(user2.friends == null){
+            user2.friends = listOf(user1)
+        }else user2.friends?.plus(user1)
+
+        if(user1.friends == null){
+            user1.friends = listOf(user2)
+        }else user1.friends?.plus(user2)
+
+        user2.friends =  user2.friends?.plus(user3)
+
+        userRepositories!!.save(user1)
+        userRepositories!!.save(user2)
+
 
 
 
