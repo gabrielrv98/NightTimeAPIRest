@@ -11,7 +11,7 @@ interface IEventBusiness {
     //List all the events
     fun list(): List<Event>
 
-    //List all the events of a bar
+    //List all the events of an event
     fun listEventByBar(bar: Bar): List<Event>
 
     //Show one Event
@@ -20,6 +20,8 @@ interface IEventBusiness {
     //Save a new event
     fun save(event: Event): Event
 
-    //remove a bar
+    //remove an event
     fun remove(idEvent: Long)
+
+    fun removeAllByBar(bar: Bar)
 }

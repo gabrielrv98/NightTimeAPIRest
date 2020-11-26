@@ -38,22 +38,6 @@ class EventRestController {
         }
     }
 
-    //todo eliminar
-    //no tan bien manera, pero pensar en algo
-    @GetMapping("/bar/{id}")
-    fun listByBar(@PathVariable("id") idBar: Long) : ResponseEntity<List<Event>> {
-        return try {
-
-            val bar = barBusiness!!.load(idBar)
-            ResponseEntity(eventBusiness!!.listEventByBar(bar), HttpStatus.OK)
-
-        }catch (e: NotFoundException){
-            ResponseEntity(HttpStatus.NOT_FOUND)
-        } catch (e: Exception) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        }
-    }
-
 
     /**
      * Listen to a Get with the [Constants.URL_BASE_EVENT] and an Id as a parameter to show one Event

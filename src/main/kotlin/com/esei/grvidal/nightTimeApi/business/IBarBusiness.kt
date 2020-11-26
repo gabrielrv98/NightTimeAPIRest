@@ -11,8 +11,6 @@ interface IBarBusiness {
     //List all the bars
     fun list(): List<Bar>
 
-    fun listWithEvents(idBar: Long): List<Event>
-
     //Show one bar
     fun load(idBar: Long): Bar
 

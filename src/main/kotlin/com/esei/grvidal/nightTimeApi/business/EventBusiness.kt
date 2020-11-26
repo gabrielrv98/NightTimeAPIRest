@@ -1,6 +1,5 @@
 package com.esei.grvidal.nightTimeApi.business
 
-import com.esei.grvidal.nightTimeApi.dao.BarRepository
 import com.esei.grvidal.nightTimeApi.dao.EventRepository
 import com.esei.grvidal.nightTimeApi.exception.BusinessException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
@@ -12,7 +11,7 @@ import java.util.*
 import kotlin.jvm.Throws
 
 /**
- * Bar service, is the implementation of the DAO interface
+ * Bar service, is the implementation of the Business interface
  *
  */
 @Service
@@ -45,11 +44,11 @@ class EventBusiness : IEventBusiness {
         try {
 
             return eventRepository!!.findAllByBar(bar)
-                //.apply { this.forEach { it.bar = null } }
+            //.apply { this.forEach { it.bar = null } }
 
-        } catch (e: NotFoundException){
+        } catch (e: NotFoundException) {
             throw e
-        }catch (e: Exception) {
+        } catch (e: Exception) {
             throw BusinessException(e.message)
         }
 
@@ -113,6 +112,24 @@ class EventBusiness : IEventBusiness {
             }
         }
 
+    }
+
+    /**
+     * This will remove all the events through the bar id where it belonged,
+     *  if not, will throw an Exception, or if it cant find it, it will throw a NotFoundException
+     */
+    @Throws(NotFoundException::class)
+    override fun removeAllByBar(bar: Bar) {
+
+        try {
+
+            eventRepository!!.findAllByBar(bar).forEach {
+                eventRepository!!.delete(it)
+            }
+
+        } catch (e: Exception) {
+            throw BusinessException(e.message)
+        }
     }
 }
 

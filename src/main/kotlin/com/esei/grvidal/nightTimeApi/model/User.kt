@@ -14,22 +14,30 @@ class User(
         @Column(unique = true, length = 20)
         var nickname: String,
         var state: String? = null,
+        var email: String,
+        @Column(name = "birth_date")
+        var birthdate: LocalDate,
+
+        @OneToOne(cascade = [CascadeType.ALL])
+        @JoinColumn(name = "next_date_city_id")
+        var dateCity: DateCity? = null
+
+) {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    var id: Long = 0
+}
+
+@Entity
+@Table(name = "next_date_city")
+class DateCity(
         @Column(name = "next_date")
-        var nextDate: LocalDate? = null,
+        var nextDate: LocalDate,
 
         @ManyToOne
         @JoinColumn(name = "city_id")
-        var cityNextDate: City? = null,
-
-        @ManyToMany
-        @JoinTable(
-                name = "friends",
-                joinColumns = [JoinColumn(name = "user_1", referencedColumnName = "id")],
-                inverseJoinColumns = [JoinColumn(name = "user_2", referencedColumnName = "id")]
-        )
-        var friends: List<User>? = null
-
-) {
+        var nextCity: City,
+){
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     var id: Long = 0

@@ -46,7 +46,8 @@ class BarRestController {
     fun listWithEvents(@PathVariable("id") idBar: Long): ResponseEntity<List<Event>> {
         return try {
 
-            ResponseEntity(barBusiness!!.listWithEvents(idBar), HttpStatus.OK)
+            val bar = barBusiness!!.load(idBar)
+            ResponseEntity(eventBusiness!!.listEventByBar(bar), HttpStatus.OK)
 
         } catch (e: Exception) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -105,29 +106,29 @@ class BarRestController {
                     "owner" -> bar.owner = v.toString()
                     "address" -> bar.address = v.toString()
                     "schedule" -> {
-                           try{
+                        try {
 
-                               val regex = """(monday|tuesday|wednesday|thursday|friday|saturday|sunday)=(true|false)""".toRegex()
-                               val matchResult =regex.findAll(v.toString())
+                            val regex = """(monday|tuesday|wednesday|thursday|friday|saturday|sunday)=(true|false)""".toRegex()
+                            val matchResult = regex.findAll(v.toString())
 
 
-                               matchResult.iterator().forEach {
+                            matchResult.iterator().forEach {
 
-                                   when(it.groupValues[1]){
-                                       "monday" ->  bar.schedule?.monday = it.groupValues[2] == "true"
-                                       "tuesday" ->  bar.schedule?.tuesday = it.groupValues[2] == "true"
-                                       "wednesday" ->  bar.schedule?.wednesday = it.groupValues[2] == "true"
-                                       "thursday" ->  bar.schedule?.thursday = it.groupValues[2] == "true"
-                                       "friday" ->  bar.schedule?.friday = it.groupValues[2] == "true"
-                                       "saturday" ->  bar.schedule?.saturday = it.groupValues[2] == "true"
-                                       "sunday" ->  bar.schedule?.sunday = it.groupValues[2] == "true"
+                                when (it.groupValues[1]) {
+                                    "monday" -> bar.schedule?.monday = it.groupValues[2] == "true"
+                                    "tuesday" -> bar.schedule?.tuesday = it.groupValues[2] == "true"
+                                    "wednesday" -> bar.schedule?.wednesday = it.groupValues[2] == "true"
+                                    "thursday" -> bar.schedule?.thursday = it.groupValues[2] == "true"
+                                    "friday" -> bar.schedule?.friday = it.groupValues[2] == "true"
+                                    "saturday" -> bar.schedule?.saturday = it.groupValues[2] == "true"
+                                    "sunday" -> bar.schedule?.sunday = it.groupValues[2] == "true"
 
-                                   }
-                               }
+                                }
+                            }
 
-                           }catch(e:Exception){
-                               responseHeader.set("ScheduleError", "no properly format "+e.message)
-                           }
+                        } catch (e: Exception) {
+                            responseHeader.set("ScheduleError", "no properly format " + e.message)
+                        }
                     }
                 }
             }
@@ -135,7 +136,7 @@ class BarRestController {
             ResponseEntity(responseHeader, HttpStatus.OK)
 
         } catch (e: BusinessException) {
-            ResponseEntity(responseHeader,HttpStatus.INTERNAL_SERVER_ERROR)
+            ResponseEntity(responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 
@@ -145,7 +146,10 @@ class BarRestController {
     @DeleteMapping("/{id}")
     fun delete(@PathVariable("id") idBar: Long): ResponseEntity<Any> {
         return try {
+
+            eventBusiness!!.removeAllByBar(barBusiness!!.load(idBar))
             barBusiness!!.remove(idBar)
+
             ResponseEntity(HttpStatus.OK)
         } catch (e: BusinessException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)

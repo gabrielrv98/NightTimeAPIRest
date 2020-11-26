@@ -1,8 +1,10 @@
 package com.esei.grvidal.nightTimeApi.business
 
+import com.esei.grvidal.nightTimeApi.dao.DateCityRepository
 import com.esei.grvidal.nightTimeApi.dao.UserRepository
 import com.esei.grvidal.nightTimeApi.exception.BusinessException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
+import com.esei.grvidal.nightTimeApi.model.DateCity
 import com.esei.grvidal.nightTimeApi.model.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -21,6 +23,9 @@ class UserBusiness : IUserBusiness {
      */
     @Autowired
     val userRepository: UserRepository? = null
+
+    @Autowired
+    val dateCityRepository: DateCityRepository? = null
 
 
     /**
@@ -58,7 +63,7 @@ class UserBusiness : IUserBusiness {
         }
 
         if (!op.isPresent) {
-            throw NotFoundException("No se encontro al bar con el id $idUser")
+            throw NotFoundException("Couldn't find the user with id $idUser")
         }
 
         return op.get()

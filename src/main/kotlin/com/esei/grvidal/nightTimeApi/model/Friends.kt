@@ -1,0 +1,27 @@
+package com.esei.grvidal.nightTimeApi.model
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo
+import com.fasterxml.jackson.annotation.ObjectIdGenerators
+import javax.persistence.*
+
+@Entity
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator::class,
+        property = "id")//todo no se como funcionara
+class Friends(
+        @ManyToOne
+        @JoinColumn(name="user_1")
+        var user1: User,
+
+        @ManyToOne
+        @JoinColumn(name="user_2")
+        var user2: User
+
+) {
+    @OneToMany(mappedBy = "friends")
+    var messages : Set<Message> ? = null
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    var id: Long = 0
+}

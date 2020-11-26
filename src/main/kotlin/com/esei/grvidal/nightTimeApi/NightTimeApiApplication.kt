@@ -1,9 +1,6 @@
 package com.esei.grvidal.nightTimeApi
 
-import com.esei.grvidal.nightTimeApi.dao.BarRepository
-import com.esei.grvidal.nightTimeApi.dao.CityRepository
-import com.esei.grvidal.nightTimeApi.dao.EventRepository
-import com.esei.grvidal.nightTimeApi.dao.UserRepository
+import com.esei.grvidal.nightTimeApi.dao.*
 import com.esei.grvidal.nightTimeApi.model.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
@@ -12,6 +9,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.runApplication
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import java.time.LocalDate
+import java.time.LocalTime
 
 @SpringBootApplication
 @EnableJpaRepositories("com.esei.grvidal.nightTimeApi.dao")
@@ -29,6 +27,12 @@ class NightTimeApiApplication : CommandLineRunner {
 
     @Autowired
     val userRepositories: UserRepository? = null
+
+    @Autowired
+    val friendsRepositories: FriendsRepository? = null
+
+    @Autowired
+    val messageRepositories: MessageRepository? = null
 
     override fun run(vararg args: String?) {
 
@@ -72,29 +76,63 @@ class NightTimeApiApplication : CommandLineRunner {
 
 
 
-        val user1 = User("Gabriel Rguez","grvidal","Hey there i'm using NightTime", LocalDate.now(),cityOu)
-        val user2 = User("Nuria Sotelo","pinkxnut",".", LocalDate.of(2020,10,30) ?: null,cityOu)
-        val user3 = User("Irene Monterey","monteRey","Pues soy mas de playa", LocalDate.of(2020,10,30) ?: null,cityVigo)
-        val user4 = User("Jose Negro","joseju","Todo lo que se pueda decir es irrelevante")
+        val user1 = User(
+                "Gabriel Rguez",
+                "grvidal",
+                "Hey there i'm using NightTime",
+                email = "grvidal@esei.uvigo.es",
+                birthdate = LocalDate.of(1998, 3, 14),
+
+        )
+
+        user1.dateCity =  DateCity(nextDate = LocalDate.now(), nextCity = cityOu)
+        val user2 = User(
+                "Nuria Sotelo",
+                "pinkxnut",
+                ".",
+                "nuasotelo@gmail.com",
+                birthdate = LocalDate.of(2001, 9, 17),
+
+
+        )
+        user2.dateCity = DateCity(nextDate = LocalDate.of(2020, 10, 30), nextCity = cityOu)
+        val user3 = User(
+                "Irene Monterey",
+                "monteRey",
+                "Pues soy mas de playa",
+                email = "ireneReina@hotmail.com",
+                birthdate = LocalDate.of(1998, 4, 12)
+        )
+        user3.dateCity = DateCity(nextDate = LocalDate.of(2020, 10, 30), nextCity = cityVigo)
+
+        val user4 = User(
+                "Jose Negro",
+                "joseju",
+                "Todo lo que se pueda decir es irrelevante",
+                "joseNegro@gmail.com",
+                birthdate = LocalDate.of(1990, 4, 25)
+        )
 
         userRepositories!!.save(user1)
         userRepositories!!.save(user2)
         userRepositories!!.save(user3)
         userRepositories!!.save(user4)
 
-        if(user2.friends == null){
-            user2.friends = listOf(user1)
-        }else user2.friends?.plus(user1)
+        friendsRepositories!!.save(Friends(user1,user2))
+        friendsRepositories!!.save(Friends(user3,user2))
 
-        if(user1.friends == null){
-            user1.friends = listOf(user2)
-        }else user1.friends?.plus(user2)
 
-        user2.friends =  user2.friends?.plus(user3)
 
-        userRepositories!!.save(user1)
-        userRepositories!!.save(user2)
+        val friends = friendsRepositories!!.findFriendsByUser1_IdOrUser2_Id(user1.id, user1.id)[0]
+        var msg = Message("Hola nuria", LocalDate.now(), LocalTime.now(), friends, friends.user1)
 
+        messageRepositories!!.save(msg)
+        msg = Message("Adios Gabriel", LocalDate.now().plusDays(1), LocalTime.now().plusHours(1), friends, friends.user2)
+        messageRepositories!!.save(msg)
+
+        //val chat2 = Friends(user1,user3)
+
+        //friendsRepositories!!.save(chat2)
 
 
 

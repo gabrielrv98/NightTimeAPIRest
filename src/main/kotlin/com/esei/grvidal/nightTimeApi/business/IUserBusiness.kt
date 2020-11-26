@@ -1,5 +1,6 @@
 package com.esei.grvidal.nightTimeApi.business
 
+import com.esei.grvidal.nightTimeApi.model.DateCity
 import com.esei.grvidal.nightTimeApi.model.User
 
 /**
@@ -18,4 +19,5 @@ interface IUserBusiness {
 
     //remove an user
     fun remove(idUser: Long)
+
 }

@@ -26,7 +26,7 @@ class Bar(
 
         @OneToOne(cascade = [CascadeType.ALL])
         @JoinColumn(name = "schedule_id")
-        var schedule: Schedule? = null,
+        var schedule: Schedule? = null
 ) {
 
     @Id

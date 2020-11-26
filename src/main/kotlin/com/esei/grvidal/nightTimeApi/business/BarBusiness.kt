@@ -25,9 +25,6 @@ class BarBusiness : IBarBusiness {
     val barRepository: BarRepository? = null
 
 
-    @Autowired
-    val eventRepository: EventRepository? = null
-
 
     /**
      * This will list all the bars, if not, will throw a BusinessException
@@ -40,20 +37,6 @@ class BarBusiness : IBarBusiness {
         } catch (e: Exception) {
             throw BusinessException(e.message)
         }
-    }
-
-    @Throws(BusinessException::class)
-    override fun listWithEvents(idBar: Long): List<Event> {
-
-        try {
-            val bar = load(idBar)
-            return eventRepository!!.findAllByBar(bar)//todo algo hay raro aqui
-                    //.apply { this.forEach { it.bar = null } }
-
-        } catch (e: Exception) {
-            throw BusinessException(e.message)
-        }
-
     }
 
 
@@ -107,11 +90,7 @@ class BarBusiness : IBarBusiness {
             throw NotFoundException("No se encontro al bar con el id $idBar")
         } else {
 
-
             try {
-                eventRepository!!.findAllByBar(op.get()).forEach {
-                    eventRepository!!.deleteById(it.id)
-                }
                 barRepository!!.deleteById(idBar)
             } catch (e: Exception) {
                 throw BusinessException(e.message)
