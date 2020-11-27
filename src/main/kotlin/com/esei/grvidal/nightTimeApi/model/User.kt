@@ -8,7 +8,7 @@ import javax.persistence.*
 @Entity
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator::class,
-        property = "id")//todo no se como funcionara
+        property = "id")
 class User(
         var name: String,
         @Column(unique = true, length = 20)
@@ -23,21 +23,6 @@ class User(
         var dateCity: DateCity? = null
 
 ) {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    var id: Long = 0
-}
-
-@Entity
-@Table(name = "next_date_city")
-class DateCity(
-        @Column(name = "next_date")
-        var nextDate: LocalDate,
-
-        @ManyToOne
-        @JoinColumn(name = "city_id")
-        var nextCity: City,
-){
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     var id: Long = 0

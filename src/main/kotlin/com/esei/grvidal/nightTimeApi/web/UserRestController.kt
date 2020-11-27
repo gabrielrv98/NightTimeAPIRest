@@ -1,7 +1,6 @@
 package com.esei.grvidal.nightTimeApi.web
 
 import com.esei.grvidal.nightTimeApi.business.IFriendsBusiness
-import com.esei.grvidal.nightTimeApi.business.ICityBusiness
 import com.esei.grvidal.nightTimeApi.business.IDateCityBusiness
 import com.esei.grvidal.nightTimeApi.business.IUserBusiness
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
@@ -14,7 +13,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.time.LocalDate
+import java.util.*
 
 /**
  * This is the User Controller
@@ -32,7 +31,6 @@ class UserRestController {
 
     @Autowired
     val dateCityBusiness: IDateCityBusiness? = null
-
 
 
     /**
@@ -68,11 +66,55 @@ class UserRestController {
      * @param user new Bar to insert in the database
      */
     @PostMapping("")
-    fun insert(@RequestBody user: User): ResponseEntity<Any> {
+    fun insert(@RequestBody user: User, @RequestHeader(name = "password") password: String): ResponseEntity<Any> {
         return try {
             userBusiness!!.save(user)
+            userBusiness!!.saveSecretData(SecretData(password, user))
+
             val responseHeader = HttpHeaders()
             responseHeader.set("location", Constants.URL_BASE_USER + "/" + user.id)
+
+            ResponseEntity(responseHeader, HttpStatus.CREATED)
+        } catch (e: BusinessException) {
+            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
+    @GetMapping("/{id}/login")
+    fun login(
+            @PathVariable("id") idUser: Long,
+            @RequestHeader(name = "username") username: String,
+            @RequestHeader(name = "password") password: String,
+    ): ResponseEntity<Any> {
+        var responseHeader = HttpHeaders()
+        return try {
+            val user = userBusiness!!.load(idUser = idUser)
+
+            if (user.nickname == username) {
+                responseHeader.set("UUID", userBusiness!!.login(user, password).toString())
+
+            } else throw BusinessException("")
+
+            ResponseEntity(responseHeader, HttpStatus.OK)
+
+        } catch (e: Exception) {
+            responseHeader = HttpHeaders()
+            responseHeader.set("Error", "Credentials don't match")
+            ResponseEntity(responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
+    /**
+     * Listen to a Post with the [Constants.URL_BASE_BAR] and a requestBody with a Bar to create a bar
+     * @param idUser new Bar to insert in the database
+     */
+    @PostMapping("/{id}")
+    fun insertPT2(@PathVariable("id") idUser: Long, @RequestBody secretData: SecretData): ResponseEntity<Any> {
+        return try {
+            userBusiness!!.saveSecretData(secretData)
+            val responseHeader = HttpHeaders()
+            responseHeader.set("secretKey", secretData.uuid.toString())
+
             ResponseEntity(responseHeader, HttpStatus.CREATED)
         } catch (e: BusinessException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -108,22 +150,22 @@ class UserRestController {
     }
 
     @PutMapping("/{id}/date")
-    fun updateDate(@PathVariable("id") idUser: Long, @RequestBody dateCity: DateCity): ResponseEntity<Any>{
-        return try{
+    fun updateDate(@PathVariable("id") idUser: Long, @RequestBody dateCity: DateCity): ResponseEntity<Any> {
+        return try {
 
             val user = userBusiness!!.load(idUser)
 
             if (user.dateCity != null) {
                 dateCity.id = user.dateCity!!.id
 
-            }else user.dateCity = dateCity
+            } else user.dateCity = dateCity
 
             dateCityBusiness!!.save(dateCity)
             userBusiness!!.save(user)
 
             ResponseEntity(HttpStatus.OK)
-        }catch (e:Exception){
-            ResponseEntity(e.toString(),HttpStatus.INTERNAL_SERVER_ERROR)
+        } catch (e: Exception) {
+            ResponseEntity(e.toString(), HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 
@@ -195,7 +237,7 @@ class UserRestController {
 
     /**
      * Listen to a Post with the [Constants.URL_BASE_BAR] and a requestBody with a Bar to create a bar
-     * @param friends new Bar to insert in the database
+     * @param friends new [Friends] to insert in the database
      * // todo always send friends with id = 0
      */
     @PostMapping("/{id}/friends")
@@ -345,25 +387,40 @@ class UserRestController {
      * @return a [List<[Friends]>] with all the friends with any messages
      */
     @GetMapping("/{idUser}/date")
-    fun getPeopleAndFriends(@PathVariable("idUser") idUser: Long, @RequestBody dateCity: DateCity): ResponseEntity<Any> {
+    fun getPeopleAndFriends(
+            @PathVariable("idUser") idUser: Long,
+            @RequestBody dateCity: DateCity,
+    ): ResponseEntity<Any> {
         return try {
             val responseHeader = HttpHeaders()
 
-            //da un errror 
-            val number = dateCityBusiness!!.getTotalPeopleByDateAndCity(dateCity.nextCity.id,dateCity.nextDate)
+            val user = userBusiness!!.load(idUser)
 
-            responseHeader.set("Total",number.toString())
-            //friendsBusiness!!.listByUser(idUser)// return a  list with the users
+            var number = dateCityBusiness!!.getTotalPeopleByDateAndCity(dateCity.nextCity.id, dateCity.nextDate)
+            if (user.dateCity?.nextCity?.id == dateCity.nextCity.id && user.dateCity?.nextDate == dateCity.nextDate) {
+                number -= 1
+            }
 
-            ResponseEntity(responseHeader,HttpStatus.I_AM_A_TEAPOT)
+            responseHeader.set("Total", number.toString())
+            var number2 = 0
+            getUsersFromFriendList(idUser).body?.let {
+                it.forEach { userFriend ->
+                    userFriend.dateCity?.let { userFriendDateCity ->
+                        if (userFriendDateCity.nextDate == dateCity.nextDate &&
+                                userFriendDateCity.nextCity.id == dateCity.nextCity.id)
+                            number2 += 1
+                    }
+                }
+            }
+            responseHeader.set("Friends", number2.toString())
+
+            ResponseEntity(responseHeader, HttpStatus.I_AM_A_TEAPOT)
         } catch (e: BusinessException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         } catch (e: NotFoundException) {
             ResponseEntity(HttpStatus.NOT_FOUND)
         }
     }
-
-
 
 
 }

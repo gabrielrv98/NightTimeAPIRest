@@ -1074,314 +1074,355 @@
     <table id="342" parent="4" name="message"/>
     <table id="343" parent="4" name="next_date_city"/>
     <table id="344" parent="4" name="schedule"/>
-    <table id="345" parent="4" name="user"/>
-    <column id="346" parent="337" name="id">
+    <table id="345" parent="4" name="secret_data"/>
+    <table id="346" parent="4" name="user"/>
+    <column id="347" parent="337" name="id">
       <Position>1</Position>
       <DataType>bigint(20)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="347" parent="337" name="address">
+    <column id="348" parent="337" name="address">
       <Position>2</Position>
       <DataType>varchar(255)|0s</DataType>
     </column>
-    <column id="348" parent="337" name="name">
+    <column id="349" parent="337" name="name">
       <Position>3</Position>
       <DataType>varchar(255)|0s</DataType>
     </column>
-    <column id="349" parent="337" name="owner">
+    <column id="350" parent="337" name="owner">
       <Position>4</Position>
       <DataType>varchar(255)|0s</DataType>
     </column>
-    <column id="350" parent="337" name="city_id">
+    <column id="351" parent="337" name="city_id">
       <Position>5</Position>
       <DataType>bigint(20)|0s</DataType>
     </column>
-    <column id="351" parent="337" name="schedule_id">
+    <column id="352" parent="337" name="schedule_id">
       <Position>6</Position>
       <DataType>bigint(20)|0s</DataType>
     </column>
-    <index id="352" parent="337" name="FKejevlg6ulrnr35f799vshvvwp">
+    <index id="353" parent="337" name="FKejevlg6ulrnr35f799vshvvwp">
       <ColNames>city_id</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="353" parent="337" name="FKd6g8k6qbndh2k1a1q3a02dl9c">
+    <index id="354" parent="337" name="FKd6g8k6qbndh2k1a1q3a02dl9c">
       <ColNames>schedule_id</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="354" parent="337" name="PRIMARY">
+    <key id="355" parent="337" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="355" parent="337" name="FKejevlg6ulrnr35f799vshvvwp">
+    <foreign-key id="356" parent="337" name="FKejevlg6ulrnr35f799vshvvwp">
       <ColNames>city_id</ColNames>
       <RefTableName>city</RefTableName>
       <RefColNames>id</RefColNames>
     </foreign-key>
-    <foreign-key id="356" parent="337" name="FKd6g8k6qbndh2k1a1q3a02dl9c">
+    <foreign-key id="357" parent="337" name="FKd6g8k6qbndh2k1a1q3a02dl9c">
       <ColNames>schedule_id</ColNames>
       <RefTableName>schedule</RefTableName>
       <RefColNames>id</RefColNames>
     </foreign-key>
-    <column id="357" parent="338" name="id">
+    <column id="358" parent="338" name="id">
       <Position>1</Position>
       <DataType>bigint(20)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="358" parent="338" name="country">
+    <column id="359" parent="338" name="country">
       <Position>2</Position>
       <DataType>varchar(255)|0s</DataType>
     </column>
-    <column id="359" parent="338" name="name">
+    <column id="360" parent="338" name="name">
       <Position>3</Position>
       <DataType>varchar(255)|0s</DataType>
     </column>
-    <key id="360" parent="338" name="PRIMARY">
+    <key id="361" parent="338" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="361" parent="339" name="id">
+    <column id="362" parent="339" name="id">
       <Position>1</Position>
       <DataType>bigint(20)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="362" parent="339" name="date">
+    <column id="363" parent="339" name="date">
       <Position>2</Position>
       <DataType>date|0s</DataType>
     </column>
-    <column id="363" parent="339" name="description">
+    <column id="364" parent="339" name="description">
       <Position>3</Position>
       <DataType>varchar(255)|0s</DataType>
     </column>
-    <column id="364" parent="339" name="bar_id">
+    <column id="365" parent="339" name="bar_id">
       <Position>4</Position>
       <DataType>bigint(20)|0s</DataType>
     </column>
-    <index id="365" parent="339" name="FKpdw7vfxcaq8glklxwnmoxvic3">
+    <index id="366" parent="339" name="FKpdw7vfxcaq8glklxwnmoxvic3">
       <ColNames>bar_id</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="366" parent="339" name="PRIMARY">
+    <key id="367" parent="339" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="367" parent="339" name="FKpdw7vfxcaq8glklxwnmoxvic3">
+    <foreign-key id="368" parent="339" name="FKpdw7vfxcaq8glklxwnmoxvic3">
       <ColNames>bar_id</ColNames>
       <RefTableName>bar</RefTableName>
       <RefColNames>id</RefColNames>
     </foreign-key>
-    <column id="368" parent="340" name="id">
+    <column id="369" parent="340" name="id">
       <Position>1</Position>
       <DataType>bigint(20)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="369" parent="340" name="user_1">
+    <column id="370" parent="340" name="user_1">
       <Position>2</Position>
       <DataType>bigint(20)|0s</DataType>
     </column>
-    <column id="370" parent="340" name="user_2">
+    <column id="371" parent="340" name="user_2">
       <Position>3</Position>
       <DataType>bigint(20)|0s</DataType>
     </column>
-    <index id="371" parent="340" name="FK6jn0twg3xe3rem4ylxb9o28mq">
+    <index id="372" parent="340" name="FK6jn0twg3xe3rem4ylxb9o28mq">
       <ColNames>user_1</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="372" parent="340" name="FK4ronnr8f5mc9l720x5p6mvvwo">
+    <index id="373" parent="340" name="FK4ronnr8f5mc9l720x5p6mvvwo">
       <ColNames>user_2</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="373" parent="340" name="PRIMARY">
+    <key id="374" parent="340" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="374" parent="340" name="FK6jn0twg3xe3rem4ylxb9o28mq">
+    <foreign-key id="375" parent="340" name="FK6jn0twg3xe3rem4ylxb9o28mq">
       <ColNames>user_1</ColNames>
       <RefTableName>user</RefTableName>
       <RefColNames>id</RefColNames>
     </foreign-key>
-    <foreign-key id="375" parent="340" name="FK4ronnr8f5mc9l720x5p6mvvwo">
+    <foreign-key id="376" parent="340" name="FK4ronnr8f5mc9l720x5p6mvvwo">
       <ColNames>user_2</ColNames>
       <RefTableName>user</RefTableName>
       <RefColNames>id</RefColNames>
     </foreign-key>
-    <column id="376" parent="341" name="next_val">
+    <column id="377" parent="341" name="next_val">
       <Position>1</Position>
       <DataType>bigint(20)|0s</DataType>
     </column>
-    <column id="377" parent="342" name="id">
+    <column id="378" parent="342" name="id">
       <Position>1</Position>
       <DataType>bigint(20)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="378" parent="342" name="date">
+    <column id="379" parent="342" name="date">
       <Position>2</Position>
       <DataType>date|0s</DataType>
     </column>
-    <column id="379" parent="342" name="hour">
+    <column id="380" parent="342" name="hour">
       <Position>3</Position>
       <DataType>time|0s</DataType>
     </column>
-    <column id="380" parent="342" name="text">
+    <column id="381" parent="342" name="text">
       <Position>4</Position>
       <DataType>varchar(255)|0s</DataType>
     </column>
-    <column id="381" parent="342" name="friends_id">
+    <column id="382" parent="342" name="friends_id">
       <Position>5</Position>
       <DataType>bigint(20)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="382" parent="342" name="user_id">
+    <column id="383" parent="342" name="user_id">
       <Position>6</Position>
       <DataType>bigint(20)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <index id="383" parent="342" name="FKots1xpkl890s9bdpxwwcxeny1">
+    <index id="384" parent="342" name="FKots1xpkl890s9bdpxwwcxeny1">
       <ColNames>friends_id</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="384" parent="342" name="FKb3y6etti1cfougkdr0qiiemgv">
+    <index id="385" parent="342" name="FKb3y6etti1cfougkdr0qiiemgv">
       <ColNames>user_id</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="385" parent="342" name="PRIMARY">
+    <key id="386" parent="342" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="386" parent="342" name="FKots1xpkl890s9bdpxwwcxeny1">
+    <foreign-key id="387" parent="342" name="FKots1xpkl890s9bdpxwwcxeny1">
       <ColNames>friends_id</ColNames>
       <RefTableName>friends</RefTableName>
       <RefColNames>id</RefColNames>
     </foreign-key>
-    <foreign-key id="387" parent="342" name="FKb3y6etti1cfougkdr0qiiemgv">
+    <foreign-key id="388" parent="342" name="FKb3y6etti1cfougkdr0qiiemgv">
       <ColNames>user_id</ColNames>
       <RefTableName>user</RefTableName>
       <RefColNames>id</RefColNames>
     </foreign-key>
-    <column id="388" parent="343" name="id">
+    <column id="389" parent="343" name="id">
       <Position>1</Position>
       <DataType>bigint(20)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="389" parent="343" name="next_date">
+    <column id="390" parent="343" name="next_date">
       <Position>2</Position>
       <DataType>date|0s</DataType>
     </column>
-    <column id="390" parent="343" name="city_id">
+    <column id="391" parent="343" name="city_id">
       <Position>3</Position>
       <DataType>bigint(20)|0s</DataType>
     </column>
-    <index id="391" parent="343" name="FKr6xtlho37cxr5qxdr4fv6bdbn">
+    <index id="392" parent="343" name="FKr6xtlho37cxr5qxdr4fv6bdbn">
       <ColNames>city_id</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="392" parent="343" name="PRIMARY">
+    <key id="393" parent="343" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="393" parent="343" name="FKr6xtlho37cxr5qxdr4fv6bdbn">
+    <foreign-key id="394" parent="343" name="FKr6xtlho37cxr5qxdr4fv6bdbn">
       <ColNames>city_id</ColNames>
       <RefTableName>city</RefTableName>
       <RefColNames>id</RefColNames>
     </foreign-key>
-    <column id="394" parent="344" name="id">
+    <column id="395" parent="344" name="id">
       <Position>1</Position>
       <DataType>bigint(20)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="395" parent="344" name="friday">
+    <column id="396" parent="344" name="friday">
       <Position>2</Position>
       <DataType>bit(1)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="396" parent="344" name="monday">
+    <column id="397" parent="344" name="monday">
       <Position>3</Position>
       <DataType>bit(1)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="397" parent="344" name="saturday">
+    <column id="398" parent="344" name="saturday">
       <Position>4</Position>
       <DataType>bit(1)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="398" parent="344" name="sunday">
+    <column id="399" parent="344" name="sunday">
       <Position>5</Position>
       <DataType>bit(1)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="399" parent="344" name="thursday">
+    <column id="400" parent="344" name="thursday">
       <Position>6</Position>
       <DataType>bit(1)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="400" parent="344" name="tuesday">
+    <column id="401" parent="344" name="tuesday">
       <Position>7</Position>
       <DataType>bit(1)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="401" parent="344" name="wednesday">
+    <column id="402" parent="344" name="wednesday">
       <Position>8</Position>
       <DataType>bit(1)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <key id="402" parent="344" name="PRIMARY">
+    <key id="403" parent="344" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="403" parent="345" name="id">
+    <column id="404" parent="345" name="id">
       <Position>1</Position>
       <DataType>bigint(20)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="404" parent="345" name="birth_date">
+    <column id="405" parent="345" name="password">
       <Position>2</Position>
-      <DataType>date|0s</DataType>
+      <DataType>varchar(255)|0s</DataType>
     </column>
-    <column id="405" parent="345" name="email">
+    <column id="406" parent="345" name="uuid">
       <Position>3</Position>
-      <DataType>varchar(255)|0s</DataType>
+      <DataType>binary(255)|0s</DataType>
     </column>
-    <column id="406" parent="345" name="name">
+    <column id="407" parent="345" name="user_id">
       <Position>4</Position>
-      <DataType>varchar(255)|0s</DataType>
-    </column>
-    <column id="407" parent="345" name="nickname">
-      <Position>5</Position>
-      <DataType>varchar(20)|0s</DataType>
-    </column>
-    <column id="408" parent="345" name="state">
-      <Position>6</Position>
-      <DataType>varchar(255)|0s</DataType>
-    </column>
-    <column id="409" parent="345" name="next_date_city_id">
-      <Position>7</Position>
       <DataType>bigint(20)|0s</DataType>
     </column>
-    <index id="410" parent="345" name="UK_n4swgcf30j6bmtb4l4cjryuym">
-      <ColNames>nickname</ColNames>
+    <index id="408" parent="345" name="UK_5tjo5g9otq7p1e0ovqpkg38ra">
+      <ColNames>uuid</ColNames>
       <Unique>1</Unique>
       <Type>btree</Type>
     </index>
-    <index id="411" parent="345" name="FK6dq0c2rplpdliar0tglwgo56g">
-      <ColNames>next_date_city_id</ColNames>
+    <index id="409" parent="345" name="FK4g70136e4bp17koc5gno08i1y">
+      <ColNames>user_id</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="412" parent="345" name="PRIMARY">
+    <key id="410" parent="345" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <key id="413" parent="345" name="UK_n4swgcf30j6bmtb4l4cjryuym">
+    <key id="411" parent="345" name="UK_5tjo5g9otq7p1e0ovqpkg38ra">
+      <ColNames>uuid</ColNames>
+      <UnderlyingIndexName>UK_5tjo5g9otq7p1e0ovqpkg38ra</UnderlyingIndexName>
+    </key>
+    <foreign-key id="412" parent="345" name="FK4g70136e4bp17koc5gno08i1y">
+      <ColNames>user_id</ColNames>
+      <RefTableName>user</RefTableName>
+      <RefColNames>id</RefColNames>
+    </foreign-key>
+    <column id="413" parent="346" name="id">
+      <Position>1</Position>
+      <DataType>bigint(20)|0s</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="414" parent="346" name="birth_date">
+      <Position>2</Position>
+      <DataType>date|0s</DataType>
+    </column>
+    <column id="415" parent="346" name="email">
+      <Position>3</Position>
+      <DataType>varchar(255)|0s</DataType>
+    </column>
+    <column id="416" parent="346" name="name">
+      <Position>4</Position>
+      <DataType>varchar(255)|0s</DataType>
+    </column>
+    <column id="417" parent="346" name="nickname">
+      <Position>5</Position>
+      <DataType>varchar(20)|0s</DataType>
+    </column>
+    <column id="418" parent="346" name="state">
+      <Position>6</Position>
+      <DataType>varchar(255)|0s</DataType>
+    </column>
+    <column id="419" parent="346" name="next_date_city_id">
+      <Position>7</Position>
+      <DataType>bigint(20)|0s</DataType>
+    </column>
+    <index id="420" parent="346" name="UK_n4swgcf30j6bmtb4l4cjryuym">
+      <ColNames>nickname</ColNames>
+      <Unique>1</Unique>
+      <Type>btree</Type>
+    </index>
+    <index id="421" parent="346" name="FK6dq0c2rplpdliar0tglwgo56g">
+      <ColNames>next_date_city_id</ColNames>
+      <Type>btree</Type>
+    </index>
+    <key id="422" parent="346" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <key id="423" parent="346" name="UK_n4swgcf30j6bmtb4l4cjryuym">
       <ColNames>nickname</ColNames>
       <UnderlyingIndexName>UK_n4swgcf30j6bmtb4l4cjryuym</UnderlyingIndexName>
     </key>
-    <foreign-key id="414" parent="345" name="FK6dq0c2rplpdliar0tglwgo56g">
+    <foreign-key id="424" parent="346" name="FK6dq0c2rplpdliar0tglwgo56g">
       <ColNames>next_date_city_id</ColNames>
       <RefTableName>next_date_city</RefTableName>
       <RefColNames>id</RefColNames>

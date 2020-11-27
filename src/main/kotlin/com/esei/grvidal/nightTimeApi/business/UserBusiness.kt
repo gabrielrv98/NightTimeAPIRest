@@ -1,10 +1,12 @@
 package com.esei.grvidal.nightTimeApi.business
 
 import com.esei.grvidal.nightTimeApi.dao.DateCityRepository
+import com.esei.grvidal.nightTimeApi.dao.SecretDataRepository
 import com.esei.grvidal.nightTimeApi.dao.UserRepository
 import com.esei.grvidal.nightTimeApi.exception.BusinessException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
-import com.esei.grvidal.nightTimeApi.model.DateCity
+import com.esei.grvidal.nightTimeApi.model.Bar
+import com.esei.grvidal.nightTimeApi.model.SecretData
 import com.esei.grvidal.nightTimeApi.model.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -25,7 +27,7 @@ class UserBusiness : IUserBusiness {
     val userRepository: UserRepository? = null
 
     @Autowired
-    val dateCityRepository: DateCityRepository? = null
+    val secretDataRepository: SecretDataRepository? = null
 
 
     /**
@@ -84,6 +86,21 @@ class UserBusiness : IUserBusiness {
     }
 
     /**
+     * This will save a new bar, if not, will throw an Exception
+     */
+    @Throws(BusinessException::class)
+    override fun saveSecretData(secretData: SecretData): SecretData {
+
+        try {
+            secretData.uuid = UUID.randomUUID()
+            return secretDataRepository!!.save(secretData)
+
+        } catch (e: Exception) {
+            throw BusinessException(e.message)
+        }
+    }
+
+    /**
      * This will remove a bars through its id, if not, will throw an Exception, or if it cant find it, it will throw a NotFoundException
      */
     @Throws(BusinessException::class, NotFoundException::class)
@@ -106,6 +123,37 @@ class UserBusiness : IUserBusiness {
                 throw BusinessException(e.message)
             }
         }
+
+    }
+
+    @Throws(BusinessException::class, NotFoundException::class)
+    override fun login(user: User, password: String): UUID {
+        val op: Optional<SecretData>
+
+        try {
+            op = secretDataRepository!!.findDistinctFirstByUserAndPassword(user,password)
+
+        } catch (e: Exception) {
+            throw BusinessException(e.message)
+        }
+
+        if (!op.isPresent) {
+            throw NotFoundException("Credenciales no coinciden ")
+        } else {
+            with(op.get()){
+
+                if (this.uuid == null) {
+
+                    this.uuid = UUID.randomUUID()
+                    secretDataRepository!!.save(this)
+                }
+
+                return this.uuid!!
+            }
+
+
+        }
+
 
     }
 }

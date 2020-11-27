@@ -43,6 +43,7 @@ class DateCityBusiness : IDateCityBusiness {
     @Throws(BusinessException::class)
     override fun getTotalPeopleByDateAndCity(nextCity_id: Long, nextDate: LocalDate): Int {
         try {
+
             return dateCityRepository!!.countAllByNextCity_IdAndNextDate(nextCity_id, nextDate)
         } catch (e: Exception) {
             throw BusinessException(e.message)

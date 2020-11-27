@@ -2,6 +2,7 @@ package com.esei.grvidal.nightTimeApi
 
 import com.esei.grvidal.nightTimeApi.dao.*
 import com.esei.grvidal.nightTimeApi.model.*
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -33,6 +34,11 @@ class NightTimeApiApplication : CommandLineRunner {
 
     @Autowired
     val messageRepositories: MessageRepository? = null
+
+    @Autowired
+    val secretDataRepository: SecretDataRepository? = null
+
+    val logger = LoggerFactory.getLogger(NightTimeApiApplication::class.java)!!
 
     override fun run(vararg args: String?) {
 
@@ -86,6 +92,11 @@ class NightTimeApiApplication : CommandLineRunner {
         )
 
         user1.dateCity =  DateCity(nextDate = LocalDate.now(), nextCity = cityOu)
+        userRepositories!!.save(user1)
+
+        var secretData = SecretData(password = "passwordUser1",user = user1)
+        secretDataRepository!!.save(secretData)
+
         val user2 = User(
                 "Nuria Sotelo",
                 "pinkxnut",
@@ -95,7 +106,12 @@ class NightTimeApiApplication : CommandLineRunner {
 
 
         )
-        user2.dateCity = DateCity(nextDate = LocalDate.of(2020, 10, 30), nextCity = cityOu)
+        user2.dateCity = DateCity(nextDate = LocalDate.now(), nextCity = cityOu)
+        userRepositories!!.save(user2)
+
+        secretData = SecretData(password = "passwordUser2",user = user2)
+        secretDataRepository!!.save(secretData)
+
         val user3 = User(
                 "Irene Monterey",
                 "monteRey",
@@ -103,7 +119,11 @@ class NightTimeApiApplication : CommandLineRunner {
                 email = "ireneReina@hotmail.com",
                 birthdate = LocalDate.of(1998, 4, 12)
         )
-        user3.dateCity = DateCity(nextDate = LocalDate.of(2020, 10, 30), nextCity = cityVigo)
+        user3.dateCity = DateCity(nextDate = LocalDate.now(), nextCity = cityOu)
+        userRepositories!!.save(user3)
+
+        secretData = SecretData(password = "passwordUser3",user = user3)
+        secretDataRepository!!.save(secretData)
 
         val user4 = User(
                 "Jose Negro",
@@ -112,11 +132,11 @@ class NightTimeApiApplication : CommandLineRunner {
                 "joseNegro@gmail.com",
                 birthdate = LocalDate.of(1990, 4, 25)
         )
-
-        userRepositories!!.save(user1)
-        userRepositories!!.save(user2)
-        userRepositories!!.save(user3)
+        user4.dateCity = DateCity(nextDate = LocalDate.now(), nextCity = cityVigo)
         userRepositories!!.save(user4)
+
+        secretData = SecretData(password = "passwordUser4",user = user4)
+        secretDataRepository!!.save(secretData)
 
         friendsRepositories!!.save(Friends(user1,user2))
         friendsRepositories!!.save(Friends(user3,user2))
@@ -130,9 +150,11 @@ class NightTimeApiApplication : CommandLineRunner {
         msg = Message("Adios Gabriel", LocalDate.now().plusDays(1), LocalTime.now().plusHours(1), friends, friends.user2)
         messageRepositories!!.save(msg)
 
-        //val chat2 = Friends(user1,user3)
+        //val friends1w3 = Friends(user1,user3)
 
-        //friendsRepositories!!.save(chat2)
+        //friendsRepositories!!.save(friends1w3)
+
+        logger.info("Application ready to use")
 
 
 
