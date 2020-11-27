@@ -223,7 +223,7 @@ class UserRestController {
 
     /**
      * Listen to a Post with the [Constants.URL_BASE_BAR] and a requestBody with a Bar to create a bar
-     * @param friends new [Friends] to insert in the database
+     * @param friendRequest new [FriendRequest] to insert in the database
      * // todo always send friends with id = 0
      */
     @PostMapping("/{id}/friends")
@@ -259,25 +259,33 @@ class UserRestController {
             if (idUser == friendRequestDB.userAnswer.id) {
 
                 //Answer yes
-                if (friendRequest.answer == AnswerOptions.YES) {
+                when (friendRequest.answer) {
+                    AnswerOptions.YES -> {
 
-                    //create new friendship
-                    val newFriends = Friends(friendRequestDB.userAsk, friendRequestDB.userAnswer)
-                    friendsBusiness!!.save(newFriends)
-                    responseHeader.set("location", Constants.URL_BASE_USER + "/" + newFriends.id)
+                        //create new friendship
+                        val newFriends = Friends(friendRequestDB.userAsk, friendRequestDB.userAnswer)
+                        friendsBusiness!!.save(newFriends)
+                        responseHeader.set("location", Constants.URL_BASE_USER + "/" + newFriends.id)
 
-                    friendRequestBusiness!!.remove(friendRequestDB.id)
-                    return ResponseEntity(responseHeader, HttpStatus.OK)
+                        friendRequestBusiness!!.remove(friendRequestDB.id)
+                        return ResponseEntity(responseHeader, HttpStatus.OK)
 
-                    //anser no
-                } else if (friendRequest.answer == AnswerOptions.NO) {
+                        //answer no
+                    }
+                    AnswerOptions.NO -> {
 
-                    //remove request
-                    friendRequestBusiness!!.remove(friendRequestDB.id)
-                    return ResponseEntity(responseHeader, HttpStatus.OK)
+                        //remove request
+                        friendRequestBusiness!!.remove(friendRequestDB.id)
+                        return ResponseEntity(responseHeader, HttpStatus.OK)
+
+                    }
+                    else -> {
+                        return ResponseEntity( HttpStatus.ALREADY_REPORTED)
+                    }
                 }
-                //Usuario no tiene permiso
+
             }
+            //User has no permission
             responseHeader.set("Error", "Only userAnswer can update the request")
             return ResponseEntity(responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
 

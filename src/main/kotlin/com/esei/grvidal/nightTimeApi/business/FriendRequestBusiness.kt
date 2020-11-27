@@ -4,6 +4,7 @@ import com.esei.grvidal.nightTimeApi.dao.FriendRequestRepository
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.exception.BusinessException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
+import com.esei.grvidal.nightTimeApi.model.AnswerOptions
 import com.esei.grvidal.nightTimeApi.model.FriendRequest
 import com.esei.grvidal.nightTimeApi.model.Friends
 import org.springframework.beans.factory.annotation.Autowired
@@ -81,8 +82,10 @@ class FriendRequestBusiness : IFriendRequestBusiness {
             if (!op.isPresent) {
                 op = friendRequestRepository!!.findFriendRequestByUserAsk_IdAndUserAnswer_Id(
                         friendRequest.userAnswer.id, friendRequest.userAsk.id)
-                if (!op.isPresent)
+                if (!op.isPresent) {
+                    friendRequest.answer = AnswerOptions.NOT_ANSWERED
                     return friendRequestRepository!!.save(friendRequest)
+                }
             }
             throw AlreadyExistsException("Relation already exists")
 
