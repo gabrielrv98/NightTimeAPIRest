@@ -2,6 +2,7 @@ package com.esei.grvidal.nightTimeApi.web
 
 import com.esei.grvidal.nightTimeApi.business.IFriendsBusiness
 import com.esei.grvidal.nightTimeApi.business.IDateCityBusiness
+import com.esei.grvidal.nightTimeApi.business.IFriendRequestBusiness
 import com.esei.grvidal.nightTimeApi.business.IUserBusiness
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.exception.BusinessException
@@ -13,7 +14,6 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.util.*
 
 /**
  * This is the User Controller
@@ -28,9 +28,11 @@ class UserRestController {
     @Autowired
     val friendsBusiness: IFriendsBusiness? = null
 
-
     @Autowired
     val dateCityBusiness: IDateCityBusiness? = null
+
+    @Autowired
+    val friendRequestBusiness: IFriendRequestBusiness? = null
 
 
     /**
@@ -104,22 +106,6 @@ class UserRestController {
         }
     }
 
-    /**
-     * Listen to a Post with the [Constants.URL_BASE_BAR] and a requestBody with a Bar to create a bar
-     * @param idUser new Bar to insert in the database
-     */
-    @PostMapping("/{id}")
-    fun insertPT2(@PathVariable("id") idUser: Long, @RequestBody secretData: SecretData): ResponseEntity<Any> {
-        return try {
-            userBusiness!!.saveSecretData(secretData)
-            val responseHeader = HttpHeaders()
-            responseHeader.set("secretKey", secretData.uuid.toString())
-
-            ResponseEntity(responseHeader, HttpStatus.CREATED)
-        } catch (e: BusinessException) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        }
-    }
 
     /**
      * Listen to a Patch with the [Constants.URL_BASE_BAR] and a requestBody with a User to update a User
@@ -241,26 +227,60 @@ class UserRestController {
      * // todo always send friends with id = 0
      */
     @PostMapping("/{id}/friends")
-    fun insertFriendship(@PathVariable("id") idUser: Long, @RequestBody friends: Friends): ResponseEntity<Any> {
+    fun insertRequest(@PathVariable("id") idUser: Long, @RequestBody friendRequest: FriendRequest): ResponseEntity<Any> {
         val responseHeader = HttpHeaders()
-        try {
+        return try {
 
-            if ((idUser == friends.user1.id || idUser == friends.user2.id) &&
-                    (friends.user1.id != friends.user2.id)
-            ) {
-                try {
-                    friendsBusiness!!.save(friends)
-                } catch (e: AlreadyExistsException) {
-                    responseHeader.set("Error", e.message)
-                    return ResponseEntity(responseHeader, HttpStatus.I_AM_A_TEAPOT)
-                }
+            if (idUser == friendRequest.userAsk.id) {
+                friendRequestBusiness!!.save(friendRequest)
 
-                responseHeader.set("location", Constants.URL_BASE_USER + "/" + friends.id)
-                return ResponseEntity(responseHeader, HttpStatus.CREATED)
+                responseHeader.set("location", Constants.URL_BASE_USER + "/" + friendRequest.id)
+                ResponseEntity(responseHeader, HttpStatus.CREATED)
             } else {
                 responseHeader.set("Error", "User is not in the friendship")
-                return ResponseEntity(responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
+                ResponseEntity(responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
             }
+
+        } catch (e: AlreadyExistsException) {
+            responseHeader.set("Error", e.message)
+            ResponseEntity(responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
+        } catch (e: BusinessException) {
+            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
+    @PatchMapping("/{id}/friends")
+    fun updateRequest(@PathVariable("id") idUser: Long, @RequestBody friendRequest: FriendRequest): ResponseEntity<Any> {
+        val responseHeader = HttpHeaders()
+        val friendRequestDB = friendRequestBusiness!!.load(friendRequestId = friendRequest.id)
+        try {
+
+            //check the idUser is the user who can update the Request
+            if (idUser == friendRequestDB.userAnswer.id) {
+
+                //Answer yes
+                if (friendRequest.answer == AnswerOptions.YES) {
+
+                    //create new friendship
+                    val newFriends = Friends(friendRequestDB.userAsk, friendRequestDB.userAnswer)
+                    friendsBusiness!!.save(newFriends)
+                    responseHeader.set("location", Constants.URL_BASE_USER + "/" + newFriends.id)
+
+                    friendRequestBusiness!!.remove(friendRequestDB.id)
+                    return ResponseEntity(responseHeader, HttpStatus.OK)
+
+                    //anser no
+                } else if (friendRequest.answer == AnswerOptions.NO) {
+
+                    //remove request
+                    friendRequestBusiness!!.remove(friendRequestDB.id)
+                    return ResponseEntity(responseHeader, HttpStatus.OK)
+                }
+                //Usuario no tiene permiso
+            }
+            responseHeader.set("Error", "Only userAnswer can update the request")
+            return ResponseEntity(responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
+
 
         } catch (e: AlreadyExistsException) {
             responseHeader.set("Error", e.message)
@@ -268,11 +288,12 @@ class UserRestController {
         } catch (e: BusinessException) {
             return ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
+
     }
 
     /**
      * Listen to a Post with the [Constants.URL_BASE_BAR] and a requestBody with a Bar to create a bar
-     *
+     * //todo not sure how to handle this
      * @return The check of a deleted [Friends]
      */
     @DeleteMapping("/{id}/friends/{idFriends}")
