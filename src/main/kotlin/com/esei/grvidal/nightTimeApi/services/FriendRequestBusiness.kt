@@ -2,9 +2,9 @@ package com.esei.grvidal.nightTimeApi.services
 
 import com.esei.grvidal.nightTimeApi.dao.FriendRequestRepository
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
-import com.esei.grvidal.nightTimeApi.exception.BusinessException
+import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
-import com.esei.grvidal.nightTimeApi.model.AnswerOptions
+import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
 import com.esei.grvidal.nightTimeApi.model.FriendRequest
 import com.esei.grvidal.nightTimeApi.model.Friends
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,23 +28,23 @@ class FriendRequestBusiness : IFriendRequestBusiness {
     /**
      * This will list all the chats, if not, will throw a BusinessException
      */
-    @Throws(BusinessException::class)
+    @Throws(ServiceException::class)
     override fun list(): List<FriendRequest> {
 
         try {
             return friendRequestRepository!!.findAll()
         } catch (e: Exception) {
-            throw BusinessException(e.message)
+            throw ServiceException(e.message)
         }
     }
 
-    @Throws(BusinessException::class)
+    @Throws(ServiceException::class)
     override fun listByUserAnswer(userId: Long): List<FriendRequest> {
         try {
             return friendRequestRepository!!.findFriendRequestByUserAnswer_Id(userId)
 
         } catch (e: Exception) {
-            throw BusinessException(e.message)
+            throw ServiceException(e.message)
         }
     }
 
@@ -53,13 +53,13 @@ class FriendRequestBusiness : IFriendRequestBusiness {
      * This will show one Chat, if not, will throw a BusinessException or
      * if the object cant be found, it will throw a NotFoundException
      */
-    @Throws(BusinessException::class, NotFoundException::class)
+    @Throws(ServiceException::class, NotFoundException::class)
     override fun load(friendRequestId: Long): FriendRequest {
         val op: Optional<FriendRequest>
         try {
             op = friendRequestRepository!!.findById(friendRequestId)
         } catch (e: Exception) {
-            throw BusinessException(e.message)
+            throw ServiceException(e.message)
         }
 
         if (!op.isPresent) {
@@ -73,7 +73,7 @@ class FriendRequestBusiness : IFriendRequestBusiness {
     /**
      * This will save a new [Friends], if not, will throw an Exception
      */
-    @Throws(BusinessException::class, AlreadyExistsException::class)
+    @Throws(ServiceException::class, AlreadyExistsException::class)
     override fun save(friendRequest: FriendRequest): FriendRequest {
         try {
 
@@ -93,7 +93,7 @@ class FriendRequestBusiness : IFriendRequestBusiness {
         } catch (e: AlreadyExistsException) {
             throw AlreadyExistsException(e.message)
         } catch (e: Exception) {
-            throw BusinessException(e.message)
+            throw ServiceException(e.message)
         }
     }
 
@@ -102,14 +102,14 @@ class FriendRequestBusiness : IFriendRequestBusiness {
      * or if it cant find it, it will throw a NotFoundException
      *
      */
-    @Throws(BusinessException::class, NotFoundException::class)
+    @Throws(ServiceException::class, NotFoundException::class)
     override fun remove(friendRequestId: Long) {
         val op: Optional<FriendRequest>
 
         try {
             op = friendRequestRepository!!.findById(friendRequestId)
         } catch (e: Exception) {
-            throw BusinessException(e.message)
+            throw ServiceException(e.message)
         }
 
         if (!op.isPresent) {
@@ -119,7 +119,7 @@ class FriendRequestBusiness : IFriendRequestBusiness {
             try {
                 friendRequestRepository!!.deleteById(friendRequestId)
             } catch (e: Exception) {
-                throw BusinessException(e.message)
+                throw ServiceException(e.message)
             }
         }
 

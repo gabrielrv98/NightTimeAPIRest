@@ -1,7 +1,7 @@
 package com.esei.grvidal.nightTimeApi.services
 
 import com.esei.grvidal.nightTimeApi.dao.DateCityRepository
-import com.esei.grvidal.nightTimeApi.exception.BusinessException
+import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.model.DateCity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -27,23 +27,23 @@ class DateCityBusiness : IDateCityBusiness {
     /**
      * This will list all the bars, if not, will throw a BusinessException
      */
-    @Throws(BusinessException::class)
+    @Throws(ServiceException::class)
     override fun list(): List<DateCity> {
 
         try {
             return dateCityRepository!!.findAll()
         } catch (e: Exception) {
-            throw BusinessException(e.message)
+            throw ServiceException(e.message)
         }
     }
 
-    @Throws(BusinessException::class)
+    @Throws(ServiceException::class)
     override fun getTotalPeopleByDateAndCity(nextCity_id: Long, nextDate: LocalDate): Int {
         try {
 
             return dateCityRepository!!.countAllByNextCity_IdAndNextDate(nextCity_id, nextDate)
         } catch (e: Exception) {
-            throw BusinessException(e.message)
+            throw ServiceException(e.message)
         }
 
     }
@@ -51,13 +51,13 @@ class DateCityBusiness : IDateCityBusiness {
     /**
      * This will save a new bar, if not, will throw an Exception
      */
-    @Throws(BusinessException::class)
+    @Throws(ServiceException::class)
     override fun save(dateCity: DateCity): DateCity {
 
         try {
             return dateCityRepository!!.save(dateCity)
         } catch (e: Exception) {
-            throw BusinessException(e.message)
+            throw ServiceException(e.message)
         }
     }
 

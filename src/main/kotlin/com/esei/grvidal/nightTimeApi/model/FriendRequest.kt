@@ -1,5 +1,6 @@
 package com.esei.grvidal.nightTimeApi.model
 
+import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
 import com.fasterxml.jackson.annotation.JsonIdentityInfo
 import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import javax.persistence.*
@@ -24,10 +25,4 @@ class FriendRequest(
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     var id: Long = 0
-}
-
-enum class AnswerOptions(){
-    NOT_ANSWERED,
-    YES,
-    NO
 }

@@ -2,7 +2,7 @@ package com.esei.grvidal.nightTimeApi.services
 
 import com.esei.grvidal.nightTimeApi.dao.SecretDataRepository
 import com.esei.grvidal.nightTimeApi.dao.UserRepository
-import com.esei.grvidal.nightTimeApi.exception.BusinessException
+import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.SecretData
 import com.esei.grvidal.nightTimeApi.model.User
@@ -31,7 +31,7 @@ class UserBusiness : IUserBusiness {
     /**
      * This will list all the bars, if not, will throw a BusinessException
      */
-    @Throws(BusinessException::class)
+    @Throws(ServiceException::class)
     override fun list(): List<User> {
 
         try {
@@ -44,7 +44,7 @@ class UserBusiness : IUserBusiness {
 
                      */
         } catch (e: Exception) {
-            throw BusinessException(e.message)
+            throw ServiceException(e.message)
         }
     }
 
@@ -53,62 +53,53 @@ class UserBusiness : IUserBusiness {
      * This will show one user, if not, will throw a BusinessException or
      * if the object cant be found, it will throw a NotFoundException
      */
-    @Throws(BusinessException::class, NotFoundException::class)
+    @Throws( NotFoundException::class)//TODO COPIAR
     override fun load(idUser: Long): User {
-        val op: Optional<User>
-        try {
-            op = userRepository!!.findById(idUser)
-        } catch (e: Exception) {
-            throw BusinessException(e.message)
-        }
 
-        if (!op.isPresent) {
-            throw NotFoundException("Couldn't find the user with id $idUser")
-        }
-
-        return op.get()
+        return userRepository!!.findById(idUser)
+                .orElseThrow{ NotFoundException("Couldn't find the user with id $idUser") }
 
     }
 
     /**
      * This will save a new bar, if not, will throw an Exception
      */
-    @Throws(BusinessException::class)
+    @Throws(ServiceException::class)
     override fun save(user: User): User {
 
         try {
             return userRepository!!.save(user)
         } catch (e: Exception) {
-            throw BusinessException(e.message)
+            throw ServiceException(e.message)
         }
     }
 
     /**
      * This will save a new bar, if not, will throw an Exception
      */
-    @Throws(BusinessException::class)
-    override fun saveSecretData(secretData: SecretData): SecretData {
+    @Throws(ServiceException::class)
+override fun saveSecretData(secretData: SecretData): SecretData {
 
         try {
             secretData.uuid = UUID.randomUUID()
             return secretDataRepository!!.save(secretData)
 
         } catch (e: Exception) {
-            throw BusinessException(e.message)
+            throw ServiceException(e.message)
         }
     }
 
     /**
      * This will remove a bars through its id, if not, will throw an Exception, or if it cant find it, it will throw a NotFoundException
      */
-    @Throws(BusinessException::class, NotFoundException::class)
+    @Throws(ServiceException::class, NotFoundException::class)
     override fun remove(idUser: Long) {
         val op: Optional<User>
 
         try {
             op = userRepository!!.findById(idUser)
         } catch (e: Exception) {
-            throw BusinessException(e.message)
+            throw ServiceException(e.message)
         }
 
         if (!op.isPresent) {
@@ -118,13 +109,13 @@ class UserBusiness : IUserBusiness {
             try {
                 userRepository!!.deleteById(idUser)
             } catch (e: Exception) {
-                throw BusinessException(e.message)
+                throw ServiceException(e.message)
             }
         }
 
     }
 
-    @Throws(BusinessException::class, NotFoundException::class)
+    @Throws(ServiceException::class, NotFoundException::class)
     override fun login(user: User, password: String): UUID {
         val op: Optional<SecretData>
 
@@ -132,7 +123,7 @@ class UserBusiness : IUserBusiness {
             op = secretDataRepository!!.findDistinctFirstByUserAndPassword(user,password)
 
         } catch (e: Exception) {
-            throw BusinessException(e.message)
+            throw ServiceException(e.message)
         }
 
         if (!op.isPresent) {

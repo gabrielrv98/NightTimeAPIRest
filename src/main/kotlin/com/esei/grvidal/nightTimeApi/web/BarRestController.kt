@@ -1,12 +1,12 @@
 package com.esei.grvidal.nightTimeApi.web
 
 import com.esei.grvidal.nightTimeApi.services.IBarService
-import com.esei.grvidal.nightTimeApi.services.IEventBusiness
-import com.esei.grvidal.nightTimeApi.exception.BusinessException
+import com.esei.grvidal.nightTimeApi.services.IEventService
+import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Bar
-import com.esei.grvidal.nightTimeApi.model.Event
 import com.esei.grvidal.nightTimeApi.projections.BarProjection
+import com.esei.grvidal.nightTimeApi.projections.EventProjection
 import com.esei.grvidal.nightTimeApi.utlis.Constants
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
@@ -25,7 +25,7 @@ class BarRestController {
     val barService: IBarService? = null
 
     @Autowired
-    val eventBusiness: IEventBusiness? = null
+    val eventService: IEventService? = null
 
 
     /**
@@ -33,39 +33,39 @@ class BarRestController {
      */
     @GetMapping("")
     fun list(): ResponseEntity<List<BarProjection>> {
-        return try {
-            ResponseEntity(barService!!.list(), HttpStatus.OK)
-        } catch (e: Exception) {
+        val myBarService = barService
+
+        return if (myBarService != null) {
+            ResponseEntity(myBarService.list(), HttpStatus.OK)
+        } else
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        }
+
     }
 
     /**
      * Returns a list with the events of the bar that matches the ID
      */
     @GetMapping("/{id}/events")
-    fun listWithEvents(@PathVariable("id") idBar: Long): ResponseEntity<List<Event>> {
-        return try {
-
-            val bar = barService!!.load(idBar)
-            ResponseEntity(eventBusiness!!.listEventByBar(bar), HttpStatus.OK)
-
-        } catch (e: Exception) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+    fun listWithEvents(@PathVariable("id") idBar: Long): ResponseEntity<List<EventProjection>> {
+        
+        eventService?.let{
+            try {
+                return ResponseEntity(it.listEventByBar(idBar), HttpStatus.OK)
+            }catch(e : NotFoundException){
+                ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+            }
         }
+        return ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+
     }
 
     @GetMapping("/{id}/projection")
     fun getProjection(@PathVariable("id") idBar: Long): ResponseEntity<Any> {
-        return try {
+        val myBarService = barService
+        return if (myBarService != null) {
+            ResponseEntity(myBarService.getProjection(idBar), HttpStatus.OK)
+        } else ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
 
-            val bar = barService!!.getProjection(idBar)
-            //val bar = barBusiness!!.load(idBar)
-            ResponseEntity(bar, HttpStatus.OK)
-
-        } catch (e: Exception) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        }
     }
 
 
@@ -75,8 +75,15 @@ class BarRestController {
     @GetMapping("/{id}")
     fun load(@PathVariable("id") idBar: Long): ResponseEntity<Any> {
         return try {
-            ResponseEntity(barService!!.load(idBar), HttpStatus.OK)
-        } catch (e: BusinessException) {
+//            ResponseEntity(barService?.getProjection(idBar), HttpStatus.OK)
+            val service = barService
+            if (service != null) {
+
+                ResponseEntity(service.getProjection(idBar) ?: null, HttpStatus.OK)
+            } else
+                ResponseEntity(null, HttpStatus.INSUFFICIENT_STORAGE)
+
+        } catch (e: ServiceException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         } catch (e: NotFoundException) {
             ResponseEntity(HttpStatus.NOT_FOUND)
@@ -94,7 +101,7 @@ class BarRestController {
             val responseHeader = HttpHeaders()
             responseHeader.set("location", Constants.URL_BASE_BAR + "/" + bar.id)
             ResponseEntity(responseHeader, HttpStatus.CREATED)
-        } catch (e: BusinessException) {
+        } catch (e: ServiceException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
@@ -149,7 +156,7 @@ class BarRestController {
             barService!!.save(bar)
             ResponseEntity(responseHeader, HttpStatus.OK)
 
-        } catch (e: BusinessException) {
+        } catch (e: ServiceException) {
             ResponseEntity(responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
@@ -161,11 +168,10 @@ class BarRestController {
     fun delete(@PathVariable("id") idBar: Long): ResponseEntity<Any> {
         return try {
 
-            eventBusiness!!.removeAllByBar(barService!!.load(idBar))
             barService!!.remove(idBar)
 
             ResponseEntity(HttpStatus.OK)
-        } catch (e: BusinessException) {
+        } catch (e: ServiceException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         } catch (e: NotFoundException) {
             ResponseEntity(HttpStatus.NOT_FOUND)

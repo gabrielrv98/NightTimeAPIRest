@@ -5,9 +5,12 @@ import com.esei.grvidal.nightTimeApi.services.IDateCityBusiness
 import com.esei.grvidal.nightTimeApi.services.IFriendRequestBusiness
 import com.esei.grvidal.nightTimeApi.services.IUserBusiness
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
-import com.esei.grvidal.nightTimeApi.exception.BusinessException
+import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.*
+import com.esei.grvidal.nightTimeApi.projections.FriendProjection
+import com.esei.grvidal.nightTimeApi.projections.UserProjection
+import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
 import com.esei.grvidal.nightTimeApi.utlis.Constants
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
@@ -55,7 +58,7 @@ class UserRestController {
     fun load(@PathVariable("id") idUser: Long): ResponseEntity<Any> {
         return try {
             ResponseEntity(userBusiness!!.load(idUser), HttpStatus.OK)
-        } catch (e: BusinessException) {
+        } catch (e: ServiceException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         } catch (e: NotFoundException) {
             ResponseEntity(HttpStatus.NOT_FOUND)
@@ -77,7 +80,7 @@ class UserRestController {
             responseHeader.set("location", Constants.URL_BASE_USER + "/" + user.id)
 
             ResponseEntity(responseHeader, HttpStatus.CREATED)
-        } catch (e: BusinessException) {
+        } catch (e: ServiceException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
@@ -95,7 +98,7 @@ class UserRestController {
             if (user.nickname == username) {
                 responseHeader.set("UUID", userBusiness!!.login(user, password).toString())
 
-            } else throw BusinessException("")
+            } else throw ServiceException("")
 
             ResponseEntity(responseHeader, HttpStatus.OK)
 
@@ -130,7 +133,7 @@ class UserRestController {
             userBusiness!!.save(user)
             ResponseEntity(responseHeader, HttpStatus.OK)
 
-        } catch (e: BusinessException) {
+        } catch (e: ServiceException) {
             ResponseEntity(responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
@@ -163,7 +166,7 @@ class UserRestController {
         return try {
             userBusiness!!.remove(idUser)
             ResponseEntity(HttpStatus.OK)
-        } catch (e: BusinessException) {
+        } catch (e: ServiceException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         } catch (e: NotFoundException) {
             ResponseEntity(HttpStatus.NOT_FOUND)
@@ -182,14 +185,11 @@ class UserRestController {
      *  @return  A List<[Friends]> with all the friends of the [idUser]
      */
     @GetMapping("/{id}/friends")
-    fun getFriendships(@PathVariable("id") idUser: Long): ResponseEntity<List<Friends>> {
-        return try {
-            ResponseEntity(friendsBusiness!!.listByUser(idUser), HttpStatus.OK)
-        } catch (e: BusinessException) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        } catch (e: NotFoundException) {
-            ResponseEntity(HttpStatus.NOT_FOUND)
-        }
+    fun getFriendships(@PathVariable("id") idUser: Long): ResponseEntity<List<FriendProjection>> {
+        return friendsBusiness?.let{
+                ResponseEntity( it.listFriendsByUser(idUser)   , HttpStatus.OK)
+        } ?: ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+
     }
 
     /**
@@ -200,21 +200,13 @@ class UserRestController {
      * @deprecated
      */
     @GetMapping("/{id}/friends/users")
-    fun getUsersFromFriendList(@PathVariable("id") idUser: Long): ResponseEntity<List<User>> {
+    fun getUsersFromFriendList(@PathVariable("id") idUser: Long): ResponseEntity<List<UserProjection>> {
         return try {
-            val user = userBusiness!!.load(idUser)
 
-            val friendsList: List<Friends> = friendsBusiness!!.listByUser(idUser)
-            var userList: List<User> = listOf()
-
-
-            friendsList.onEach { friendship ->
-                if (friendship.user1 == user) userList = userList.plus(friendship.user2)
-                else if (friendship.user2 == user) userList = userList.plus(friendship.user1)
-            }
+            val userList: List<UserProjection> = friendsBusiness!!.listUserByUser(idUser)
 
             ResponseEntity(userList, HttpStatus.OK)
-        } catch (e: BusinessException) {
+        } catch (e: ServiceException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         } catch (e: NotFoundException) {
             ResponseEntity(HttpStatus.NOT_FOUND)
@@ -244,7 +236,7 @@ class UserRestController {
         } catch (e: AlreadyExistsException) {
             responseHeader.set("Error", e.message)
             ResponseEntity(responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
-        } catch (e: BusinessException) {
+        } catch (e: ServiceException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
@@ -293,7 +285,7 @@ class UserRestController {
         } catch (e: AlreadyExistsException) {
             responseHeader.set("Error", e.message)
             return ResponseEntity(responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
-        } catch (e: BusinessException) {
+        } catch (e: ServiceException) {
             return ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
 
@@ -314,13 +306,13 @@ class UserRestController {
             if (friends.user1.id == idUser || friends.user2.id == idUser) {
                 friendsBusiness!!.remove(idFriends)
 
-                ResponseEntity(HttpStatus.OK)
+                ResponseEntity(HttpStatus.NO_CONTENT)
             } else {
                 responseHeader.set("Error", "User is not the friendship")
                 ResponseEntity(HttpStatus.NOT_FOUND)
             }
 
-        } catch (e: BusinessException) {
+        } catch (e: ServiceException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         } catch (e: NotFoundException) {
             ResponseEntity(HttpStatus.NOT_FOUND)
@@ -338,7 +330,7 @@ class UserRestController {
 
             var filtered: List<Friends> = listOf()
 
-            friendsBusiness!!.listByUser(idUser).onEach {
+            friendsBusiness!!.listChatsByUser(idUser).onEach {
                 if (it.messages != null) {
                     if (it.messages!!.isNotEmpty())
                         filtered = filtered.plus(it)
@@ -346,7 +338,7 @@ class UserRestController {
             }
 
             ResponseEntity(filtered, HttpStatus.OK)
-        } catch (e: BusinessException) {
+        } catch (e: ServiceException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         } catch (e: NotFoundException) {
             ResponseEntity(HttpStatus.NOT_FOUND)
@@ -375,7 +367,7 @@ class UserRestController {
                 ResponseEntity(friends, HttpStatus.OK)
 
 
-        } catch (e: BusinessException) {
+        } catch (e: ServiceException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         } catch (e: NotFoundException) {
             ResponseEntity(HttpStatus.NOT_FOUND)
@@ -405,7 +397,7 @@ class UserRestController {
 
                 ResponseEntity(responseHeader, HttpStatus.OK)
             }
-        } catch (e: BusinessException) {
+        } catch (e: ServiceException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
@@ -434,9 +426,9 @@ class UserRestController {
             var number2 = 0
             getUsersFromFriendList(idUser).body?.let {
                 it.forEach { userFriend ->
-                    userFriend.dateCity?.let { userFriendDateCity ->
-                        if (userFriendDateCity.nextDate == dateCity.nextDate &&
-                                userFriendDateCity.nextCity.id == dateCity.nextCity.id)
+                    userFriend.getDateCity()?.let { userFriendDateCity ->
+                        if (userFriendDateCity.getNextDate() == dateCity.nextDate &&
+                                userFriendDateCity.getNextCity().getId() == dateCity.nextCity.id)
                             number2 += 1
                     }
                 }
@@ -444,12 +436,12 @@ class UserRestController {
             responseHeader.set("Friends", number2.toString())
 
             ResponseEntity(responseHeader, HttpStatus.I_AM_A_TEAPOT)
-        } catch (e: BusinessException) {
+        } catch (e: ServiceException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         } catch (e: NotFoundException) {
             ResponseEntity(HttpStatus.NOT_FOUND)
         }
     }
 
-
+//todo 401 no permisos
 }

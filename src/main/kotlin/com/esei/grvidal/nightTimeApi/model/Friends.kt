@@ -1,5 +1,6 @@
 package com.esei.grvidal.nightTimeApi.model
 
+import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
 import com.fasterxml.jackson.annotation.JsonIdentityInfo
 import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import javax.persistence.*
@@ -18,6 +19,8 @@ class Friends(
         var user2: User
 
 ) {
+    var answer: AnswerOptions? = AnswerOptions.NOT_ANSWERED
+
     @OneToMany(mappedBy = "friends")
     var messages : Set<Message> ? = null
 
@@ -25,3 +28,5 @@ class Friends(
     @GeneratedValue(strategy = GenerationType.AUTO)
     var id: Long = 0
 }
+
+

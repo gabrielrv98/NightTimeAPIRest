@@ -2,6 +2,8 @@ package com.esei.grvidal.nightTimeApi.services
 
 import com.esei.grvidal.nightTimeApi.model.Friends
 import com.esei.grvidal.nightTimeApi.model.Message
+import com.esei.grvidal.nightTimeApi.projections.FriendProjection
+import com.esei.grvidal.nightTimeApi.projections.UserProjection
 
 /**
  * DAO Interface for Bars
@@ -12,7 +14,10 @@ interface IFriendsBusiness {
     fun list(): List<Friends>
 
     //List all the chats of one user //api propose
-    fun listByUser(userId: Long): List<Friends>
+    fun listUserByUser(userId: Long): List<UserProjection>
+
+    fun listChatsByUser(userId: Long): List<Friends>
+    fun listFriendsByUser(userId: Long): List<FriendProjection>
 
     //List all the messages in one chat of one user //api propose
     fun listMessagesFromChat(friendsId: Long): List<Message>

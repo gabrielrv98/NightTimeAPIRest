@@ -1,5 +1,7 @@
 package com.esei.grvidal.nightTimeApi.model
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo
+import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import javax.persistence.*
 
 
@@ -14,6 +16,9 @@ import javax.persistence.*
  *
  */
 @Entity
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator::class,
+        property = "id")//todo no se como funcionara
 @Table(name = "bar")
 class Bar(
         var name: String,

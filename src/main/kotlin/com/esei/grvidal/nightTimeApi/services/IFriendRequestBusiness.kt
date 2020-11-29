@@ -1,6 +1,6 @@
 package com.esei.grvidal.nightTimeApi.services
 
-import com.esei.grvidal.nightTimeApi.exception.BusinessException
+import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.model.FriendRequest
 import kotlin.jvm.Throws
 
@@ -13,7 +13,7 @@ interface IFriendRequestBusiness {
     fun list(): List<FriendRequest>
 
     //List all the chats of one user //api propose
-    @Throws( BusinessException::class)
+    @Throws( ServiceException::class)
     fun listByUserAnswer(userId: Long): List<FriendRequest>
 
     //Show one chat

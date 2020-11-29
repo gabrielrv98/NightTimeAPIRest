@@ -1,7 +1,7 @@
 package com.esei.grvidal.nightTimeApi.dao
 
-import com.esei.grvidal.nightTimeApi.model.Bar
 import com.esei.grvidal.nightTimeApi.model.Event
+import com.esei.grvidal.nightTimeApi.projections.EventProjection
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
@@ -14,7 +14,8 @@ import org.springframework.stereotype.Repository
 
 @Repository//todo investigar esto
 interface EventRepository : JpaRepository<Event, Long> {
+    fun findAllBy(): List<EventProjection>
 
-    fun findAllByBar(bar: Bar): List<Event>
+    fun findAllByBar_Id(barId: Long): List<EventProjection>
 }
 

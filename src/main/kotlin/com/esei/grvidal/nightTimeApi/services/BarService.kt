@@ -1,7 +1,7 @@
 package com.esei.grvidal.nightTimeApi.services
 
 import com.esei.grvidal.nightTimeApi.dao.BarRepository
-import com.esei.grvidal.nightTimeApi.exception.BusinessException
+import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Bar
 import com.esei.grvidal.nightTimeApi.projections.BarProjection
@@ -28,14 +28,14 @@ class BarService : IBarService {
     /**
      * This will list all the bars, if not, will throw a BusinessException
      */
-    @Throws(BusinessException::class)
+    @Throws(ServiceException::class)
     override fun list(): List<BarProjection> {
 
         try {
             return barRepository!!.getBarBy()
             //return barRepository!!.findAll()
         } catch (e: Exception) {
-            throw BusinessException(e.message)
+            throw ServiceException(e.message)
         }
     }
 
@@ -47,7 +47,7 @@ class BarService : IBarService {
             //barRepository!!.findById(idBar).ifPresent()
             return barRepository!!.getBarById(idBar)
         }catch(e:Exception){
-            throw BusinessException(e.message)
+            throw ServiceException(e.message)
         }
     }
 
@@ -60,13 +60,13 @@ class BarService : IBarService {
     /**
      * This will show one bar, if not, will throw a BusinessException or if the object cant be found, it will throw a NotFoundException
      */
-    @Throws(BusinessException::class, NotFoundException::class)
+    @Throws(ServiceException::class, NotFoundException::class)
     override fun load(idBar: Long): Bar {
         val op: Optional<Bar>
         try {
             op = barRepository!!.findById(idBar)
         } catch (e: Exception) {
-            throw BusinessException(e.message)
+            throw ServiceException(e.message)
         }
 
         if (!op.isPresent) {
@@ -80,27 +80,27 @@ class BarService : IBarService {
     /**
      * This will save a new bar, if not, will throw an Exception
      */
-    @Throws(BusinessException::class)
+    @Throws(ServiceException::class)
     override fun save(bar: Bar): Bar {
 
         try {
             return barRepository!!.save(bar)
         } catch (e: Exception) {
-            throw BusinessException(e.message)
+            throw ServiceException(e.message)
         }
     }
 
     /**
      * This will remove a bars through its id, if not, will throw an Exception, or if it cant find it, it will throw a NotFoundException
      */
-    @Throws(BusinessException::class, NotFoundException::class)
+    @Throws(ServiceException::class, NotFoundException::class)
     override fun remove(idBar: Long) {
         val op: Optional<Bar>
 
         try {
             op = barRepository!!.findById(idBar)
         } catch (e: Exception) {
-            throw BusinessException(e.message)
+            throw ServiceException(e.message)
         }
 
         if (!op.isPresent) {
@@ -110,7 +110,7 @@ class BarService : IBarService {
             try {
                 barRepository!!.deleteById(idBar)
             } catch (e: Exception) {
-                throw BusinessException(e.message)
+                throw ServiceException(e.message)
             }
         }
 
