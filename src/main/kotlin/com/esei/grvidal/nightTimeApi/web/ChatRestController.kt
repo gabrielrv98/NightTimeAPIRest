@@ -1,6 +1,6 @@
 package com.esei.grvidal.nightTimeApi.web
 
-import com.esei.grvidal.nightTimeApi.business.IFriendsBusiness
+import com.esei.grvidal.nightTimeApi.services.IFriendsBusiness
 import com.esei.grvidal.nightTimeApi.exception.BusinessException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Friends

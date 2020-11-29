@@ -1,11 +1,12 @@
 package com.esei.grvidal.nightTimeApi.web
 
-import com.esei.grvidal.nightTimeApi.business.IBarBusiness
-import com.esei.grvidal.nightTimeApi.business.IEventBusiness
+import com.esei.grvidal.nightTimeApi.services.IBarService
+import com.esei.grvidal.nightTimeApi.services.IEventBusiness
 import com.esei.grvidal.nightTimeApi.exception.BusinessException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Bar
 import com.esei.grvidal.nightTimeApi.model.Event
+import com.esei.grvidal.nightTimeApi.projections.BarProjection
 import com.esei.grvidal.nightTimeApi.utlis.Constants
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.*
 class BarRestController {
 
     @Autowired
-    val barBusiness: IBarBusiness? = null
+    val barService: IBarService? = null
 
     @Autowired
     val eventBusiness: IEventBusiness? = null
@@ -31,9 +32,9 @@ class BarRestController {
      * Listen to a Get with the [Constants.URL_BASE_BAR] to show all Bars
      */
     @GetMapping("")
-    fun list(): ResponseEntity<List<Bar>> {
+    fun list(): ResponseEntity<List<BarProjection>> {
         return try {
-            ResponseEntity(barBusiness!!.list(), HttpStatus.OK)
+            ResponseEntity(barService!!.list(), HttpStatus.OK)
         } catch (e: Exception) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -46,8 +47,21 @@ class BarRestController {
     fun listWithEvents(@PathVariable("id") idBar: Long): ResponseEntity<List<Event>> {
         return try {
 
-            val bar = barBusiness!!.load(idBar)
+            val bar = barService!!.load(idBar)
             ResponseEntity(eventBusiness!!.listEventByBar(bar), HttpStatus.OK)
+
+        } catch (e: Exception) {
+            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
+    @GetMapping("/{id}/projection")
+    fun getProjection(@PathVariable("id") idBar: Long): ResponseEntity<Any> {
+        return try {
+
+            val bar = barService!!.getProjection(idBar)
+            //val bar = barBusiness!!.load(idBar)
+            ResponseEntity(bar, HttpStatus.OK)
 
         } catch (e: Exception) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -61,7 +75,7 @@ class BarRestController {
     @GetMapping("/{id}")
     fun load(@PathVariable("id") idBar: Long): ResponseEntity<Any> {
         return try {
-            ResponseEntity(barBusiness!!.load(idBar), HttpStatus.OK)
+            ResponseEntity(barService!!.load(idBar), HttpStatus.OK)
         } catch (e: BusinessException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         } catch (e: NotFoundException) {
@@ -76,7 +90,7 @@ class BarRestController {
     @PostMapping("")
     fun insert(@RequestBody bar: Bar): ResponseEntity<Any> {
         return try {
-            barBusiness!!.save(bar)
+            barService!!.save(bar)
             val responseHeader = HttpHeaders()
             responseHeader.set("location", Constants.URL_BASE_BAR + "/" + bar.id)
             ResponseEntity(responseHeader, HttpStatus.CREATED)
@@ -99,7 +113,7 @@ class BarRestController {
         val responseHeader = HttpHeaders()
         return try {
 
-            val bar = barBusiness!!.load(idBar)
+            val bar = barService!!.load(idBar)
             fields.forEach { (k, v) ->
                 when (k) {
                     "name" -> bar.name = v.toString()
@@ -132,7 +146,7 @@ class BarRestController {
                     }
                 }
             }
-            barBusiness!!.save(bar)
+            barService!!.save(bar)
             ResponseEntity(responseHeader, HttpStatus.OK)
 
         } catch (e: BusinessException) {
@@ -147,8 +161,8 @@ class BarRestController {
     fun delete(@PathVariable("id") idBar: Long): ResponseEntity<Any> {
         return try {
 
-            eventBusiness!!.removeAllByBar(barBusiness!!.load(idBar))
-            barBusiness!!.remove(idBar)
+            eventBusiness!!.removeAllByBar(barService!!.load(idBar))
+            barService!!.remove(idBar)
 
             ResponseEntity(HttpStatus.OK)
         } catch (e: BusinessException) {

@@ -1,7 +1,7 @@
 package com.esei.grvidal.nightTimeApi.web
 
-import com.esei.grvidal.nightTimeApi.business.IBarBusiness
-import com.esei.grvidal.nightTimeApi.business.IEventBusiness
+import com.esei.grvidal.nightTimeApi.services.IBarService
+import com.esei.grvidal.nightTimeApi.services.IEventBusiness
 import com.esei.grvidal.nightTimeApi.exception.BusinessException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Event
@@ -23,7 +23,7 @@ class EventRestController {
     val eventBusiness: IEventBusiness? = null
 
     @Autowired
-    val barBusiness: IBarBusiness? = null
+    val barService: IBarService? = null
 
 
     /**

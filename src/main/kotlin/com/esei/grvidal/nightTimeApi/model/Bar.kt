@@ -22,12 +22,15 @@ class Bar(
 
         @ManyToOne//(cascade = [CascadeType.PERSIST])
         @JoinColumn(name = "city_id")
-        var city: City? = null,
+        var city: City,
 
         @OneToOne(cascade = [CascadeType.ALL])
         @JoinColumn(name = "schedule_id")
         var schedule: Schedule? = null
 ) {
+    
+    @OneToMany(mappedBy = "bar",cascade = [CascadeType.REMOVE])
+    var events : List<Event>? = null
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
