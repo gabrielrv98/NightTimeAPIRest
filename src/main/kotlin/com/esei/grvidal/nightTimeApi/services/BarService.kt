@@ -5,6 +5,7 @@ import com.esei.grvidal.nightTimeApi.dto.CityDTO
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Bar
+import com.esei.grvidal.nightTimeApi.projections.BarDetailsProjection
 import com.esei.grvidal.nightTimeApi.projections.BarProjection
 import com.esei.grvidal.nightTimeApi.serviceInterface.IBarService
 import org.springframework.beans.factory.annotation.Autowired
@@ -114,6 +115,16 @@ class BarService : IBarService {
 
     override fun listByCity(cityId: Long): List<BarProjection> {
         return barRepository!!.getBarsByCity_Id(cityId)
+    }
+
+    override fun getDetails(idBar: Long): BarDetailsProjection {
+
+        try {
+            return barRepository!!.getBarDetailsById(idBar)
+
+        } catch (e: EmptyResultDataAccessException) {
+            throw NotFoundException("No bar with id $idBar have been found")
+        }
     }
 }
 

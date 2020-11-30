@@ -6,6 +6,7 @@ import com.esei.grvidal.nightTimeApi.serviceInterface.IEventService
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Bar
+import com.esei.grvidal.nightTimeApi.projections.BarDetailsProjection
 import com.esei.grvidal.nightTimeApi.projections.BarProjection
 import com.esei.grvidal.nightTimeApi.projections.EventProjection
 import com.esei.grvidal.nightTimeApi.utlis.Constants
@@ -32,7 +33,7 @@ class BarRestController {
     /**
      * Listen to a Get with the [Constants.URL_BASE_BAR] to show all Bars
      */
-    @GetMapping("/bycity/{idCity}")
+    @GetMapping("/byCity/{idCity}")
     fun listByCity(@PathVariable("idCity") cityId: Long): ResponseEntity<List<BarProjection>> {
         barService?.let{
             return ResponseEntity(it.listByCity(cityId), HttpStatus.OK)
@@ -40,6 +41,25 @@ class BarRestController {
 
         return ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
     }
+
+    /**
+     * Returns a list with the events of the bar that matches the ID
+     */
+    @GetMapping("/{id}/details")
+    fun getDetails(@PathVariable("id") idBar: Long): ResponseEntity<Any> {
+
+        barService?.let{
+            return try {
+                 ResponseEntity(it.getDetails(idBar), HttpStatus.OK)
+
+            }catch(e : NotFoundException){
+                ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+            }
+        }
+        return ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+
+    }
+
 
     /**
      * Returns a list with the events of the bar that matches the ID
