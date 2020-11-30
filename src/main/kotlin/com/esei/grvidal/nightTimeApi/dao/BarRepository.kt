@@ -13,5 +13,6 @@ interface BarRepository : JpaRepository<Bar, Long> {
     //override fun findAll(): MutableList<Bar>
     fun getBarBy(): List<BarProjection>
     fun getBarById(id: Long): BarProjection //Optional<BarProjection>
+    fun getBarsByCity_Id(city_id: Long): List<BarProjection>
 }
 

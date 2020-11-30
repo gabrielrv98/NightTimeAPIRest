@@ -1,5 +1,6 @@
 package com.esei.grvidal.nightTimeApi.web
 
+import com.esei.grvidal.nightTimeApi.dto.CityDTO
 import com.esei.grvidal.nightTimeApi.serviceInterface.IBarService
 import com.esei.grvidal.nightTimeApi.serviceInterface.IEventService
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
@@ -31,15 +32,13 @@ class BarRestController {
     /**
      * Listen to a Get with the [Constants.URL_BASE_BAR] to show all Bars
      */
-    @GetMapping("")
-    fun list(): ResponseEntity<List<BarProjection>> {
-        val myBarService = barService
+    @GetMapping("/bycity/{idCity}")
+    fun listByCity(@PathVariable("idCity") cityId: Long): ResponseEntity<List<BarProjection>> {
+        barService?.let{
+            return ResponseEntity(it.listByCity(cityId), HttpStatus.OK)
+        }
 
-        return if (myBarService != null) {
-            ResponseEntity(myBarService.list(), HttpStatus.OK)
-        } else
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-
+        return ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
     }
 
     /**

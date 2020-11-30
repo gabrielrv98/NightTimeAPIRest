@@ -1,5 +1,6 @@
 package com.esei.grvidal.nightTimeApi.serviceInterface
 
+import com.esei.grvidal.nightTimeApi.dto.CityDTO
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.model.Bar
@@ -25,4 +26,5 @@ interface IBarService {
 
     //remove a bar
     fun remove(idBar: Long)
+    fun listByCity(cityId: Long): List<BarProjection>
 }

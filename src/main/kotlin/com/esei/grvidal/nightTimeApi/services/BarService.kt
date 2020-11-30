@@ -1,6 +1,7 @@
 package com.esei.grvidal.nightTimeApi.services
 
 import com.esei.grvidal.nightTimeApi.dao.BarRepository
+import com.esei.grvidal.nightTimeApi.dto.CityDTO
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Bar
@@ -109,6 +110,10 @@ class BarService : IBarService {
             }
         }
 
+    }
+
+    override fun listByCity(cityId: Long): List<BarProjection> {
+        return barRepository!!.getBarsByCity_Id(cityId)
     }
 }
 
