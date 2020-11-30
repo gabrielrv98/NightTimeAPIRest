@@ -3,7 +3,8 @@ package com.esei.grvidal.nightTimeApi.services
 import com.esei.grvidal.nightTimeApi.dao.CityRepository
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
-import com.esei.grvidal.nightTimeApi.model.City 
+import com.esei.grvidal.nightTimeApi.model.City
+import com.esei.grvidal.nightTimeApi.serviceInterface.ICityBusiness
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.*

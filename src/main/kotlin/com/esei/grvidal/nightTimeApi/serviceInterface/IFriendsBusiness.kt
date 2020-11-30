@@ -1,4 +1,4 @@
-package com.esei.grvidal.nightTimeApi.services
+package com.esei.grvidal.nightTimeApi.serviceInterface
 
 import com.esei.grvidal.nightTimeApi.model.Friends
 import com.esei.grvidal.nightTimeApi.model.Message

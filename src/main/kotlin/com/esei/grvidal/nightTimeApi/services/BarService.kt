@@ -5,7 +5,9 @@ import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Bar
 import com.esei.grvidal.nightTimeApi.projections.BarProjection
+import com.esei.grvidal.nightTimeApi.serviceInterface.IBarService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.stereotype.Service
 import java.util.*
 import kotlin.jvm.Throws
@@ -24,7 +26,6 @@ class BarService : IBarService {
     val barRepository: BarRepository? = null
 
 
-
     /**
      * This will list all the bars, if not, will throw a BusinessException
      */
@@ -40,22 +41,16 @@ class BarService : IBarService {
     }
 
 
-
-
+    @Throws(NotFoundException::class)
     override fun getProjection(idBar: Long): BarProjection {
-        try{
-            //barRepository!!.findById(idBar).ifPresent()
+
+        try {
             return barRepository!!.getBarById(idBar)
-        }catch(e:Exception){
-            throw ServiceException(e.message)
+
+        } catch (e: EmptyResultDataAccessException) {
+            throw NotFoundException("No bar with id $idBar have been found")
         }
     }
-
-
-
-
-
-
 
     /**
      * This will show one bar, if not, will throw a BusinessException or if the object cant be found, it will throw a NotFoundException

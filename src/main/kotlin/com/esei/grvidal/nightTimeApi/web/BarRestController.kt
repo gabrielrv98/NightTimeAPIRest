@@ -1,7 +1,7 @@
 package com.esei.grvidal.nightTimeApi.web
 
-import com.esei.grvidal.nightTimeApi.services.IBarService
-import com.esei.grvidal.nightTimeApi.services.IEventService
+import com.esei.grvidal.nightTimeApi.serviceInterface.IBarService
+import com.esei.grvidal.nightTimeApi.serviceInterface.IEventService
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Bar
@@ -61,10 +61,17 @@ class BarRestController {
 
     @GetMapping("/{id}/projection")
     fun getProjection(@PathVariable("id") idBar: Long): ResponseEntity<Any> {
-        val myBarService = barService
-        return if (myBarService != null) {
-            ResponseEntity(myBarService.getProjection(idBar), HttpStatus.OK)
-        } else ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+        barService?.let{
+
+            return try{
+                ResponseEntity(it.getProjection(idBar), HttpStatus.OK)
+            }catch (e: NotFoundException){
+                ResponseEntity(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
+            }
+
+        }
+
+        return ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
 
     }
 
@@ -74,20 +81,16 @@ class BarRestController {
      */
     @GetMapping("/{id}")
     fun load(@PathVariable("id") idBar: Long): ResponseEntity<Any> {
-        return try {
-//            ResponseEntity(barService?.getProjection(idBar), HttpStatus.OK)
-            val service = barService
-            if (service != null) {
 
-                ResponseEntity(service.getProjection(idBar) ?: null, HttpStatus.OK)
-            } else
-                ResponseEntity(null, HttpStatus.INSUFFICIENT_STORAGE)
-
-        } catch (e: ServiceException) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        } catch (e: NotFoundException) {
-            ResponseEntity(HttpStatus.NOT_FOUND)
+        barService?.let{
+            return try{
+                ResponseEntity(it.getProjection(idBar) , HttpStatus.OK)
+            }catch(e: NotFoundException){
+                ResponseEntity(e.message,HttpStatus.NOT_FOUND)
+            }
         }
+
+        return ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
     }
 
     /**

@@ -12,6 +12,6 @@ import org.springframework.stereotype.Repository
 interface BarRepository : JpaRepository<Bar, Long> {
     //override fun findAll(): MutableList<Bar>
     fun getBarBy(): List<BarProjection>
-    fun getBarById(id: Long): BarProjection
+    fun getBarById(id: Long): BarProjection //Optional<BarProjection>
 }
 

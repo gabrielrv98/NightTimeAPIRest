@@ -9,6 +9,7 @@ import com.esei.grvidal.nightTimeApi.model.Friends
 import com.esei.grvidal.nightTimeApi.model.Message
 import com.esei.grvidal.nightTimeApi.projections.FriendProjection
 import com.esei.grvidal.nightTimeApi.projections.UserProjection
+import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendsBusiness
 import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service

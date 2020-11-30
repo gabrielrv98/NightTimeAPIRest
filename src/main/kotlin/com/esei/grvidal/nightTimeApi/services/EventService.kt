@@ -5,6 +5,7 @@ import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Event
 import com.esei.grvidal.nightTimeApi.projections.EventProjection
+import com.esei.grvidal.nightTimeApi.serviceInterface.IEventService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.*

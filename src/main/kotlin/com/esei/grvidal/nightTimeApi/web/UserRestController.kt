@@ -1,9 +1,9 @@
 package com.esei.grvidal.nightTimeApi.web
 
-import com.esei.grvidal.nightTimeApi.services.IFriendsBusiness
-import com.esei.grvidal.nightTimeApi.services.IDateCityBusiness
-import com.esei.grvidal.nightTimeApi.services.IFriendRequestBusiness
-import com.esei.grvidal.nightTimeApi.services.IUserBusiness
+import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendsBusiness
+import com.esei.grvidal.nightTimeApi.serviceInterface.IDateCityBusiness
+import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendRequestBusiness
+import com.esei.grvidal.nightTimeApi.serviceInterface.IUserBusiness
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
