@@ -24,11 +24,11 @@ class BarRestController {
 
     //Bar Service with the logic of bar
     @Autowired
-    val barService: IBarService? = null
+    lateinit var barService: IBarService
 
     //City Service with the logic of city
     @Autowired
-    val cityService: ICityService? = null
+    lateinit var cityService: ICityService
 
 
     /**
@@ -40,11 +40,9 @@ class BarRestController {
      */
     @GetMapping("/byCity/{idCity}")
     fun listByCity(@PathVariable("idCity") cityId: Long): ResponseEntity<List<BarProjection>> {
-        barService?.let {
-            return ResponseEntity(it.listByCity(cityId), HttpStatus.OK)
-        }
 
-        return ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+        return ResponseEntity(barService.listByCity(cityId), HttpStatus.OK)
+
     }
 
     /**
@@ -56,14 +54,13 @@ class BarRestController {
     @GetMapping("/{id}/details")
     fun getDetails(@PathVariable("id") idBar: Long): ResponseEntity<Any> {
 
-        barService?.let {
-            return try {
-                ResponseEntity(it.getDetails(idBar), HttpStatus.OK)
-            } catch (e: NotFoundException) {
-                ResponseEntity(e.message, HttpStatus.NOT_FOUND)
-            }
+
+        return try {
+            ResponseEntity(barService.getDetails(idBar), HttpStatus.OK)
+        } catch (e: NotFoundException) {
+            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
         }
-        return ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+
 
     }
 
@@ -77,15 +74,12 @@ class BarRestController {
     @GetMapping("/{id}")
     fun load(@PathVariable("id") idBar: Long): ResponseEntity<Any> {
 
-        barService?.let {
-            return try {
-                ResponseEntity(it.getFullProjection(idBar), HttpStatus.OK)
-            } catch (e: NotFoundException) {
-                ResponseEntity(e.message, HttpStatus.NOT_FOUND)
-            }
+        return try {
+            ResponseEntity(barService.getFullProjection(idBar), HttpStatus.OK)
+        } catch (e: NotFoundException) {
+            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
         }
 
-        return ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
     }
 
     /**
@@ -98,7 +92,7 @@ class BarRestController {
         val responseHeader = HttpHeaders()
 
         return try {
-            val barId = barService!!.save(bar.toBar(cityService!!.load(bar.cityId)))
+            val barId = barService.save(bar.toBar(cityService.load(bar.cityId)))
             responseHeader.set("location", Constants.URL_BASE_BAR + "/" + barId)
             ResponseEntity(responseHeader, HttpStatus.CREATED)
 
@@ -121,7 +115,7 @@ class BarRestController {
         val responseHeader = HttpHeaders()
 
         return try {
-            barService!!.update(idBar, barEdit)
+            barService.update(idBar, barEdit)
             ResponseEntity(responseHeader, HttpStatus.OK)
 
         } catch (e: NotFoundException) {
@@ -140,7 +134,7 @@ class BarRestController {
     fun delete(@PathVariable("id") idBar: Long): ResponseEntity<Any> {
         return try {
 
-            barService!!.remove(idBar)
+            barService.remove(idBar)
             ResponseEntity(HttpStatus.NO_CONTENT)
 
         } catch (e: NotFoundException) {
