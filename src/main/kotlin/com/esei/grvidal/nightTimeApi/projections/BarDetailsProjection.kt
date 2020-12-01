@@ -8,7 +8,7 @@ interface BarDetailsProjection{
 
     fun getId() : Long
     //@Value("#{T(BarProjection).toId(target.getEvents().get(0))}")
-    fun getEvents() : List<EventProjection>?
+    fun getEvents() : List<EventFromBarProjection>?
 
 }
 

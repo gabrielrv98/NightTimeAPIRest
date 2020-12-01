@@ -44,13 +44,9 @@ class BarService : IBarService {
      */
     @Throws(NotFoundException::class)
     override fun getDetails(idBar: Long): BarDetailsProjection {
+        return barRepository.getBarDetailsById(idBar).orElseThrow { NotFoundException("No bar with id $idBar have been found") }
 
-        try {
-            return barRepository.getBarDetailsById(idBar)
 
-        } catch (e: EmptyResultDataAccessException) {
-            throw NotFoundException("No bar with id $idBar have been found")
-        }
     }
 
     /**
