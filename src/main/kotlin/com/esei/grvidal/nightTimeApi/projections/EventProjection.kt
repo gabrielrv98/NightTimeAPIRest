@@ -7,4 +7,5 @@ interface EventProjection {
     fun getId(): Long
     fun getDescription() : String
     fun getDate() : LocalDate?
+    fun getBarName(): String
 }
