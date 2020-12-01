@@ -42,17 +42,10 @@ class CityService : ICityService {
      * This will show one City, if not, will throw a BusinessException or 
      * if the object cant be found, it will throw a NotFoundException
      */
-    @Throws(ServiceException::class, NotFoundException::class)
+    @Throws(NotFoundException::class)
     override fun load(idCity: Long): City {
 
-        val op = cityRepository!!.findById(idCity)
-
-        if (!op.isPresent) {
-            throw NotFoundException("No se encontro al bar con el id $idCity")
-        }
-
-        return op.get()
-
+        return cityRepository!!.findById(idCity).orElseThrow { NotFoundException("No se encontro la ciudad con el id $idCity") }
     }
 
     /**
