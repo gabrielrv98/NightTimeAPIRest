@@ -16,5 +16,6 @@ interface BarRepository : JpaRepository<Bar, Long> {
     fun getBarById(id: Long): BarProjection //Optional<BarProjection>
     fun getBarDetailsById(id: Long): BarDetailsProjection
     fun getBarsByCity_Id(city_id: Long): List<BarProjection>
+    //fun getBarsByCity() : List<BarProjection>
 }
 

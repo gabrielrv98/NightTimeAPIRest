@@ -48,16 +48,33 @@ class NightTimeApiApplication : CommandLineRunner {
         cityRepositories!!.save(cityOu)
         cityRepositories!!.save(cityVigo)
 
-        val bar1 = Bar("Luxus", "Algun pijo", "Mercedes 2º",city = cityOu)
-
-        bar1.schedule =  Schedule(monday = true, tuesday = false, wednesday = false,
-                thursday = true, friday = false, saturday = true, sunday = true)
+        val bar1 = Bar(
+                "Luxus",
+                "Algun pijo",
+                "Mercedes 2º",
+                city = cityOu,
+                mondaySchedule = "11:00-20:30",
+                tuesdaySchedule = "11:00-20:30",
+                wednesdaySchedule = "12:00-22:00",
+                thursdaySchedule = "12:00-22:00",
+                fridaySchedule = null,
+                saturdaySchedule = "14:40-21:20"
+        )
 
         barRepository!!.save(bar1)
 
-        val bar2 = Bar("Patio andaluz", "Aida", "Calle turbia", city = cityOu)
-        bar2.schedule = Schedule(monday = true, tuesday = false, wednesday = false,
-                thursday = true, friday = false, saturday = true, sunday = true)
+        val bar2 = Bar(
+                "Patio andaluz",
+                "Aida",
+                "Calle turbia",
+                city = cityOu,
+                mondaySchedule = "12:00-20:30",
+                tuesdaySchedule = "12:00-20:30",
+                wednesdaySchedule = null,
+                thursdaySchedule = "17:00-22:00",
+                fridaySchedule = null,
+                saturdaySchedule = "14:40-21:20"
+        )
         barRepository!!.save(bar2)
 
 
@@ -71,9 +88,18 @@ class NightTimeApiApplication : CommandLineRunner {
         eventRepositories!!.save(event2)
         eventRepositories!!.save(event3)
 
-        val bar3 = Bar("Faro de Vigo", "Juan", "Calle Principe",cityVigo)
-        bar3.schedule = Schedule(monday = false, tuesday = true, wednesday = true,
-                thursday = false, friday = false, saturday = true, sunday = false)
+        val bar3 = Bar(
+                "Faro de Vigo",
+                "Juan",
+                "Calle Principe",
+                city = cityVigo,
+                mondaySchedule = "11:00-20:30",
+                tuesdaySchedule = null,
+                wednesdaySchedule = "12:00-22:00",
+                thursdaySchedule = "12:00-22:00",
+                fridaySchedule = null,
+                saturdaySchedule = "14:40-21:20"
+        )
         barRepository!!.save(bar3)
 
 

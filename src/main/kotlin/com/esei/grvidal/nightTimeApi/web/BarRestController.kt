@@ -156,7 +156,7 @@ class BarRestController {
 
 
                             matchResult.iterator().forEach {
-
+/*
                                 when (it.groupValues[1]) {
                                     "monday" -> bar.schedule?.monday = it.groupValues[2] == "true"
                                     "tuesday" -> bar.schedule?.tuesday = it.groupValues[2] == "true"
@@ -167,6 +167,8 @@ class BarRestController {
                                     "sunday" -> bar.schedule?.sunday = it.groupValues[2] == "true"
 
                                 }
+
+ */
                             }
 
                         } catch (e: Exception) {

@@ -25,13 +25,18 @@ class Bar(
         var owner: String,
         var address: String,
 
+        var mondaySchedule : String? = null,
+        var tuesdaySchedule : String? = null,
+        var wednesdaySchedule : String? = null,
+        var thursdaySchedule : String? = null,
+        var fridaySchedule : String? = null,
+        var saturdaySchedule : String? = null,
+        var sundaySchedule : String? = null,
+
         @ManyToOne//(cascade = [CascadeType.PERSIST])
         @JoinColumn(name = "city_id")
         var city: City,
 
-        @OneToOne(cascade = [CascadeType.ALL])
-        @JoinColumn(name = "schedule_id")
-        var schedule: Schedule? = null
 ) {
     
     @OneToMany(mappedBy = "bar",cascade = [CascadeType.REMOVE])
@@ -41,23 +46,4 @@ class Bar(
     @GeneratedValue(strategy = GenerationType.AUTO)
     var id: Long = 0
 
-}
-
-/**
- * Entity of the Schedule, this holds the data that the DB can save
- */
-@Entity
-@Table(name = "schedule")
-class Schedule(
-        var monday: Boolean,
-        var tuesday: Boolean,
-        var wednesday: Boolean,
-        var thursday: Boolean,
-        var friday: Boolean,
-        var saturday: Boolean,
-        var sunday: Boolean,
-) {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    var id: Long = 0
 }
