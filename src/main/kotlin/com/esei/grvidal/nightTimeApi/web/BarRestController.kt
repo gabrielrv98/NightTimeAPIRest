@@ -1,7 +1,9 @@
 package com.esei.grvidal.nightTimeApi.web
 
+import com.esei.grvidal.nightTimeApi.dto.BarDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.BarDTOInsert
 import com.esei.grvidal.nightTimeApi.dto.CityDTO
+import com.esei.grvidal.nightTimeApi.dto.toBar
 import com.esei.grvidal.nightTimeApi.serviceInterface.IBarService
 import com.esei.grvidal.nightTimeApi.serviceInterface.IEventService
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
@@ -10,6 +12,7 @@ import com.esei.grvidal.nightTimeApi.model.Bar
 import com.esei.grvidal.nightTimeApi.projections.BarDetailsProjection
 import com.esei.grvidal.nightTimeApi.projections.BarProjection
 import com.esei.grvidal.nightTimeApi.projections.EventProjection
+import com.esei.grvidal.nightTimeApi.serviceInterface.ICityService
 import com.esei.grvidal.nightTimeApi.utlis.Constants
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
@@ -28,6 +31,9 @@ class BarRestController {
     val barService: IBarService? = null
 
     @Autowired
+    val cityService: ICityService? = null
+
+    @Autowired
     val eventService: IEventService? = null
 
 
@@ -37,7 +43,7 @@ class BarRestController {
      */
     @GetMapping("/byCity/{idCity}")
     fun listByCity(@PathVariable("idCity") cityId: Long): ResponseEntity<List<BarProjection>> {
-        barService?.let{
+        barService?.let {
             return ResponseEntity(it.listByCity(cityId), HttpStatus.OK)
         }
 
@@ -50,10 +56,10 @@ class BarRestController {
     @GetMapping("/{id}/details")
     fun getDetails(@PathVariable("id") idBar: Long): ResponseEntity<Any> {
 
-        barService?.let{
+        barService?.let {
             return try {
-                 ResponseEntity(it.getDetails(idBar), HttpStatus.OK)
-            }catch(e : NotFoundException){
+                ResponseEntity(it.getDetails(idBar), HttpStatus.OK)
+            } catch (e: NotFoundException) {
                 ResponseEntity(e.message, HttpStatus.NOT_FOUND)
             }
         }
@@ -68,11 +74,11 @@ class BarRestController {
     @GetMapping("/{id}")
     fun load(@PathVariable("id") idBar: Long): ResponseEntity<Any> {
 
-        barService?.let{
-            return try{
-                ResponseEntity(it.getFullProjection(idBar) , HttpStatus.OK)
-            }catch(e: NotFoundException){
-                ResponseEntity(e.message,HttpStatus.NOT_FOUND)
+        barService?.let {
+            return try {
+                ResponseEntity(it.getFullProjection(idBar), HttpStatus.OK)
+            } catch (e: NotFoundException) {
+                ResponseEntity(e.message, HttpStatus.NOT_FOUND)
             }
         }
 
@@ -86,70 +92,102 @@ class BarRestController {
     @PostMapping("")
     fun insert(@RequestBody bar: BarDTOInsert): ResponseEntity<Any> {
         return try {
-            val barId = barService!!.save(bar).id
+            val barId = barService!!.save(bar.toBar(cityService!!.load(bar.cityId))).id
             val responseHeader = HttpHeaders()
             responseHeader.set("location", Constants.URL_BASE_BAR + "/" + barId)
             ResponseEntity(responseHeader, HttpStatus.CREATED)
         } catch (e: NotFoundException) {
-            ResponseEntity(e.message,HttpStatus.NOT_FOUND)
+            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
         }
     }
 
     /**
-     * Listen to a Put with the [Constants.URL_BASE_BAR] and a requestBody with a Bar to update a Bar
+     * Listen to a Patch with the [Constants.URL_BASE_BAR] and a requestBody with a Bar to update a Bar
      *
      * @param idBar id of the bar that will be updated
-     * @param fields attributes to modify
+     * @param barEdit bar with the attributes to modify
      *
      * If there is any mistake in Schedule object it will just omit the pair key value
      * //TODO editar city del bar
      */
     @PatchMapping("/{id}")
-    fun update(@PathVariable("id") idBar: Long, @RequestBody fields: Map<String, Any>): ResponseEntity<Any> {
+    fun update(@PathVariable("id") idBar: Long, @RequestBody barEdit: BarDTOEdit): ResponseEntity<Any> {
         val responseHeader = HttpHeaders()
-        return try {
+        //getting the old Bar
+        val barOriginal = barService!!.load(idBar)
 
-            val bar = barService!!.load(idBar)
-            fields.forEach { (k, v) ->
-                when (k) {
-                    "name" -> bar.name = v.toString()
-                    "owner" -> bar.owner = v.toString()
-                    "address" -> bar.address = v.toString()
-                    "schedule" -> {
-                        try {
+        //updating the bar
+        barOriginal.apply {
+            id = idBar
+            name = barEdit.name ?: this.name
+            owner = barEdit.owner ?: this.owner
+            address = barEdit.address ?: this.address
 
-                            val regex = """(monday|tuesday|wednesday|thursday|friday|saturday|sunday)=(true|false)""".toRegex()
-                            val matchResult = regex.findAll(v.toString())
-
-
-                            matchResult.iterator().forEach {
-/*
-                                when (it.groupValues[1]) {
-                                    "monday" -> bar.schedule?.monday = it.groupValues[2] == "true"
-                                    "tuesday" -> bar.schedule?.tuesday = it.groupValues[2] == "true"
-                                    "wednesday" -> bar.schedule?.wednesday = it.groupValues[2] == "true"
-                                    "thursday" -> bar.schedule?.thursday = it.groupValues[2] == "true"
-                                    "friday" -> bar.schedule?.friday = it.groupValues[2] == "true"
-                                    "saturday" -> bar.schedule?.saturday = it.groupValues[2] == "true"
-                                    "sunday" -> bar.schedule?.sunday = it.groupValues[2] == "true"
-
-                                }
-
- */
-                            }
-
-                        } catch (e: Exception) {
-                            responseHeader.set("ScheduleError", "no properly format " + e.message)
-                        }
-                    }
+            city = barEdit.cityId?.let {
+                try {
+                    //if the city id doesn't match any cities, it wont update
+                    cityService!!.load(it)
+                } catch (e: NotFoundException) {
+                    responseHeader.set("Warning", e.message)
+                    this.city
                 }
-            }
-            //barService!!.save(bar)
-            ResponseEntity(responseHeader, HttpStatus.OK)
+            } ?: this.city
 
-        } catch (e: ServiceException) {
-            ResponseEntity(responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
+            mondaySchedule = if (barEdit.mondaySchedule == null)
+                this.mondaySchedule
+            else {
+                if (barEdit.mondaySchedule != "null") barEdit.mondaySchedule
+                else null
+            }
+
+            tuesdaySchedule = if (barEdit.tuesdaySchedule == null)
+                this.tuesdaySchedule
+            else {
+                if (barEdit.tuesdaySchedule != "null") barEdit.tuesdaySchedule
+                else null
+            }
+
+            wednesdaySchedule = if (barEdit.wednesdaySchedule == null)
+                this.wednesdaySchedule
+            else {
+                if (barEdit.wednesdaySchedule != "null") barEdit.wednesdaySchedule
+                else null
+            }
+
+            thursdaySchedule = if (barEdit.thursdaySchedule == null)
+                this.thursdaySchedule
+            else {
+                if (barEdit.thursdaySchedule != "null") barEdit.thursdaySchedule
+                else null
+            }
+
+            fridaySchedule = if (barEdit.fridaySchedule == null)
+                this.fridaySchedule
+            else {
+                if (barEdit.fridaySchedule != "null") barEdit.fridaySchedule
+                else null
+            }
+
+            saturdaySchedule = if (barEdit.saturdaySchedule == null)
+                this.saturdaySchedule
+            else {
+                if (barEdit.saturdaySchedule != "null") barEdit.saturdaySchedule
+                else null
+            }
+
+            sundaySchedule = if (barEdit.sundaySchedule == null)
+                this.sundaySchedule
+            else {
+                if (barEdit.sundaySchedule != "null") barEdit.sundaySchedule
+                else null
+            }
         }
+
+
+        barService!!.save(barOriginal)
+        return ResponseEntity(responseHeader, HttpStatus.OK)
+
+
     }
 
     /**
@@ -160,12 +198,10 @@ class BarRestController {
         return try {
 
             barService!!.remove(idBar)
+            ResponseEntity(HttpStatus.NO_CONTENT)
 
-            ResponseEntity(HttpStatus.OK)
-        } catch (e: ServiceException) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         } catch (e: NotFoundException) {
-            ResponseEntity(HttpStatus.NOT_FOUND)
+            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
         }
     }
 }

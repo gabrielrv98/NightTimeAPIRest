@@ -4,7 +4,7 @@ import com.esei.grvidal.nightTimeApi.dao.CityRepository
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.City
-import com.esei.grvidal.nightTimeApi.serviceInterface.ICityBusiness
+import com.esei.grvidal.nightTimeApi.serviceInterface.ICityService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.*
@@ -15,7 +15,7 @@ import kotlin.jvm.Throws
  *
  */
 @Service
-class CityBusiness : ICityBusiness {
+class CityService : ICityService {
 
     /**
      *Dependency injection with autowired
@@ -44,12 +44,8 @@ class CityBusiness : ICityBusiness {
      */
     @Throws(ServiceException::class, NotFoundException::class)
     override fun load(idCity: Long): City {
-        val op: Optional<City>
-        try {
-            op = cityRepository!!.findById(idCity)
-        } catch (e: Exception) {
-            throw ServiceException(e.message)
-        }
+
+        val op = cityRepository!!.findById(idCity)
 
         if (!op.isPresent) {
             throw NotFoundException("No se encontro al bar con el id $idCity")

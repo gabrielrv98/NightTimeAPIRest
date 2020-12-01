@@ -5,7 +5,7 @@ import com.esei.grvidal.nightTimeApi.model.City
 /**
  * DAO Interface for Cities
  */
-interface ICityBusiness {
+interface ICityService {
 
     //List all the Cities
     fun list(): List<City>

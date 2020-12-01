@@ -3,7 +3,7 @@ package com.esei.grvidal.nightTimeApi.services
 import com.esei.grvidal.nightTimeApi.dao.BarRepository
 import com.esei.grvidal.nightTimeApi.dao.CityRepository
 import com.esei.grvidal.nightTimeApi.dto.BarDTOInsert
-import com.esei.grvidal.nightTimeApi.dto.CityDTO
+import com.esei.grvidal.nightTimeApi.dto.toBar
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Bar
@@ -83,52 +83,24 @@ class BarService : IBarService {
     /**
      * This will save a new bar, if not, will throw an Exception
      */
-    @Throws(ServiceException::class)
-    override fun save(bar: BarDTOInsert): Bar {
-        return barRepository!!.save(bar.toBar())
+    override fun save(bar: Bar): Bar {
+        return barRepository!!.save(bar)
     }
 
-    @Throws(NotFoundException::class)
-    fun BarDTOInsert.toBar(): Bar{
-
-        return Bar(
-                name = this.name,
-                owner = this.owner,
-                address = this.address,
-                mondaySchedule = this.mondaySchedule,
-                tuesdaySchedule = this.tuesdaySchedule,
-                wednesdaySchedule = this.wednesdaySchedule,
-                thursdaySchedule = this.thursdaySchedule,
-                fridaySchedule = this.fridaySchedule,
-                saturdaySchedule = this.saturdaySchedule,
-                sundaySchedule = this.sundaySchedule,
-                city = cityRepository!!.findById(this.cityId)
-                        .orElseThrow{ throw NotFoundException("City with id $cityId not found")}
-        )
-    }
     /**
      * This will remove a bars through its id, if not, will throw an Exception, or if it cant find it, it will throw a NotFoundException
      */
     @Throws(ServiceException::class, NotFoundException::class)
     override fun remove(idBar: Long) {
-        val op: Optional<Bar>
 
-        try {
-            op = barRepository!!.findById(idBar)
-        } catch (e: Exception) {
-            throw ServiceException(e.message)
-        }
+        val op = barRepository!!.findById(idBar)
+
 
         if (!op.isPresent) {
             throw NotFoundException("No se encontro al bar con el id $idBar")
-        } else {
 
-            try {
-                barRepository!!.deleteById(idBar)
-            } catch (e: Exception) {
-                throw ServiceException(e.message)
-            }
-        }
+        } else
+            barRepository!!.deleteById(idBar)
 
     }
 
@@ -149,7 +121,7 @@ class BarService : IBarService {
     override fun getFullProjection(idBar: Long): BarFullProjection {
 
         try {
-            return  barRepository!!.getFullBarById(idBar)
+            return barRepository!!.getFullBarById(idBar)
 
         } catch (e: EmptyResultDataAccessException) {
             throw NotFoundException("No bar with id $idBar have been found")

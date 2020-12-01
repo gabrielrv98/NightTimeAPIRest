@@ -24,8 +24,8 @@ interface IBarService {
     //Show one bar
     fun load(idBar: Long): Bar
 
-    //Save a new bar
-    fun save(bar: BarDTOInsert): Bar
+    //Save a bar
+    fun save(bar: Bar): Bar
 
     //remove a bar
     fun remove(idBar: Long)
