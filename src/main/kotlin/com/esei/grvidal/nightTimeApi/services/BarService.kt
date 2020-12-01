@@ -6,6 +6,7 @@ import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Bar
 import com.esei.grvidal.nightTimeApi.projections.BarDetailsProjection
+import com.esei.grvidal.nightTimeApi.projections.BarFullProjection
 import com.esei.grvidal.nightTimeApi.projections.BarProjection
 import com.esei.grvidal.nightTimeApi.serviceInterface.IBarService
 import org.springframework.beans.factory.annotation.Autowired
@@ -121,6 +122,16 @@ class BarService : IBarService {
 
         try {
             return barRepository!!.getBarDetailsById(idBar)
+
+        } catch (e: EmptyResultDataAccessException) {
+            throw NotFoundException("No bar with id $idBar have been found")
+        }
+    }
+
+    override fun getFullProjection(idBar: Long): BarFullProjection {
+
+        try {
+            return  barRepository!!.getFullBarById(idBar)
 
         } catch (e: EmptyResultDataAccessException) {
             throw NotFoundException("No bar with id $idBar have been found")

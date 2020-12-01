@@ -32,6 +32,7 @@ class BarRestController {
 
     /**
      * Listen to a Get with the [Constants.URL_BASE_BAR] to show all Bars
+     * TODO ADD PAGEABLE
      */
     @GetMapping("/byCity/{idCity}")
     fun listByCity(@PathVariable("idCity") cityId: Long): ResponseEntity<List<BarProjection>> {
@@ -51,45 +52,10 @@ class BarRestController {
         barService?.let{
             return try {
                  ResponseEntity(it.getDetails(idBar), HttpStatus.OK)
-
             }catch(e : NotFoundException){
                 ResponseEntity(e.message, HttpStatus.NOT_FOUND)
             }
         }
-        return ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-
-    }
-
-
-    /**
-     * Returns a list with the events of the bar that matches the ID
-     */
-    @GetMapping("/{id}/events")
-    fun listWithEvents(@PathVariable("id") idBar: Long): ResponseEntity<List<EventProjection>> {
-        
-        eventService?.let{
-            try {
-                return ResponseEntity(it.listEventByBar(idBar), HttpStatus.OK)
-            }catch(e : NotFoundException){
-                ResponseEntity(e.message, HttpStatus.NOT_FOUND)
-            }
-        }
-        return ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-
-    }
-
-    @GetMapping("/{id}/projection")
-    fun getProjection(@PathVariable("id") idBar: Long): ResponseEntity<Any> {
-        barService?.let{
-
-            return try{
-                ResponseEntity(it.getProjection(idBar), HttpStatus.OK)
-            }catch (e: NotFoundException){
-                ResponseEntity(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
-            }
-
-        }
-
         return ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
 
     }
@@ -103,7 +69,7 @@ class BarRestController {
 
         barService?.let{
             return try{
-                ResponseEntity(it.getProjection(idBar) , HttpStatus.OK)
+                ResponseEntity(it.getFullProjection(idBar) , HttpStatus.OK)
             }catch(e: NotFoundException){
                 ResponseEntity(e.message,HttpStatus.NOT_FOUND)
             }
