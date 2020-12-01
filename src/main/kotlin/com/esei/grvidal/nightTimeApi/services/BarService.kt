@@ -3,8 +3,6 @@ package com.esei.grvidal.nightTimeApi.services
 import com.esei.grvidal.nightTimeApi.dao.BarRepository
 import com.esei.grvidal.nightTimeApi.dao.CityRepository
 import com.esei.grvidal.nightTimeApi.dto.BarDTOEdit
-import com.esei.grvidal.nightTimeApi.dto.BarDTOInsert
-import com.esei.grvidal.nightTimeApi.dto.toBar
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Bar
@@ -14,10 +12,7 @@ import com.esei.grvidal.nightTimeApi.projections.BarProjection
 import com.esei.grvidal.nightTimeApi.serviceInterface.IBarService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.EmptyResultDataAccessException
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
-import java.util.*
 import kotlin.jvm.Throws
 
 /**
@@ -63,7 +58,7 @@ class BarService : IBarService {
      */
     @Throws(NotFoundException::class)
     fun load(idBar: Long): Bar {
-        return barRepository!!.findById(idBar).orElseThrow { NotFoundException("No se encontro al bar con el id $idBar") }
+        return barRepository!!.findById(idBar).orElseThrow { NotFoundException("No bar with id $idBar have been found") }
     }
 
     /**
@@ -97,7 +92,7 @@ class BarService : IBarService {
             city = cityEdit
 
             // if the parameter [mondaySchedule] is null, it won't update
-            mondaySchedule = if (barEdit.mondaySchedule == null)
+            this.mondaySchedule = if (barEdit.mondaySchedule == null)
                 this.mondaySchedule
             else {
                 // if the containing string is null, mondaySchedule will be updated as null
@@ -106,42 +101,42 @@ class BarService : IBarService {
                 else barEdit.mondaySchedule
             }
 
-            tuesdaySchedule = if (barEdit.tuesdaySchedule == null)
+            this.tuesdaySchedule = if (barEdit.tuesdaySchedule == null)
                 this.tuesdaySchedule
             else {
                 if (barEdit.tuesdaySchedule != "null") barEdit.tuesdaySchedule
                 else null
             }
 
-            wednesdaySchedule = if (barEdit.wednesdaySchedule == null)
+            this.wednesdaySchedule = if (barEdit.wednesdaySchedule == null)
                 this.wednesdaySchedule
             else {
                 if (barEdit.wednesdaySchedule != "null") barEdit.wednesdaySchedule
                 else null
             }
 
-            thursdaySchedule = if (barEdit.thursdaySchedule == null)
+            this.thursdaySchedule = if (barEdit.thursdaySchedule == null)
                 this.thursdaySchedule
             else {
                 if (barEdit.thursdaySchedule != "null") barEdit.thursdaySchedule
                 else null
             }
 
-            fridaySchedule = if (barEdit.fridaySchedule == null)
+            this.fridaySchedule = if (barEdit.fridaySchedule == null)
                 this.fridaySchedule
             else {
                 if (barEdit.fridaySchedule != "null") barEdit.fridaySchedule
                 else null
             }
 
-            saturdaySchedule = if (barEdit.saturdaySchedule == null)
+            this.saturdaySchedule = if (barEdit.saturdaySchedule == null)
                 this.saturdaySchedule
             else {
                 if (barEdit.saturdaySchedule != "null") barEdit.saturdaySchedule
                 else null
             }
 
-            sundaySchedule = if (barEdit.sundaySchedule == null)
+            this.sundaySchedule = if (barEdit.sundaySchedule == null)
                 this.sundaySchedule
             else {
                 if (barEdit.sundaySchedule != "null") barEdit.sundaySchedule
@@ -163,7 +158,7 @@ class BarService : IBarService {
 
 
         if (!op.isPresent) {
-            throw NotFoundException("No se encontro al bar con el id $idBar")
+            throw NotFoundException("No bar with id $idBar have been found")
 
         } else
             barRepository!!.deleteById(idBar)

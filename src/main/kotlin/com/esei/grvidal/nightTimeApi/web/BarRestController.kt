@@ -5,7 +5,6 @@ import com.esei.grvidal.nightTimeApi.dto.BarDTOInsert
 import com.esei.grvidal.nightTimeApi.dto.toBar
 import com.esei.grvidal.nightTimeApi.serviceInterface.IBarService
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
-import com.esei.grvidal.nightTimeApi.model.Bar
 import com.esei.grvidal.nightTimeApi.projections.BarDetailsProjection
 import com.esei.grvidal.nightTimeApi.projections.BarProjection
 import com.esei.grvidal.nightTimeApi.serviceInterface.ICityService
@@ -110,7 +109,7 @@ class BarRestController {
 
     /**
      * Listen to a Patch and a requestBody with a [BarDTOEdit] to update a Bar
-     * if any atribute is null, the original will be used, and if any schedule is text "null", will be set as null
+     * if any attribute is null, the original will be used, and if any schedule is text "null", will be set as null
      *
      * @param idBar id of the bar that will be updated
      * @param barEdit bar with the attributes to modify
