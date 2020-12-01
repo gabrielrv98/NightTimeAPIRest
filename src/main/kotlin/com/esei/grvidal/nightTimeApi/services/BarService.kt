@@ -26,17 +26,17 @@ class BarService : IBarService {
      *Dependency injection with autowired
      */
     @Autowired
-    val barRepository: BarRepository? = null
+    lateinit var barRepository: BarRepository
 
     @Autowired
-    val cityRepository: CityRepository? = null
+    lateinit var cityRepository: CityRepository
 
 
     /**
      * List all the bars in the given city [cityId]
      */
     override fun listByCity(cityId: Long): List<BarProjection> {
-        return barRepository!!.getBarsByCity_Id(cityId)
+        return barRepository.getBarsByCity_Id(cityId)
     }
 
     /**
@@ -46,7 +46,7 @@ class BarService : IBarService {
     override fun getDetails(idBar: Long): BarDetailsProjection {
 
         try {
-            return barRepository!!.getBarDetailsById(idBar)
+            return barRepository.getBarDetailsById(idBar)
 
         } catch (e: EmptyResultDataAccessException) {
             throw NotFoundException("No bar with id $idBar have been found")
@@ -58,14 +58,14 @@ class BarService : IBarService {
      */
     @Throws(NotFoundException::class)
     fun load(idBar: Long): Bar {
-        return barRepository!!.findById(idBar).orElseThrow { NotFoundException("No bar with id $idBar have been found") }
+        return barRepository.findById(idBar).orElseThrow { NotFoundException("No bar with id $idBar have been found") }
     }
 
     /**
      * This will save a new bar
      */
     override fun save(bar: Bar): Long {
-        return barRepository!!.save(bar).id
+        return barRepository.save(bar).id
     }
 
     /**
@@ -78,7 +78,7 @@ class BarService : IBarService {
         val barOriginal = load(idBar)
 
         val cityEdit = barEdit.cityId?.let {
-            cityRepository!!.findById(it).orElse(barOriginal.city)
+            cityRepository.findById(it).orElse(barOriginal.city)
         }
                 ?: barOriginal.city
 
@@ -144,7 +144,7 @@ class BarService : IBarService {
             }
         }
 
-        barRepository!!.save(barOriginal)
+        barRepository.save(barOriginal)
 
     }
 
@@ -154,14 +154,14 @@ class BarService : IBarService {
     @Throws(ServiceException::class, NotFoundException::class)
     override fun remove(idBar: Long) {
 
-        val op = barRepository!!.findById(idBar)
+        val op = barRepository.findById(idBar)
 
 
         if (!op.isPresent) {
             throw NotFoundException("No bar with id $idBar have been found")
 
         } else
-            barRepository!!.deleteById(idBar)
+            barRepository.deleteById(idBar)
 
     }
 
@@ -169,7 +169,7 @@ class BarService : IBarService {
     override fun getFullProjection(idBar: Long): BarFullProjection {
 
         try {
-            return barRepository!!.getFullBarById(idBar)
+            return barRepository.getFullBarById(idBar)
 
         } catch (e: EmptyResultDataAccessException) {
             throw NotFoundException("No bar with id $idBar have been found")
