@@ -79,8 +79,8 @@ class NightTimeApiApplication : CommandLineRunner {
 
 
         val event1 = Event( "copas a menos de 1 euro",date = LocalDate.now(), bar = bar1)
-        val event2 = Event( "Fardos gratis", bar = bar1)
-        val event3 = Event( "No lo tenemos muy claro", bar = bar2)
+        val event2 = Event( "Fardos gratis",date = LocalDate.now(), bar = bar1)
+        val event3 = Event( "No lo tenemos muy claro",date = LocalDate.now(), bar = bar2)
 
 
 

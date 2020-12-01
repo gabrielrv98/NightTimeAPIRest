@@ -8,6 +8,7 @@ import com.esei.grvidal.nightTimeApi.projections.EventProjection
 import com.esei.grvidal.nightTimeApi.serviceInterface.IEventService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import java.util.*
 import kotlin.jvm.Throws
 
@@ -22,7 +23,7 @@ class EventService : IEventService {
      *Dependency injection with autowired
      */
     @Autowired
-    val eventRepository: EventRepository? = null
+    lateinit var eventRepository: EventRepository
 
 
     /**
@@ -30,34 +31,21 @@ class EventService : IEventService {
      */
     @Throws(ServiceException::class)
     override fun list(): List<EventProjection> {
-        return eventRepository?.findAllBy() ?: listOf()
+        return eventRepository.findAllBy()
     }
 
 
     @Throws(ServiceException::class, NotFoundException::class)
     override fun listEventByBar(idBar: Long): List<EventProjection> {
 
-        return eventRepository?.findAllByBar_Id(idBar) ?: listOf()
+        return eventRepository.findAllByBar_Id(idBar)
 
     }
 
-
-    /**
-     * This will show one bar, if not, will throw a BusinessException or if the object cant be found, it will throw a NotFoundException
-     */
-    @Throws(ServiceException::class)
-    override fun load(idEvent: Long): Event? {
-        val op: Optional<Event>
-        eventRepository?.let{
-
-            op = it.findById(idEvent)
-            return if (op.isPresent) {
-                op.get()
-            }else null
-        }
-        throw ServiceException("Repository error")
-
+    override fun listEventByDay(date: LocalDate): List<EventProjection> {
+        return eventRepository.findAllByDate(date)
     }
+
 
     /**
      * This will save a new bar, if not, will throw an Exception
@@ -65,7 +53,7 @@ class EventService : IEventService {
     @Throws(ServiceException::class)
     override fun save(event: Event): Event {
 
-        return eventRepository?.save(event) ?: throw ServiceException("Element faild to save")
+        return eventRepository.save(event)
     }
 
     /**
@@ -76,7 +64,7 @@ class EventService : IEventService {
         val op: Optional<Event>
 
         try {
-            op = eventRepository!!.findById(idEvent)
+            op = eventRepository.findById(idEvent)
         } catch (e: Exception) {
             throw ServiceException(e.message)
         }
@@ -86,7 +74,7 @@ class EventService : IEventService {
         } else {
 
             try {
-                eventRepository!!.deleteById(idEvent)
+                eventRepository.deleteById(idEvent)
             } catch (e: Exception) {
                 throw ServiceException(e.message)
             }

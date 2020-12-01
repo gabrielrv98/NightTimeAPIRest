@@ -13,7 +13,7 @@ import javax.persistence.*
 @Table(name = "event")
 class Event(
         var description: String,
-        var date: LocalDate? = null,
+        var date: LocalDate,
 
         @ManyToOne
         @JoinColumn(name = "bar_id")

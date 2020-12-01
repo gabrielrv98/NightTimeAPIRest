@@ -4,6 +4,7 @@ import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.model.Bar
 import com.esei.grvidal.nightTimeApi.model.Event
 import com.esei.grvidal.nightTimeApi.projections.EventProjection
+import java.time.LocalDate
 import kotlin.jvm.Throws
 
 /**
@@ -17,9 +18,8 @@ interface IEventService {
     //List all the events of an event
     fun listEventByBar(idBar: Long): List<EventProjection>
 
-    //Show one Event
-    @Throws(ServiceException::class)
-    fun load(idEvent: Long): Event?
+    //List all the events of an event
+    fun listEventByDay(date: LocalDate): List<EventProjection>
 
     //Save a new event
     fun save(event: Event): Event
