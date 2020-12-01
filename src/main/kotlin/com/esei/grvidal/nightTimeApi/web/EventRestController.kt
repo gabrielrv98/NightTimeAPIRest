@@ -84,11 +84,9 @@ class EventRestController {
     fun delete(@PathVariable("id") idEvent: Long): ResponseEntity<Any> {
         return try {
             eventService.remove(idEvent)
-            ResponseEntity(HttpStatus.OK)
-        } catch (e: ServiceException) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+            ResponseEntity(HttpStatus.NO_CONTENT)
         } catch (e: NotFoundException) {
-            ResponseEntity(HttpStatus.NOT_FOUND)
+            ResponseEntity(e.message,HttpStatus.NOT_FOUND)
         }
     }
 }

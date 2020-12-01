@@ -75,24 +75,9 @@ class EventService : IEventService {
      */
     @Throws(NotFoundException::class)
     override fun remove(idEvent: Long) {
-        val op: Optional<Event>
 
-        try {
-            op = eventRepository.findById(idEvent)
-        } catch (e: Exception) {
-            throw ServiceException(e.message)
-        }
-
-        if (!op.isPresent) {
-            throw NotFoundException("No se encontro al evento con el id $idEvent")
-        } else {
-
-            try {
-                eventRepository.deleteById(idEvent)
-            } catch (e: Exception) {
-                throw ServiceException(e.message)
-            }
-        }
+        val event = load(idEvent)
+        eventRepository.delete(event)
 
     }
 
