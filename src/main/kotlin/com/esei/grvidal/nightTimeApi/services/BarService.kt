@@ -154,14 +154,8 @@ class BarService : IBarService {
     @Throws(NotFoundException::class)
     override fun remove(idBar: Long) {
 
-        val op = barRepository.findById(idBar)
-
-
-        if (!op.isPresent) {
-            throw NotFoundException("No bar with id $idBar have been found")
-
-        } else
-            barRepository.deleteById(idBar)
+        val bar = load(idBar)
+        barRepository.delete(bar)
 
     }
 
