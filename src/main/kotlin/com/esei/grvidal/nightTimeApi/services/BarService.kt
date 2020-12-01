@@ -57,7 +57,7 @@ class BarService : IBarService {
      * This will show one bar, if not it will throw a NotFoundException
      */
     @Throws(NotFoundException::class)
-    fun load(idBar: Long): Bar {
+    override fun load(idBar: Long): Bar {
         return barRepository.findById(idBar).orElseThrow { NotFoundException("No bar with id $idBar have been found") }
     }
 
@@ -151,7 +151,7 @@ class BarService : IBarService {
     /**
      * This will remove a bars through its [idBar], if it cant find it, it will throw a NotFoundException
      */
-    @Throws(ServiceException::class, NotFoundException::class)
+    @Throws(NotFoundException::class)
     override fun remove(idBar: Long) {
 
         val op = barRepository.findById(idBar)
@@ -165,7 +165,7 @@ class BarService : IBarService {
 
     }
 
-
+    @Throws(NotFoundException::class)
     override fun getFullProjection(idBar: Long): BarFullProjection {
 
         try {

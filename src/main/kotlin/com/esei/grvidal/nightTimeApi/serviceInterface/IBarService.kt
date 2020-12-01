@@ -17,6 +17,10 @@ interface IBarService {
     //list all the bars on a city
     fun listByCity(cityId: Long): List<BarProjection>
 
+    //Returns a Bar Entity
+    @Throws(NotFoundException::class)
+    fun load(idBar: Long): Bar
+
     //returns a class with the rest of the bars attributes
     @Throws(NotFoundException::class)
     fun getDetails(idBar: Long): BarDetailsProjection
