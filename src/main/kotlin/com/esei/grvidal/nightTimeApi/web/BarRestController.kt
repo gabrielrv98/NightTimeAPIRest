@@ -1,5 +1,6 @@
 package com.esei.grvidal.nightTimeApi.web
 
+import com.esei.grvidal.nightTimeApi.dto.BarDTOInsert
 import com.esei.grvidal.nightTimeApi.dto.CityDTO
 import com.esei.grvidal.nightTimeApi.serviceInterface.IBarService
 import com.esei.grvidal.nightTimeApi.serviceInterface.IEventService
@@ -83,14 +84,14 @@ class BarRestController {
      * @param bar new Bar to insert in the database
      */
     @PostMapping("")
-    fun insert(@RequestBody bar: Bar): ResponseEntity<Any> {
+    fun insert(@RequestBody bar: BarDTOInsert): ResponseEntity<Any> {
         return try {
-            barService!!.save(bar)
+            val barId = barService!!.save(bar).id
             val responseHeader = HttpHeaders()
-            responseHeader.set("location", Constants.URL_BASE_BAR + "/" + bar.id)
+            responseHeader.set("location", Constants.URL_BASE_BAR + "/" + barId)
             ResponseEntity(responseHeader, HttpStatus.CREATED)
-        } catch (e: ServiceException) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+        } catch (e: NotFoundException) {
+            ResponseEntity(e.message,HttpStatus.NOT_FOUND)
         }
     }
 
@@ -143,7 +144,7 @@ class BarRestController {
                     }
                 }
             }
-            barService!!.save(bar)
+            //barService!!.save(bar)
             ResponseEntity(responseHeader, HttpStatus.OK)
 
         } catch (e: ServiceException) {

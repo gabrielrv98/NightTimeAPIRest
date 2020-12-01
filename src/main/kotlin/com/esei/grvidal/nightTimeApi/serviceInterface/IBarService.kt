@@ -1,5 +1,6 @@
 package com.esei.grvidal.nightTimeApi.serviceInterface
 
+import com.esei.grvidal.nightTimeApi.dto.BarDTOInsert
 import com.esei.grvidal.nightTimeApi.dto.CityDTO
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
@@ -24,7 +25,7 @@ interface IBarService {
     fun load(idBar: Long): Bar
 
     //Save a new bar
-    fun save(bar: Bar): Bar
+    fun save(bar: BarDTOInsert): Bar
 
     //remove a bar
     fun remove(idBar: Long)

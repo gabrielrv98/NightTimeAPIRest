@@ -1,6 +1,8 @@
 package com.esei.grvidal.nightTimeApi.services
 
 import com.esei.grvidal.nightTimeApi.dao.BarRepository
+import com.esei.grvidal.nightTimeApi.dao.CityRepository
+import com.esei.grvidal.nightTimeApi.dto.BarDTOInsert
 import com.esei.grvidal.nightTimeApi.dto.CityDTO
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
@@ -27,6 +29,9 @@ class BarService : IBarService {
      */
     @Autowired
     val barRepository: BarRepository? = null
+
+    @Autowired
+    val cityRepository: CityRepository? = null
 
 
     /**
@@ -79,15 +84,28 @@ class BarService : IBarService {
      * This will save a new bar, if not, will throw an Exception
      */
     @Throws(ServiceException::class)
-    override fun save(bar: Bar): Bar {
-
-        try {
-            return barRepository!!.save(bar)
-        } catch (e: Exception) {
-            throw ServiceException(e.message)
-        }
+    override fun save(bar: BarDTOInsert): Bar {
+        return barRepository!!.save(bar.toBar())
     }
 
+    @Throws(NotFoundException::class)
+    fun BarDTOInsert.toBar(): Bar{
+
+        return Bar(
+                name = this.name,
+                owner = this.owner,
+                address = this.address,
+                mondaySchedule = this.mondaySchedule,
+                tuesdaySchedule = this.tuesdaySchedule,
+                wednesdaySchedule = this.wednesdaySchedule,
+                thursdaySchedule = this.thursdaySchedule,
+                fridaySchedule = this.fridaySchedule,
+                saturdaySchedule = this.saturdaySchedule,
+                sundaySchedule = this.sundaySchedule,
+                city = cityRepository!!.findById(this.cityId)
+                        .orElseThrow{ throw NotFoundException("City with id $cityId not found")}
+        )
+    }
     /**
      * This will remove a bars through its id, if not, will throw an Exception, or if it cant find it, it will throw a NotFoundException
      */
