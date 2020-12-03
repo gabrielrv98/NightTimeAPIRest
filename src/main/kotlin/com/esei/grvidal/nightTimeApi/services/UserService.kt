@@ -6,7 +6,7 @@ import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.SecretData
 import com.esei.grvidal.nightTimeApi.model.User
-import com.esei.grvidal.nightTimeApi.serviceInterface.IUserBusiness
+import com.esei.grvidal.nightTimeApi.serviceInterface.IUserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.*
@@ -17,7 +17,7 @@ import kotlin.jvm.Throws
  *
  */
 @Service
-class UserBusiness : IUserBusiness {
+class UserService : IUserService {
 
     /**
      *Dependency injection with autowired

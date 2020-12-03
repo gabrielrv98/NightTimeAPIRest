@@ -7,7 +7,7 @@ import java.util.*
 /**
  * DAO Interface for Bars
  */
-interface IUserBusiness {
+interface IUserService {
 
     //List all the user
     fun list(): List<User>

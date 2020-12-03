@@ -3,7 +3,7 @@ package com.esei.grvidal.nightTimeApi.controllers
 import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendsBusiness
 import com.esei.grvidal.nightTimeApi.serviceInterface.IDateCityBusiness
 import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendRequestBusiness
-import com.esei.grvidal.nightTimeApi.serviceInterface.IUserBusiness
+import com.esei.grvidal.nightTimeApi.serviceInterface.IUserService
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*
 class UserRestController {
 
     @Autowired
-    lateinit var userBusiness: IUserBusiness
+    lateinit var userService: IUserService
 
     @Autowired
     lateinit var friendsBusiness: IFriendsBusiness
@@ -44,7 +44,7 @@ class UserRestController {
     @GetMapping("")
     fun list(): ResponseEntity<List<User>> {
         return try {
-            ResponseEntity(userBusiness.list(), HttpStatus.OK)
+            ResponseEntity(userService.list(), HttpStatus.OK)
         } catch (e: Exception) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -58,7 +58,7 @@ class UserRestController {
     fun load(@PathVariable("id") idUser: Long): ResponseEntity<Any> {
 
         return try {
-            ResponseEntity(userBusiness.load(idUser), HttpStatus.OK)
+            ResponseEntity(userService.load(idUser), HttpStatus.OK)
         } catch (e: NotFoundException) {
             ResponseEntity(HttpStatus.NOT_FOUND)
         }
@@ -72,8 +72,8 @@ class UserRestController {
     @PostMapping("")
     fun insert(@RequestBody user: User, @RequestHeader(name = "password") password: String): ResponseEntity<Any> {
         return try {
-            userBusiness.save(user)
-            userBusiness.saveSecretData(SecretData(password, user))
+            userService.save(user)
+            userService.saveSecretData(SecretData(password, user))
 
             val responseHeader = HttpHeaders()
             responseHeader.set("location", Constants.URL_BASE_USER + "/" + user.id)
@@ -92,10 +92,10 @@ class UserRestController {
     ): ResponseEntity<Any> {
         var responseHeader = HttpHeaders()
         return try {
-            val user = userBusiness.load(idUser = idUser)
+            val user = userService.load(idUser = idUser)
 
             if (user.nickname == username) {
-                responseHeader.set("UUID", userBusiness.login(user, password).toString())
+                responseHeader.set("UUID", userService.login(user, password).toString())
 
             } else throw ServiceException("")
 
@@ -122,14 +122,14 @@ class UserRestController {
         val responseHeader = HttpHeaders()
         return try {
 
-            val user = userBusiness.load(idUser)
+            val user = userService.load(idUser)
             fields.forEach { (k, v) ->
                 when (k) {
                     "name" -> user.name = v.toString()
                     "state" -> user.state = v.toString()
                 }
             }
-            userBusiness.save(user)
+            userService.save(user)
             ResponseEntity(responseHeader, HttpStatus.OK)
 
         } catch (e: ServiceException) {
@@ -141,7 +141,7 @@ class UserRestController {
     fun updateDate(@PathVariable("id") idUser: Long, @RequestBody dateCity: DateCity): ResponseEntity<Any> {
         return try {
 
-            val user = userBusiness.load(idUser)
+            val user = userService.load(idUser)
 
             if (user.dateCity != null) {
                 dateCity.id = user.dateCity!!.id
@@ -149,7 +149,7 @@ class UserRestController {
             } else user.dateCity = dateCity
 
             dateCityBusiness.save(dateCity)
-            userBusiness.save(user)
+            userService.save(user)
 
             ResponseEntity(HttpStatus.OK)
         } catch (e: Exception) {
@@ -163,7 +163,7 @@ class UserRestController {
     @DeleteMapping("/{id}")
     fun delete(@PathVariable("id") idUser: Long): ResponseEntity<Any> {
         return try {
-            userBusiness.remove(idUser)
+            userService.remove(idUser)
             ResponseEntity(HttpStatus.OK)
         } catch (e: ServiceException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -412,7 +412,7 @@ class UserRestController {
         return try {
             val responseHeader = HttpHeaders()
 
-            val user = userBusiness.load(idUser)
+            val user = userService.load(idUser)
 
             var number = dateCityBusiness.getTotalPeopleByDateAndCity(dateCity.nextCity.id, dateCity.nextDate)
             if (user.dateCity?.nextCity?.id == dateCity.nextCity.id && user.dateCity?.nextDate == dateCity.nextDate) {
