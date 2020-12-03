@@ -2,7 +2,6 @@ package com.esei.grvidal.nightTimeApi.services
 
 import com.esei.grvidal.nightTimeApi.dao.EventRepository
 import com.esei.grvidal.nightTimeApi.dto.EventDTOEdit
-import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Event
 import com.esei.grvidal.nightTimeApi.projections.EventProjection
@@ -10,7 +9,6 @@ import com.esei.grvidal.nightTimeApi.serviceInterface.IEventService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import java.util.*
 import kotlin.jvm.Throws
 
 /**

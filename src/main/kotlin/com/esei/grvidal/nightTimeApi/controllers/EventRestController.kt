@@ -1,13 +1,10 @@
-package com.esei.grvidal.nightTimeApi.web
+package com.esei.grvidal.nightTimeApi.controllers
 
 import com.esei.grvidal.nightTimeApi.dto.EventDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.EventDTOInsert
 import com.esei.grvidal.nightTimeApi.dto.toEvent
 import com.esei.grvidal.nightTimeApi.serviceInterface.IEventService
-import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
-import com.esei.grvidal.nightTimeApi.model.Event
-import com.esei.grvidal.nightTimeApi.projections.EventProjection
 import com.esei.grvidal.nightTimeApi.serviceInterface.IBarService
 import com.esei.grvidal.nightTimeApi.utlis.Constants
 import org.springframework.beans.factory.annotation.Autowired

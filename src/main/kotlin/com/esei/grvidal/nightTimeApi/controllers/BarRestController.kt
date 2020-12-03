@@ -1,4 +1,4 @@
-package com.esei.grvidal.nightTimeApi.web
+package com.esei.grvidal.nightTimeApi.controllers
 
 import com.esei.grvidal.nightTimeApi.dto.BarDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.BarDTOInsert
