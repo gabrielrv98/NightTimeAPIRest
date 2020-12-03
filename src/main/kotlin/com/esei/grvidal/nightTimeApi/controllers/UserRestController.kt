@@ -26,16 +26,16 @@ import org.springframework.web.bind.annotation.*
 class UserRestController {
 
     @Autowired
-    val userBusiness: IUserBusiness? = null
+    lateinit var userBusiness: IUserBusiness
 
     @Autowired
-    val friendsBusiness: IFriendsBusiness? = null
+    lateinit var friendsBusiness: IFriendsBusiness
 
     @Autowired
-    val dateCityBusiness: IDateCityBusiness? = null
+    lateinit var dateCityBusiness: IDateCityBusiness
 
     @Autowired
-    val friendRequestBusiness: IFriendRequestBusiness? = null
+    lateinit var friendRequestBusiness: IFriendRequestBusiness
 
 
     /**
@@ -44,7 +44,7 @@ class UserRestController {
     @GetMapping("")
     fun list(): ResponseEntity<List<User>> {
         return try {
-            ResponseEntity(userBusiness!!.list(), HttpStatus.OK)
+            ResponseEntity(userBusiness.list(), HttpStatus.OK)
         } catch (e: Exception) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -56,10 +56,9 @@ class UserRestController {
      */
     @GetMapping("/{id}")
     fun load(@PathVariable("id") idUser: Long): ResponseEntity<Any> {
+
         return try {
-            ResponseEntity(userBusiness!!.load(idUser), HttpStatus.OK)
-        } catch (e: ServiceException) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+            ResponseEntity(userBusiness.load(idUser), HttpStatus.OK)
         } catch (e: NotFoundException) {
             ResponseEntity(HttpStatus.NOT_FOUND)
         }
@@ -73,8 +72,8 @@ class UserRestController {
     @PostMapping("")
     fun insert(@RequestBody user: User, @RequestHeader(name = "password") password: String): ResponseEntity<Any> {
         return try {
-            userBusiness!!.save(user)
-            userBusiness!!.saveSecretData(SecretData(password, user))
+            userBusiness.save(user)
+            userBusiness.saveSecretData(SecretData(password, user))
 
             val responseHeader = HttpHeaders()
             responseHeader.set("location", Constants.URL_BASE_USER + "/" + user.id)
@@ -93,10 +92,10 @@ class UserRestController {
     ): ResponseEntity<Any> {
         var responseHeader = HttpHeaders()
         return try {
-            val user = userBusiness!!.load(idUser = idUser)
+            val user = userBusiness.load(idUser = idUser)
 
             if (user.nickname == username) {
-                responseHeader.set("UUID", userBusiness!!.login(user, password).toString())
+                responseHeader.set("UUID", userBusiness.login(user, password).toString())
 
             } else throw ServiceException("")
 
@@ -123,14 +122,14 @@ class UserRestController {
         val responseHeader = HttpHeaders()
         return try {
 
-            val user = userBusiness!!.load(idUser)
+            val user = userBusiness.load(idUser)
             fields.forEach { (k, v) ->
                 when (k) {
                     "name" -> user.name = v.toString()
                     "state" -> user.state = v.toString()
                 }
             }
-            userBusiness!!.save(user)
+            userBusiness.save(user)
             ResponseEntity(responseHeader, HttpStatus.OK)
 
         } catch (e: ServiceException) {
@@ -142,15 +141,15 @@ class UserRestController {
     fun updateDate(@PathVariable("id") idUser: Long, @RequestBody dateCity: DateCity): ResponseEntity<Any> {
         return try {
 
-            val user = userBusiness!!.load(idUser)
+            val user = userBusiness.load(idUser)
 
             if (user.dateCity != null) {
                 dateCity.id = user.dateCity!!.id
 
             } else user.dateCity = dateCity
 
-            dateCityBusiness!!.save(dateCity)
-            userBusiness!!.save(user)
+            dateCityBusiness.save(dateCity)
+            userBusiness.save(user)
 
             ResponseEntity(HttpStatus.OK)
         } catch (e: Exception) {
@@ -164,7 +163,7 @@ class UserRestController {
     @DeleteMapping("/{id}")
     fun delete(@PathVariable("id") idUser: Long): ResponseEntity<Any> {
         return try {
-            userBusiness!!.remove(idUser)
+            userBusiness.remove(idUser)
             ResponseEntity(HttpStatus.OK)
         } catch (e: ServiceException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -186,10 +185,7 @@ class UserRestController {
      */
     @GetMapping("/{id}/friends")
     fun getFriendships(@PathVariable("id") idUser: Long): ResponseEntity<List<FriendProjection>> {
-        return friendsBusiness?.let{
-                ResponseEntity( it.listFriendsByUser(idUser)   , HttpStatus.OK)
-        } ?: ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-
+        return ResponseEntity( friendsBusiness.listFriendsByUser(idUser)   , HttpStatus.OK)
     }
 
     /**
@@ -203,7 +199,7 @@ class UserRestController {
     fun getUsersFromFriendList(@PathVariable("id") idUser: Long): ResponseEntity<List<UserProjection>> {
         return try {
 
-            val userList: List<UserProjection> = friendsBusiness!!.listUserByUser(idUser)
+            val userList: List<UserProjection> = friendsBusiness.listUserByUser(idUser)
 
             ResponseEntity(userList, HttpStatus.OK)
         } catch (e: ServiceException) {
@@ -224,7 +220,7 @@ class UserRestController {
         return try {
 
             if (idUser == friendRequest.userAsk.id) {
-                friendRequestBusiness!!.save(friendRequest)
+                friendRequestBusiness.save(friendRequest)
 
                 responseHeader.set("location", Constants.URL_BASE_USER + "/" + friendRequest.id)
                 ResponseEntity(responseHeader, HttpStatus.CREATED)
@@ -244,7 +240,7 @@ class UserRestController {
     @PatchMapping("/{id}/friends")
     fun updateRequest(@PathVariable("id") idUser: Long, @RequestBody friendRequest: FriendRequest): ResponseEntity<Any> {
         val responseHeader = HttpHeaders()
-        val friendRequestDB = friendRequestBusiness!!.load(friendRequestId = friendRequest.id)
+        val friendRequestDB = friendRequestBusiness.load(friendRequestId = friendRequest.id)
         try {
 
             //check the idUser is the user who can update the Request
@@ -256,10 +252,10 @@ class UserRestController {
 
                         //create new friendship
                         val newFriends = Friends(friendRequestDB.userAsk, friendRequestDB.userAnswer)
-                        friendsBusiness!!.save(newFriends)
+                        friendsBusiness.save(newFriends)
                         responseHeader.set("location", Constants.URL_BASE_USER + "/" + newFriends.id)
 
-                        friendRequestBusiness!!.remove(friendRequestDB.id)
+                        friendRequestBusiness.remove(friendRequestDB.id)
                         return ResponseEntity(responseHeader, HttpStatus.OK)
 
                         //answer no
@@ -267,7 +263,7 @@ class UserRestController {
                     AnswerOptions.NO -> {
 
                         //remove request
-                        friendRequestBusiness!!.remove(friendRequestDB.id)
+                        friendRequestBusiness.remove(friendRequestDB.id)
                         return ResponseEntity(responseHeader, HttpStatus.OK)
 
                     }
@@ -301,10 +297,10 @@ class UserRestController {
         return try {
             val responseHeader = HttpHeaders()
 
-            val friends = friendsBusiness!!.load(idFriends)
+            val friends = friendsBusiness.load(idFriends)
 
             if (friends.user1.id == idUser || friends.user2.id == idUser) {
-                friendsBusiness!!.remove(idFriends)
+                friendsBusiness.remove(idFriends)
 
                 ResponseEntity(HttpStatus.NO_CONTENT)
             } else {
@@ -329,8 +325,9 @@ class UserRestController {
         return try {
 
             var filtered: List<Friends> = listOf()
+            //move this to services
 
-            friendsBusiness!!.listChatsByUser(idUser).onEach {
+            friendsBusiness.listChatsByUser(idUser).onEach {
                 if (it.messages != null) {
                     if (it.messages!!.isNotEmpty())
                         filtered = filtered.plus(it)
@@ -360,7 +357,7 @@ class UserRestController {
         return try {
             //Security checks. If the idChat belongs to any Chat of the user
             // In the future idUser will be a secure hashed string
-            val friends = friendsBusiness!!.load(idFriend)
+            val friends = friendsBusiness.load(idFriend)
             if (friends.user1.id != idUser && friends.user2.id != idUser)
                 ResponseEntity(HttpStatus.NOT_FOUND)
             else
@@ -388,11 +385,11 @@ class UserRestController {
         return try {
 
             val responseHeader = HttpHeaders()
-            val friendsDB = friendsBusiness!!.load(msg.friends.id)
+            val friendsDB = friendsBusiness.load(msg.friends.id)
             if (friendsDB.user1.id != idUser && friendsDB.user2.id != idUser)
                 ResponseEntity(HttpStatus.NOT_FOUND)
             else {
-                friendsBusiness!!.saveMsg(msg)
+                friendsBusiness.saveMsg(msg)
                 responseHeader.set("location", Constants.URL_BASE_BAR + "/" + msg.id)
 
                 ResponseEntity(responseHeader, HttpStatus.OK)
@@ -415,9 +412,9 @@ class UserRestController {
         return try {
             val responseHeader = HttpHeaders()
 
-            val user = userBusiness!!.load(idUser)
+            val user = userBusiness.load(idUser)
 
-            var number = dateCityBusiness!!.getTotalPeopleByDateAndCity(dateCity.nextCity.id, dateCity.nextDate)
+            var number = dateCityBusiness.getTotalPeopleByDateAndCity(dateCity.nextCity.id, dateCity.nextDate)
             if (user.dateCity?.nextCity?.id == dateCity.nextCity.id && user.dateCity?.nextDate == dateCity.nextDate) {
                 number -= 1
             }
