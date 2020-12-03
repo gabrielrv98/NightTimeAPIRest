@@ -88,13 +88,12 @@ class UserRestController {
             @RequestHeader(name = "username") username: String,//todo esto o UserLoginDTO
             @RequestHeader(name = "password") password: String,
     ): ResponseEntity<Any> {
+        //todo send Token
         return try {
             val isUser = userService.login(username,password)
 
             if (isUser) {
-                //todo send Token
-                ResponseEntity(true, HttpStatus.CONTINUE)
-
+                ResponseEntity(true, HttpStatus.OK)
             } else  {
                 val responseHeader = HttpHeaders()
                 responseHeader.set("Error", "Credentials don't match")

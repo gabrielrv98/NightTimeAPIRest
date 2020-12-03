@@ -1,10 +1,8 @@
 package com.esei.grvidal.nightTimeApi.services
 
-import com.esei.grvidal.nightTimeApi.dao.SecretDataRepository
-import com.esei.grvidal.nightTimeApi.dao.UserRepository
+import com.esei.grvidal.nightTimeApi.repository.UserRepository
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
-import com.esei.grvidal.nightTimeApi.model.SecretData
 import com.esei.grvidal.nightTimeApi.model.User
 import com.esei.grvidal.nightTimeApi.serviceInterface.IUserService
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,8 +23,6 @@ class UserService : IUserService {
     @Autowired
     val userRepository: UserRepository? = null
 
-    @Autowired
-    val secretDataRepository: SecretDataRepository? = null
 
 
     /**
@@ -75,20 +71,7 @@ class UserService : IUserService {
         }
     }
 
-    /**
-     * This will save a new bar, if not, will throw an Exception
-     */
-    @Throws(ServiceException::class)
-override fun saveSecretData(secretData: SecretData): SecretData {
 
-        try {
-            secretData.uuid = UUID.randomUUID()
-            return secretDataRepository!!.save(secretData)
-
-        } catch (e: Exception) {
-            throw ServiceException(e.message)
-        }
-    }
 
     /**
      * This will remove a bars through its id, if not, will throw an Exception, or if it cant find it, it will throw a NotFoundException
@@ -116,35 +99,16 @@ override fun saveSecretData(secretData: SecretData): SecretData {
 
     }
 
-    @Throws(ServiceException::class, NotFoundException::class)
-    override fun login(user: User, password: String): UUID {
-        val op: Optional<SecretData>
+    @Throws(NotFoundException::class)
+    fun loadByNickname(nickname: String): User{
+        return userRepository!!.findByNickname(nickname).orElseThrow { NotFoundException("No users with name $nickname were found") }
+    }
 
-        try {
-            op = secretDataRepository!!.findDistinctFirstByUserAndPassword(user,password)
-
-        } catch (e: Exception) {
-            throw ServiceException(e.message)
-        }
-
-        if (!op.isPresent) {
-            throw NotFoundException("Credenciales no coinciden ")
-        } else {
-            with(op.get()){
-
-                if (this.uuid == null) {
-
-                    this.uuid = UUID.randomUUID()
-                    secretDataRepository!!.save(this)
-                }
-
-                return this.uuid!!
-            }
-
-
-        }
-
-
+    //todo test this
+    @Throws(NotFoundException::class)
+    override fun login(nickname: String, password: String): Boolean {
+        val user = loadByNickname(nickname)
+        return user.password == password
     }
 }
 
