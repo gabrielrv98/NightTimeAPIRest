@@ -1,4 +1,4 @@
-package com.esei.grvidal.nightTimeApi.dao
+package com.esei.grvidal.nightTimeApi.repository
 
 import com.esei.grvidal.nightTimeApi.model.Bar
 import com.esei.grvidal.nightTimeApi.projections.BarDetailsProjection

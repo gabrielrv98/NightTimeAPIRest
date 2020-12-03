@@ -1,6 +1,5 @@
 package com.esei.grvidal.nightTimeApi.serviceInterface
 
-import com.esei.grvidal.nightTimeApi.model.SecretData
 import com.esei.grvidal.nightTimeApi.model.User
 import java.util.*
 
@@ -17,12 +16,10 @@ interface IUserService {
 
     //Save a new user
     fun save(user: User): User
-    fun saveSecretData(secretData: SecretData): SecretData
 
     //remove an user
     fun remove(idUser: Long)
 
-
-    fun login(user: User, password: String): UUID
+    fun login(nickname: String, password: String): Boolean
 
 }

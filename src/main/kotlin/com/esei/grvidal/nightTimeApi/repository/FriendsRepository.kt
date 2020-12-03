@@ -1,8 +1,7 @@
-package com.esei.grvidal.nightTimeApi.dao
+package com.esei.grvidal.nightTimeApi.repository
 
 import com.esei.grvidal.nightTimeApi.model.Friends
 import com.esei.grvidal.nightTimeApi.projections.FriendProjection
-import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository

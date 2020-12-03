@@ -1,4 +1,4 @@
-package com.esei.grvidal.nightTimeApi.dao
+package com.esei.grvidal.nightTimeApi.repository
 
 import com.esei.grvidal.nightTimeApi.model.DateCity
 import org.springframework.data.jpa.repository.JpaRepository

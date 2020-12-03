@@ -1,6 +1,6 @@
 package com.esei.grvidal.nightTimeApi.services
 
-import com.esei.grvidal.nightTimeApi.dao.EventRepository
+import com.esei.grvidal.nightTimeApi.repository.EventRepository
 import com.esei.grvidal.nightTimeApi.dto.EventDTOEdit
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Event

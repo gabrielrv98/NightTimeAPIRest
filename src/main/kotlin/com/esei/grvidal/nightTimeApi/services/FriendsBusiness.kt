@@ -1,7 +1,7 @@
 package com.esei.grvidal.nightTimeApi.services
 
-import com.esei.grvidal.nightTimeApi.dao.FriendsRepository
-import com.esei.grvidal.nightTimeApi.dao.MessageRepository
+import com.esei.grvidal.nightTimeApi.repository.FriendsRepository
+import com.esei.grvidal.nightTimeApi.repository.MessageRepository
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
