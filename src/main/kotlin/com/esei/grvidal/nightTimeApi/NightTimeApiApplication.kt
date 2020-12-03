@@ -35,8 +35,6 @@ class NightTimeApiApplication : CommandLineRunner {
     @Autowired
     val messageRepositories: MessageRepository? = null
 
-    @Autowired
-    val secretDataRepository: SecretDataRepository? = null
 
     val logger = LoggerFactory.getLogger(NightTimeApiApplication::class.java)!!
 
