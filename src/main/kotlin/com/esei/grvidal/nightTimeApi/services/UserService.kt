@@ -21,7 +21,7 @@ class UserService : IUserService {
      *Dependency injection with autowired
      */
     @Autowired
-    val userRepository: UserRepository? = null
+    lateinit var userRepository: UserRepository
 
 
 
@@ -31,8 +31,7 @@ class UserService : IUserService {
     @Throws(ServiceException::class)
     override fun list(): List<User> {
 
-        try {
-            return userRepository!!.findAll()
+            return userRepository.findAll()
                     /*//todo ver en el futuro
                     .onEach { user ->
                 user.friends?.forEach { it.friends = null }
@@ -40,9 +39,7 @@ class UserService : IUserService {
 
 
                      */
-        } catch (e: Exception) {
-            throw ServiceException(e.message)
-        }
+
     }
 
 
@@ -53,7 +50,7 @@ class UserService : IUserService {
     @Throws( NotFoundException::class)//TODO COPIAR
     override fun load(idUser: Long): User {
 
-        return userRepository!!.findById(idUser)
+        return userRepository.findById(idUser)
                 .orElseThrow{ NotFoundException("Couldn't find the user with id $idUser") }
 
     }
@@ -64,11 +61,7 @@ class UserService : IUserService {
     @Throws(ServiceException::class)
     override fun save(user: User): User {
 
-        try {
-            return userRepository!!.save(user)
-        } catch (e: Exception) {
-            throw ServiceException(e.message)
-        }
+            return userRepository.save(user)
     }
 
 
@@ -81,7 +74,7 @@ class UserService : IUserService {
         val op: Optional<User>
 
         try {
-            op = userRepository!!.findById(idUser)
+            op = userRepository.findById(idUser)
         } catch (e: Exception) {
             throw ServiceException(e.message)
         }
@@ -91,7 +84,7 @@ class UserService : IUserService {
         } else {
 
             try {
-                userRepository!!.deleteById(idUser)
+                userRepository.deleteById(idUser)
             } catch (e: Exception) {
                 throw ServiceException(e.message)
             }
@@ -101,7 +94,7 @@ class UserService : IUserService {
 
     @Throws(NotFoundException::class)
     fun loadByNickname(nickname: String): User{
-        return userRepository!!.findByNickname(nickname).orElseThrow { NotFoundException("No users with name $nickname were found") }
+        return userRepository.findByNickname(nickname).orElseThrow { NotFoundException("No users with name $nickname were found") }
     }
 
     //todo test this
