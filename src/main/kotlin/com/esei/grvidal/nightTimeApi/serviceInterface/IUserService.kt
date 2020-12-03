@@ -1,6 +1,7 @@
 package com.esei.grvidal.nightTimeApi.serviceInterface
 
 import com.esei.grvidal.nightTimeApi.model.User
+import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import java.util.*
 
 /**
@@ -9,7 +10,7 @@ import java.util.*
 interface IUserService {
 
     //List all the user
-    fun list(): List<User>
+    fun list(): List<UserProjection>
 
     //Show one user
     fun load(idUser: Long): User

@@ -4,6 +4,7 @@ import com.esei.grvidal.nightTimeApi.repository.UserRepository
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.User
+import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import com.esei.grvidal.nightTimeApi.serviceInterface.IUserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -29,17 +30,9 @@ class UserService : IUserService {
      * This will list all the bars, if not, will throw a BusinessException
      */
     @Throws(ServiceException::class)
-    override fun list(): List<User> {
+    override fun list(): List<UserProjection> {
 
-            return userRepository.findAll()
-                    /*//todo ver en el futuro
-                    .onEach { user ->
-                user.friends?.forEach { it.friends = null }
-            }
-
-
-                     */
-
+            return userRepository.getAllBy()
     }
 
 

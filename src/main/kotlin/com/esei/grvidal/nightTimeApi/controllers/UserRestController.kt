@@ -42,12 +42,9 @@ class UserRestController {
      * Listen to a Get with the [Constants.URL_BASE_BAR] to show all Bars
      */
     @GetMapping("")
-    fun list(): ResponseEntity<List<User>> {
-        return try {
-            ResponseEntity(userService.list(), HttpStatus.OK)
-        } catch (e: Exception) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        }
+    fun list(): ResponseEntity<List<UserProjection>> {
+        return ResponseEntity(userService.list(), HttpStatus.OK)
+
     }
 
 
