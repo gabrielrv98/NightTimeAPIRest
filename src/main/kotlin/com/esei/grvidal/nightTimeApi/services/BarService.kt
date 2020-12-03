@@ -1,9 +1,8 @@
 package com.esei.grvidal.nightTimeApi.services
 
-import com.esei.grvidal.nightTimeApi.dao.BarRepository
-import com.esei.grvidal.nightTimeApi.dao.CityRepository
+import com.esei.grvidal.nightTimeApi.repository.BarRepository
+import com.esei.grvidal.nightTimeApi.repository.CityRepository
 import com.esei.grvidal.nightTimeApi.dto.BarDTOEdit
-import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Bar
 import com.esei.grvidal.nightTimeApi.projections.BarDetailsProjection
