@@ -44,7 +44,8 @@ class BarService : IBarService {
      */
     @Throws(NotFoundException::class)
     override fun getDetails(idBar: Long): BarDetailsProjection {
-        return barRepository.getBarDetailsById(idBar).orElseThrow { NotFoundException("No bar with id $idBar have been found") }
+        return barRepository.getBarDetailsById(idBar)
+                .orElseThrow { NotFoundException("No bar with id $idBar have been found") }
 
 
     }
@@ -54,7 +55,8 @@ class BarService : IBarService {
      */
     @Throws(NotFoundException::class)
     override fun load(idBar: Long): Bar {
-        return barRepository.findById(idBar).orElseThrow { NotFoundException("No bar with id $idBar have been found") }
+        return barRepository.findById(idBar)
+                .orElseThrow { NotFoundException("No bar with id $idBar have been found") }
     }
 
     /**
@@ -74,7 +76,8 @@ class BarService : IBarService {
         val barOriginal = load(idBar)
 
         val cityEdit = barEdit.cityId?.let {
-            cityRepository.findById(it).orElse(barOriginal.city)
+            cityRepository.findById(it)
+                    .orElse(barOriginal.city)
         }
                 ?: barOriginal.city
 
