@@ -70,10 +70,9 @@ class UserRestController {
      * @param user new Bar to insert in the database
      */
     @PostMapping("")
-    fun insert(@RequestBody user: User, @RequestHeader(name = "password") password: String): ResponseEntity<Any> {
+    fun insert(@RequestBody user: User): ResponseEntity<Any> {
         return try {
             userService.save(user)
-            userService.saveSecretData(SecretData(password, user))
 
             val responseHeader = HttpHeaders()
             responseHeader.set("location", Constants.URL_BASE_USER + "/" + user.id)
@@ -84,27 +83,27 @@ class UserRestController {
         }
     }
 
-    @GetMapping("/{id}/login")
+    @GetMapping("/login")
     fun login(
-            @PathVariable("id") idUser: Long,
-            @RequestHeader(name = "username") username: String,
+            @RequestHeader(name = "username") username: String,//todo esto o UserLoginDTO
             @RequestHeader(name = "password") password: String,
     ): ResponseEntity<Any> {
-        var responseHeader = HttpHeaders()
         return try {
-            val user = userService.load(idUser = idUser)
+            val isUser = userService.login(username,password)
 
-            if (user.nickname == username) {
-                responseHeader.set("UUID", userService.login(user, password).toString())
+            if (isUser) {
+                //todo send Token
+                ResponseEntity(true, HttpStatus.CONTINUE)
 
-            } else throw ServiceException("")
+            } else  {
+                val responseHeader = HttpHeaders()
+                responseHeader.set("Error", "Credentials don't match")
+                ResponseEntity(false,responseHeader, HttpStatus.BAD_REQUEST)
+            }
 
-            ResponseEntity(responseHeader, HttpStatus.OK)
 
         } catch (e: Exception) {
-            responseHeader = HttpHeaders()
-            responseHeader.set("Error", "Credentials don't match")
-            ResponseEntity(responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
+            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
         }
     }
 
