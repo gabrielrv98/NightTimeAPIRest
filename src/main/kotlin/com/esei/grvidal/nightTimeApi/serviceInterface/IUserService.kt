@@ -1,5 +1,6 @@
 package com.esei.grvidal.nightTimeApi.serviceInterface
 
+import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.User
@@ -19,12 +20,11 @@ interface IUserService {
     @Throws(NotFoundException::class)
     fun loadProjection(idUser: Long): UserProjection
 
-    //Show one user
-    @Throws(NotFoundException::class)
-    fun load(idUser: Long): User
-
     //Save a new user
     fun save(user: UserDTOInsert): Long
+
+    @Throws(NotFoundException::class)
+    fun update(idUser: Long, user: UserDTOEdit)
 
     //remove an user
     @Throws(NotFoundException::class)
@@ -32,5 +32,6 @@ interface IUserService {
 
     @Throws(NotFoundException::class)
     fun login(nickname: String, password: String): Boolean
+
 
 }

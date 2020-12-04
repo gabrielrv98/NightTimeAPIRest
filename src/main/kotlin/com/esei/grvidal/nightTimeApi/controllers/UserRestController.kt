@@ -1,5 +1,6 @@
 package com.esei.grvidal.nightTimeApi.controllers
 
+import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
 import com.esei.grvidal.nightTimeApi.dto.toUser
 import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendsBusiness
@@ -70,7 +71,7 @@ class UserRestController {
     fun load(@PathVariable("id") idUser: Long): ResponseEntity<Any> {
 
         return try {
-            ResponseEntity(userService.load(idUser), HttpStatus.OK)
+            ResponseEntity(userService.loadProjection(idUser), HttpStatus.OK)
         } catch (e: NotFoundException) {
             ResponseEntity(HttpStatus.NOT_FOUND)
         }
@@ -84,8 +85,7 @@ class UserRestController {
     @PostMapping("")
     fun insert(@RequestBody user: UserDTOInsert): ResponseEntity<Any> {
 
-            val id = userService.save(user.toUser()).id
-
+            val id = userService.save(user)
             val responseHeader = HttpHeaders()
             responseHeader.set("location", Constants.URL_BASE_USER + "/" + id)
 
@@ -126,27 +126,34 @@ class UserRestController {
      * No nickname changes for now
      */
     @PatchMapping("/{id}")
-    fun update(@PathVariable("id") idUser: Long, @RequestBody fields: Map<String, Any>): ResponseEntity<Any> {
-        val responseHeader = HttpHeaders()
+    fun update(@PathVariable("id") idUser: Long, @RequestBody user: UserDTOEdit): ResponseEntity<Any> {
+
         return try {
 
-            val user = userService.load(idUser)
-            fields.forEach { (k, v) ->
-                when (k) {
-                    "name" -> user.name = v.toString()
-                    "state" -> user.state = v.toString()
-                }
-            }
-            userService.save(user)
-            ResponseEntity(responseHeader, HttpStatus.OK)
+             userService.update(idUser,user)
+            ResponseEntity( HttpStatus.OK)
 
-        } catch (e: ServiceException) {
-            ResponseEntity(responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
+        } catch (e: NotFoundException) {
+            ResponseEntity(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 
+    /**
+     * Listen to a Delete with the [Constants.URL_BASE_BAR] and a Id as a parameter to delete a Bar
+     */
+    @DeleteMapping("/{id}")
+    fun delete(@PathVariable("id") idUser: Long): ResponseEntity<Any> {
+        return try {
+            userService.remove(idUser)
+            ResponseEntity(HttpStatus.NO_CONTENT)
+        } catch (e: NotFoundException) {
+            ResponseEntity(e.message,HttpStatus.NOT_FOUND)
+        }
+    }
+
+
     @PutMapping("/{id}/date")
-    fun updateDate(@PathVariable("id") idUser: Long, @RequestBody dateCity: DateCity): ResponseEntity<Any> {
+    fun addDate(@PathVariable("id") idUser: Long, @RequestBody dateCity: DateCity): ResponseEntity<Any> {
         return try {
 
             val user = userService.load(idUser)
@@ -165,20 +172,27 @@ class UserRestController {
         }
     }
 
-    /**
-     * Listen to a Delete with the [Constants.URL_BASE_BAR] and a Id as a parameter to delete a Bar
-     */
-    @DeleteMapping("/{id}")
-    fun delete(@PathVariable("id") idUser: Long): ResponseEntity<Any> {
+    @DeleteMapping("/{id}/date/{idDate}")
+    fun deleteDate(@PathVariable("id") idUser: Long, @PathVariable("idDate") idDate: Long): ResponseEntity<Any> {
         return try {
-            userService.remove(idUser)
+
+            val user = userService.load(idUser)
+
+            if (user.dateCity != null) {
+                dateCity.id = user.dateCity!!.id
+
+            } else user.dateCity = dateCity
+
+            dateCityBusiness.save(dateCity)
+            userService.save(user)
+
             ResponseEntity(HttpStatus.OK)
-        } catch (e: ServiceException) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        } catch (e: NotFoundException) {
-            ResponseEntity(HttpStatus.NOT_FOUND)
+        } catch (e: Exception) {
+            ResponseEntity(e.toString(), HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
+
+
 
 
     /**

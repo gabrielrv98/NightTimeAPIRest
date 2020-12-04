@@ -1,5 +1,6 @@
 package com.esei.grvidal.nightTimeApi.services
 
+import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
 import com.esei.grvidal.nightTimeApi.dto.toUser
 import com.esei.grvidal.nightTimeApi.repository.UserRepository
@@ -55,7 +56,7 @@ class UserService : IUserService {
      * if the object cant be found, it will throw a NotFoundException
      */
     @Throws( NotFoundException::class)
-    override fun load(idUser: Long): User {
+    private fun load(idUser: Long): User {
 
         return userRepository.findById(idUser)
                 .orElseThrow{ NotFoundException("Couldn't find the user with id $idUser") }
@@ -70,8 +71,10 @@ class UserService : IUserService {
             return userRepository.save(user.toUser()).id
     }
 
-
-
+    override fun update(idUser: Long, user: UserDTOEdit) {
+        val userOriginal = load(idUser)
+        userRepository.save( user.toUser(userOriginal) )
+    }
 
 
     /**
@@ -96,6 +99,17 @@ class UserService : IUserService {
         val user = loadByNickname(nickname)
         return user.password == password
     }
+}
+
+fun UserDTOEdit.toUser(user: User): User {
+    return User(
+            name?: user.name,
+            nickname = user.nickname,
+            password ?: user.password,
+            state,
+            email?: user.email,
+            birthdate = user.birthdate
+    ).apply { id = user.id }
 }
 
 
