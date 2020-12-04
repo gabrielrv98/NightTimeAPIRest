@@ -1,5 +1,7 @@
 package com.esei.grvidal.nightTimeApi.controllers
 
+import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
+import com.esei.grvidal.nightTimeApi.dto.toUser
 import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendsBusiness
 import com.esei.grvidal.nightTimeApi.serviceInterface.IDateCityBusiness
 import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendRequestBusiness
@@ -80,12 +82,12 @@ class UserRestController {
      * @param user new Bar to insert in the database
      */
     @PostMapping("")
-    fun insert(@RequestBody user: User): ResponseEntity<Any> {
+    fun insert(@RequestBody user: UserDTOInsert): ResponseEntity<Any> {
         return try {
-            userService.save(user)
+            val id = userService.save(user.toUser()).id
 
             val responseHeader = HttpHeaders()
-            responseHeader.set("location", Constants.URL_BASE_USER + "/" + user.id)
+            responseHeader.set("location", Constants.URL_BASE_USER + "/" + id)
 
             ResponseEntity(responseHeader, HttpStatus.CREATED)
         } catch (e: ServiceException) {
