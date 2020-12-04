@@ -83,16 +83,14 @@ class UserRestController {
      */
     @PostMapping("")
     fun insert(@RequestBody user: UserDTOInsert): ResponseEntity<Any> {
-        return try {
+
             val id = userService.save(user.toUser()).id
 
             val responseHeader = HttpHeaders()
             responseHeader.set("location", Constants.URL_BASE_USER + "/" + id)
 
-            ResponseEntity(responseHeader, HttpStatus.CREATED)
-        } catch (e: ServiceException) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        }
+            return ResponseEntity(responseHeader, HttpStatus.CREATED)
+
     }
 
     @GetMapping("/login")
