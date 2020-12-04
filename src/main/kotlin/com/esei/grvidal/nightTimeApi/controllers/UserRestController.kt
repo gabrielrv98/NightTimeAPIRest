@@ -1,5 +1,6 @@
 package com.esei.grvidal.nightTimeApi.controllers
 
+import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
 import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
 import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendsBusiness
@@ -152,11 +153,12 @@ class UserRestController {
 
 
     @PutMapping("/{id}/date")
-    fun addDate(@PathVariable("id") idUser: Long, @RequestBody dateCity: DateCity): ResponseEntity<Any> {
+    fun addDate(@PathVariable("id") idUser: Long, @RequestBody dateCity: DateCityDTO): ResponseEntity<Any> {
         return try {
 
             userService.addDate(idUser,dateCity)
             ResponseEntity(HttpStatus.OK)
+
         } catch (e: NotFoundException) {
             ResponseEntity(e.message, HttpStatus.NOT_FOUND)
 
@@ -169,9 +171,10 @@ class UserRestController {
     fun deleteDate(@PathVariable("id") idUser: Long, @PathVariable("idDate") idDate: Long): ResponseEntity<Any> {
         return try {
 
-            userService.deleteDate(idUser,idDate)
-
-            ResponseEntity(HttpStatus.NO_CONTENT)
+            if(userService.deleteDate(idUser,idDate))
+                ResponseEntity(HttpStatus.NO_CONTENT)
+            else
+                ResponseEntity(HttpStatus.NOT_FOUND)
         } catch (e: NotFoundException) {
             ResponseEntity(e.message, HttpStatus.NOT_FOUND)
         }

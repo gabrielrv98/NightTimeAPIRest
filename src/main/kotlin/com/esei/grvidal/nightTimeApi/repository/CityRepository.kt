@@ -1,8 +1,10 @@
 package com.esei.grvidal.nightTimeApi.repository
 
 import com.esei.grvidal.nightTimeApi.model.City
+import com.esei.grvidal.nightTimeApi.projections.CityProjection
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
+import java.util.*
 
 
 /**
@@ -10,5 +12,7 @@ import org.springframework.stereotype.Repository
  */
 @Repository
 interface CityRepository : JpaRepository<City, Long> {
+    fun getCityObjectById(id: Long): Optional<City>
+    fun getById(id: Long): Optional<CityProjection>
 
 }

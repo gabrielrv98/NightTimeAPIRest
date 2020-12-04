@@ -45,7 +45,8 @@ class CityService : ICityService {
     @Throws(NotFoundException::class)
     override fun load(idCity: Long): City {
 
-        return cityRepository!!.findById(idCity).orElseThrow { NotFoundException("No se encontro la ciudad con el id $idCity") }
+        return cityRepository!!.findById(idCity)
+                .orElseThrow { NotFoundException("No se encontro la ciudad con el id $idCity") }
     }
 
     /**

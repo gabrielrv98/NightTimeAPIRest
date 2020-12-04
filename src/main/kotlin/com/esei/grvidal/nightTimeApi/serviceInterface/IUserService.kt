@@ -1,11 +1,10 @@
 package com.esei.grvidal.nightTimeApi.serviceInterface
 
+import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
 import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
-import com.esei.grvidal.nightTimeApi.model.DateCity
-import com.esei.grvidal.nightTimeApi.model.User
 import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import java.util.*
 import kotlin.jvm.Throws
@@ -36,9 +35,9 @@ interface IUserService {
     fun login(nickname: String, password: String): Boolean
 
     @Throws(AlreadyExistsException::class ,NotFoundException::class)
-    fun addDate(idUser: Long, dateCity: DateCity)
+    fun addDate(idUser: Long, dateCity: DateCityDTO)
 
     @Throws(NotFoundException::class)
-    fun deleteDate(idUser: Long, idDate: Long)
+    fun deleteDate(idUser: Long, idDate: Long):Boolean
 
 }

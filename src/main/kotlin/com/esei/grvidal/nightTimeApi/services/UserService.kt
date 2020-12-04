@@ -1,5 +1,6 @@
 package com.esei.grvidal.nightTimeApi.services
 
+import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
 import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
 import com.esei.grvidal.nightTimeApi.dto.toUser
@@ -7,13 +8,15 @@ import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.repository.UserRepository
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
+import com.esei.grvidal.nightTimeApi.model.City
 import com.esei.grvidal.nightTimeApi.model.DateCity
 import com.esei.grvidal.nightTimeApi.model.User
 import com.esei.grvidal.nightTimeApi.projections.UserProjection
+import com.esei.grvidal.nightTimeApi.repository.CityRepository
+import com.esei.grvidal.nightTimeApi.repository.DateCityRepository
 import com.esei.grvidal.nightTimeApi.serviceInterface.IUserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import java.util.*
 import kotlin.jvm.Throws
 
 /**
@@ -28,6 +31,12 @@ class UserService : IUserService {
      */
     @Autowired
     lateinit var userRepository: UserRepository
+
+    @Autowired
+    lateinit var cityRepository: CityRepository
+
+    @Autowired
+    lateinit var dateCityRepository: DateCityRepository
 
 
     /**
@@ -102,32 +111,40 @@ class UserService : IUserService {
     }
 
     @Throws(AlreadyExistsException::class, NotFoundException::class)
-    override fun addDate(idUser: Long, dateCity: DateCity) {
+    override fun addDate(idUser: Long, dateCity: DateCityDTO) {
         val user = load(idUser)
-        user.nextDates = user.nextDates?.let {
-            if (it.none { dateCity -> dateCity.nextDate == dateCity.nextDate })
-                it + dateCity
-            else
+
+        //if user list is not null
+        if (user.nextDates != null) {
+            //but the date is already in one element
+            if (!user.nextDates!!.none { dateCityUser -> dateCityUser.nextDate == dateCity.nextDate })
+            //throw an exception
                 throw AlreadyExistsException("Date already selected, you can't be in two places at once")
-        } ?: listOf(dateCity)
+        }
 
-        userRepository.save(user)
-
+        dateCityRepository.save(
+                dateCity.toDateCity(
+                        city = cityRepository.getCityObjectById(dateCity.nextCityId)
+                                .orElseThrow { NotFoundException("No city with id ${dateCity.nextCityId} found") },
+                        user = user
+                )
+        )
     }
 
-    override fun deleteDate(idUser: Long, idDate: Long) {
+    @Throws(NotFoundException::class)
+    override fun deleteDate(idUser: Long, idDate: Long): Boolean {
         val user = load(idUser)
+        var delete = false
 
-        user.nextDates?.let { userList ->
-            val mutableList = userList.toMutableList()
-            val element = mutableList.filter { it.id == idDate }
+        if (user.nextDates != null) {
+            val element = user.nextDates!!.filter { it.id == idDate }
             if (element.isNotEmpty()) {
-                mutableList.remove(element[0])
-                user.nextDates = mutableList.toList()
+                delete = true
+                dateCityRepository.deleteById(idDate)
             }
         }
 
-        userRepository.save(user)
+        return delete
     }
 }
 
@@ -140,6 +157,10 @@ fun UserDTOEdit.toUser(user: User): User {
             email ?: user.email,
             birthdate = user.birthdate
     ).apply { id = user.id }
+}
+
+fun DateCityDTO.toDateCity(city: City, user: User): DateCity {
+    return DateCity(nextDate, city, user)
 }
 
 
