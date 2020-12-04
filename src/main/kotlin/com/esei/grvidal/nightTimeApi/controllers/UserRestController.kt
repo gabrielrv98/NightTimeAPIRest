@@ -52,6 +52,19 @@ class UserRestController {
      * Listen to a Get with the [Constants.URL_BASE_BAR] and an Id as a parameter to show one Bar
      */
     @GetMapping("/{id}")
+    fun loadProjection(@PathVariable("id") idUser: Long): ResponseEntity<Any> {
+
+        return try {
+            ResponseEntity(userService.loadProjection(idUser), HttpStatus.OK)
+        } catch (e: NotFoundException) {
+            ResponseEntity(e.message,HttpStatus.NOT_FOUND)
+        }
+    }
+
+    /**
+     * Listen to a Get with the [Constants.URL_BASE_BAR] and an Id as a parameter to show one Bar
+     */
+    @GetMapping("/{id}/test")
     fun load(@PathVariable("id") idUser: Long): ResponseEntity<Any> {
 
         return try {

@@ -13,6 +13,9 @@ interface IUserService {
     fun list(): List<UserProjection>
 
     //Show one user
+    fun loadProjection(idUser: Long): UserProjection
+
+    //Show one user
     fun load(idUser: Long): User
 
     //Save a new user

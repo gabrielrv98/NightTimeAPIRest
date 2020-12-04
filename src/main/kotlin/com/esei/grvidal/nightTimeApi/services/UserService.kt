@@ -40,7 +40,19 @@ class UserService : IUserService {
      * This will show one user, if not, will throw a BusinessException or
      * if the object cant be found, it will throw a NotFoundException
      */
-    @Throws( NotFoundException::class)//TODO COPIAR
+    @Throws( NotFoundException::class)
+    override fun loadProjection(idUser: Long): UserProjection {
+
+        return userRepository.getUserById(idUser)
+                .orElseThrow{ NotFoundException("Couldn't find the user with id $idUser") }
+
+    }
+
+    /**
+     * This will show one user, if not, will throw a BusinessException or
+     * if the object cant be found, it will throw a NotFoundException
+     */
+    @Throws( NotFoundException::class)
     override fun load(idUser: Long): User {
 
         return userRepository.findById(idUser)
@@ -86,11 +98,10 @@ class UserService : IUserService {
     }
 
     @Throws(NotFoundException::class)
-    fun loadByNickname(nickname: String): User{
+    private fun loadByNickname(nickname: String): User{
         return userRepository.findByNickname(nickname).orElseThrow { NotFoundException("No users with name $nickname were found") }
     }
 
-    //todo test this
     @Throws(NotFoundException::class)
     override fun login(nickname: String, password: String): Boolean {
         val user = loadByNickname(nickname)
