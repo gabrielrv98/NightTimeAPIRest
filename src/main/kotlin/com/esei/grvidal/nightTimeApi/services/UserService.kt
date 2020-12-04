@@ -1,5 +1,7 @@
 package com.esei.grvidal.nightTimeApi.services
 
+import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
+import com.esei.grvidal.nightTimeApi.dto.toUser
 import com.esei.grvidal.nightTimeApi.repository.UserRepository
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
@@ -64,9 +66,11 @@ class UserService : IUserService {
      * This will save a new bar, if not, will throw an Exception
      * should return a user or its ID
      */
-    override fun save(user: User): User {
-            return userRepository.save(user)
+    override fun save(user: UserDTOInsert): Long {
+            return userRepository.save(user.toUser()).id
     }
+
+
 
 
 
