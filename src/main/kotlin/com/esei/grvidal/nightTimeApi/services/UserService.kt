@@ -62,10 +62,9 @@ class UserService : IUserService {
 
     /**
      * This will save a new bar, if not, will throw an Exception
+     * should return a user or its ID
      */
-    @Throws(ServiceException::class)
     override fun save(user: User): User {
-
             return userRepository.save(user)
     }
 
@@ -74,32 +73,18 @@ class UserService : IUserService {
     /**
      * This will remove a bars through its id, if not, will throw an Exception, or if it cant find it, it will throw a NotFoundException
      */
-    @Throws(ServiceException::class, NotFoundException::class)
+    @Throws(NotFoundException::class)
     override fun remove(idUser: Long) {
-        val op: Optional<User>
 
-        try {
-            op = userRepository.findById(idUser)
-        } catch (e: Exception) {
-            throw ServiceException(e.message)
-        }
-
-        if (!op.isPresent) {
-            throw NotFoundException("No se encontro al bar con el id $idUser")
-        } else {
-
-            try {
-                userRepository.deleteById(idUser)
-            } catch (e: Exception) {
-                throw ServiceException(e.message)
-            }
-        }
+        val user = loadProjection(idUser)
+        userRepository.deleteById(user.getId())
 
     }
 
     @Throws(NotFoundException::class)
     private fun loadByNickname(nickname: String): User{
-        return userRepository.findByNickname(nickname).orElseThrow { NotFoundException("No users with name $nickname were found") }
+        return userRepository.findByNickname(nickname)
+                .orElseThrow { NotFoundException("No users with name $nickname were found") }
     }
 
     @Throws(NotFoundException::class)
