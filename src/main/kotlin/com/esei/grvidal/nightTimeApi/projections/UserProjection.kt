@@ -10,7 +10,7 @@ interface UserProjection{
     fun getState() : String
     fun getEmail(): String
     fun getBirthdate() : LocalDate
-    fun getDateCity() : DateCityProjection?
+    fun getNextDates() : List<DateCityProjection>?
 
 
 }

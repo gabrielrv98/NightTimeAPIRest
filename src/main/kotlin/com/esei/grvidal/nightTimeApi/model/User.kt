@@ -19,15 +19,10 @@ class User(
         @Column(name = "birth_date")
         var birthdate: LocalDate,
 
-        @OneToOne(cascade = [CascadeType.ALL])
-        @JoinColumn(name = "next_date_city_id")
-        var dateCity: DateCity? = null
 
 ) {
-    /*
-    @OneToMany(mappedBy = "bar",cascade = [CascadeType.REMOVE])
-    var friends : List<Event>? = null
-     */
+    @OneToMany(mappedBy = "user",cascade = [CascadeType.REMOVE])
+    var nextDates : List<DateCity>? = null
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

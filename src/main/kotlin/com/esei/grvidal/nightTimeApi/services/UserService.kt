@@ -3,9 +3,11 @@ package com.esei.grvidal.nightTimeApi.services
 import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
 import com.esei.grvidal.nightTimeApi.dto.toUser
+import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.repository.UserRepository
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
+import com.esei.grvidal.nightTimeApi.model.DateCity
 import com.esei.grvidal.nightTimeApi.model.User
 import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import com.esei.grvidal.nightTimeApi.serviceInterface.IUserService
@@ -28,14 +30,13 @@ class UserService : IUserService {
     lateinit var userRepository: UserRepository
 
 
-
     /**
      * This will list all the bars, if not, will throw a BusinessException
      */
     @Throws(ServiceException::class)
     override fun list(): List<UserProjection> {
 
-            return userRepository.getAllBy()
+        return userRepository.getAllBy()
     }
 
 
@@ -43,11 +44,11 @@ class UserService : IUserService {
      * This will show one user, if not, will throw a BusinessException or
      * if the object cant be found, it will throw a NotFoundException
      */
-    @Throws( NotFoundException::class)
+    @Throws(NotFoundException::class)
     override fun loadProjection(idUser: Long): UserProjection {
 
         return userRepository.getUserById(idUser)
-                .orElseThrow{ NotFoundException("Couldn't find the user with id $idUser") }
+                .orElseThrow { NotFoundException("Couldn't find the user with id $idUser") }
 
     }
 
@@ -55,11 +56,11 @@ class UserService : IUserService {
      * This will show one user, if not, will throw a BusinessException or
      * if the object cant be found, it will throw a NotFoundException
      */
-    @Throws( NotFoundException::class)
+    @Throws(NotFoundException::class)
     private fun load(idUser: Long): User {
 
         return userRepository.findById(idUser)
-                .orElseThrow{ NotFoundException("Couldn't find the user with id $idUser") }
+                .orElseThrow { NotFoundException("Couldn't find the user with id $idUser") }
 
     }
 
@@ -68,12 +69,12 @@ class UserService : IUserService {
      * should return a user or its ID
      */
     override fun save(user: UserDTOInsert): Long {
-            return userRepository.save(user.toUser()).id
+        return userRepository.save(user.toUser()).id
     }
 
     override fun update(idUser: Long, user: UserDTOEdit) {
         val userOriginal = load(idUser)
-        userRepository.save( user.toUser(userOriginal) )
+        userRepository.save(user.toUser(userOriginal))
     }
 
 
@@ -89,7 +90,7 @@ class UserService : IUserService {
     }
 
     @Throws(NotFoundException::class)
-    private fun loadByNickname(nickname: String): User{
+    private fun loadByNickname(nickname: String): User {
         return userRepository.findByNickname(nickname)
                 .orElseThrow { NotFoundException("No users with name $nickname were found") }
     }
@@ -99,15 +100,44 @@ class UserService : IUserService {
         val user = loadByNickname(nickname)
         return user.password == password
     }
+
+    @Throws(AlreadyExistsException::class, NotFoundException::class)
+    override fun addDate(idUser: Long, dateCity: DateCity) {
+        val user = load(idUser)
+        user.nextDates = user.nextDates?.let {
+            if (it.none { dateCity -> dateCity.nextDate == dateCity.nextDate })
+                it + dateCity
+            else
+                throw AlreadyExistsException("Date already selected, you can't be in two places at once")
+        } ?: listOf(dateCity)
+
+        userRepository.save(user)
+
+    }
+
+    override fun deleteDate(idUser: Long, idDate: Long) {
+        val user = load(idUser)
+
+        user.nextDates?.let { userList ->
+            val mutableList = userList.toMutableList()
+            val element = mutableList.filter { it.id == idDate }
+            if (element.isNotEmpty()) {
+                mutableList.remove(element[0])
+                user.nextDates = mutableList.toList()
+            }
+        }
+
+        userRepository.save(user)
+    }
 }
 
 fun UserDTOEdit.toUser(user: User): User {
     return User(
-            name?: user.name,
+            name ?: user.name,
             nickname = user.nickname,
             password ?: user.password,
             state,
-            email?: user.email,
+            email ?: user.email,
             birthdate = user.birthdate
     ).apply { id = user.id }
 }

@@ -12,6 +12,10 @@ class DateCity(
         @ManyToOne
         @JoinColumn(name = "city_id")
         var nextCity: City,
+
+        @ManyToOne
+        @JoinColumn(name = "user_id")
+        var user: User,
 ){
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

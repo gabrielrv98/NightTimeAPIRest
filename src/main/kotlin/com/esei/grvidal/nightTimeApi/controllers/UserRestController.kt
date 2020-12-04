@@ -2,7 +2,6 @@ package com.esei.grvidal.nightTimeApi.controllers
 
 import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
-import com.esei.grvidal.nightTimeApi.dto.toUser
 import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendsBusiness
 import com.esei.grvidal.nightTimeApi.serviceInterface.IDateCityBusiness
 import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendRequestBusiness
@@ -121,7 +120,7 @@ class UserRestController {
      * Listen to a Patch with the [Constants.URL_BASE_BAR] and a requestBody with a User to update a User
      *
      * @param idUser id of the bar that will be updated
-     * @param fields attributes to modify
+     * @param user attributes to modify
      *
      * No nickname changes for now
      */
@@ -156,19 +155,13 @@ class UserRestController {
     fun addDate(@PathVariable("id") idUser: Long, @RequestBody dateCity: DateCity): ResponseEntity<Any> {
         return try {
 
-            val user = userService.load(idUser)
-
-            if (user.dateCity != null) {
-                dateCity.id = user.dateCity!!.id
-
-            } else user.dateCity = dateCity
-
-            dateCityBusiness.save(dateCity)
-            userService.save(user)
-
+            userService.addDate(idUser,dateCity)
             ResponseEntity(HttpStatus.OK)
-        } catch (e: Exception) {
-            ResponseEntity(e.toString(), HttpStatus.INTERNAL_SERVER_ERROR)
+        } catch (e: NotFoundException) {
+            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+
+        } catch (e: AlreadyExistsException) {
+            ResponseEntity(e.message, HttpStatus.ALREADY_REPORTED)
         }
     }
 
@@ -176,19 +169,11 @@ class UserRestController {
     fun deleteDate(@PathVariable("id") idUser: Long, @PathVariable("idDate") idDate: Long): ResponseEntity<Any> {
         return try {
 
-            val user = userService.load(idUser)
+            userService.deleteDate(idUser,idDate)
 
-            if (user.dateCity != null) {
-                dateCity.id = user.dateCity!!.id
-
-            } else user.dateCity = dateCity
-
-            dateCityBusiness.save(dateCity)
-            userService.save(user)
-
-            ResponseEntity(HttpStatus.OK)
-        } catch (e: Exception) {
-            ResponseEntity(e.toString(), HttpStatus.INTERNAL_SERVER_ERROR)
+            ResponseEntity(HttpStatus.NO_CONTENT)
+        } catch (e: NotFoundException) {
+            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
         }
     }
 
@@ -426,6 +411,7 @@ class UserRestController {
      *
      * @return a [List<[Friends]>] with all the friends with any messages
      */
+    /*
     @GetMapping("/{idUser}/date")
     fun getPeopleAndFriends(
             @PathVariable("idUser") idUser: Long,
@@ -461,6 +447,8 @@ class UserRestController {
             ResponseEntity(HttpStatus.NOT_FOUND)
         }
     }
+
+     */
 
 //todo 401 no permisos
 }

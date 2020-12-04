@@ -21,6 +21,9 @@ class NightTimeApiApplication : CommandLineRunner {
     val barRepository: BarRepository? = null
 
     @Autowired
+    lateinit var dateCityRepository: DateCityRepository
+
+    @Autowired
     val eventRepositories: EventRepository? = null
 
     @Autowired
@@ -116,8 +119,8 @@ class NightTimeApiApplication : CommandLineRunner {
 
         )
 
-        user1.dateCity =  DateCity(nextDate = LocalDate.now(), nextCity = cityOu)
         userRepositories!!.save(user1)
+        dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user1))
 
         val user2 = User(
                 "Nuria Sotelo",
@@ -129,8 +132,8 @@ class NightTimeApiApplication : CommandLineRunner {
 
 
         )
-        user2.dateCity = DateCity(nextDate = LocalDate.now(), nextCity = cityOu)
         userRepositories!!.save(user2)
+        dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user2))
 
 
         val user3 = User(
@@ -141,8 +144,8 @@ class NightTimeApiApplication : CommandLineRunner {
                 email = "ireneReina@hotmail.com",
                 birthdate = LocalDate.of(1998, 4, 12)
         )
-        user3.dateCity = DateCity(nextDate = LocalDate.now(), nextCity = cityOu)
         userRepositories!!.save(user3)
+        dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user3))
 
 
         val user4 = User(
@@ -153,8 +156,8 @@ class NightTimeApiApplication : CommandLineRunner {
                 "joseNegro@gmail.com",
                 birthdate = LocalDate.of(1990, 4, 25)
         )
-        user4.dateCity = DateCity(nextDate = LocalDate.now(), nextCity = cityVigo)
         userRepositories!!.save(user4)
+        dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityVigo, user = user4))
 
         friendsRepositories!!.save(Friends(user1,user2))
         friendsRepositories!!.save(Friends(user3,user2))

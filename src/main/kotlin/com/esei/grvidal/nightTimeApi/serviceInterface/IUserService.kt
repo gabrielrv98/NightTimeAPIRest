@@ -2,7 +2,9 @@ package com.esei.grvidal.nightTimeApi.serviceInterface
 
 import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
+import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
+import com.esei.grvidal.nightTimeApi.model.DateCity
 import com.esei.grvidal.nightTimeApi.model.User
 import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import java.util.*
@@ -33,5 +35,10 @@ interface IUserService {
     @Throws(NotFoundException::class)
     fun login(nickname: String, password: String): Boolean
 
+    @Throws(AlreadyExistsException::class ,NotFoundException::class)
+    fun addDate(idUser: Long, dateCity: DateCity)
+
+    @Throws(NotFoundException::class)
+    fun deleteDate(idUser: Long, idDate: Long)
 
 }
