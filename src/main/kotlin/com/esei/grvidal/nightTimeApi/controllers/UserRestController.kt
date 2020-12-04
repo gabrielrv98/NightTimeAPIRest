@@ -4,7 +4,7 @@ import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
 import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
 import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendsBusiness
-import com.esei.grvidal.nightTimeApi.serviceInterface.IDateCityBusiness
+import com.esei.grvidal.nightTimeApi.serviceInterface.IDateCityService
 import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendRequestBusiness
 import com.esei.grvidal.nightTimeApi.serviceInterface.IUserService
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
@@ -35,7 +35,7 @@ class UserRestController {
     lateinit var friendsBusiness: IFriendsBusiness
 
     @Autowired
-    lateinit var dateCityBusiness: IDateCityBusiness
+    lateinit var dateCityService: IDateCityService
 
     @Autowired
     lateinit var friendRequestBusiness: IFriendRequestBusiness
@@ -138,6 +138,7 @@ class UserRestController {
         }
     }
 
+
     /**
      * Listen to a Delete with the [Constants.URL_BASE_BAR] and a Id as a parameter to delete a Bar
      */
@@ -150,6 +151,12 @@ class UserRestController {
             ResponseEntity(e.message,HttpStatus.NOT_FOUND)
         }
     }
+
+
+
+    /**
+     * DateCity Related methods
+     */
 
 
     @PutMapping("/{id}/date")
@@ -425,7 +432,7 @@ class UserRestController {
 
             val user = userService.load(idUser)
 
-            var number = dateCityBusiness.getTotalPeopleByDateAndCity(dateCity.nextCity.id, dateCity.nextDate)
+            var number = dateCityService.getTotalPeopleByDateAndCity(dateCity.nextCity.id, dateCity.nextDate)
             if (user.dateCity?.nextCity?.id == dateCity.nextCity.id && user.dateCity?.nextDate == dateCity.nextDate) {
                 number -= 1
             }

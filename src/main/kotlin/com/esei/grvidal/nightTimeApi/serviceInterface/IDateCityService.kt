@@ -6,7 +6,7 @@ import java.time.LocalDate
 /**
  * DAO Interface for Bars
  */
-interface IDateCityBusiness {
+interface IDateCityService {
 
     //List all the user
     fun list(): List<DateCity>

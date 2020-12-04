@@ -3,7 +3,7 @@ package com.esei.grvidal.nightTimeApi.services
 import com.esei.grvidal.nightTimeApi.repository.DateCityRepository
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.model.DateCity
-import com.esei.grvidal.nightTimeApi.serviceInterface.IDateCityBusiness
+import com.esei.grvidal.nightTimeApi.serviceInterface.IDateCityService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -14,7 +14,7 @@ import kotlin.jvm.Throws
  *
  */
 @Service
-class DateCityBusiness : IDateCityBusiness {
+class DateCityService : IDateCityService {
 
     /**
      *Dependency injection with autowired
