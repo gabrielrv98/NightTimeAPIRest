@@ -112,11 +112,10 @@ class BarRestController {
      */
     @PatchMapping("/{id}")
     fun update(@PathVariable("id") idBar: Long, @RequestBody barEdit: BarDTOEdit): ResponseEntity<Any> {
-        val responseHeader = HttpHeaders()
 
         return try {
             barService.update(idBar, barEdit)
-            ResponseEntity(responseHeader, HttpStatus.OK)
+            ResponseEntity( HttpStatus.OK)
 
         } catch (e: NotFoundException) {
             ResponseEntity(e.message, HttpStatus.NOT_FOUND)
