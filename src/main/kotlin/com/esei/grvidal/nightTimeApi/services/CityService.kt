@@ -87,6 +87,10 @@ class CityService : ICityService {
         }
 
     }
+
+    override fun exists(idCity: Long): Boolean {
+        return cityRepository!!.findById(idCity).isPresent
+    }
 }
 
 

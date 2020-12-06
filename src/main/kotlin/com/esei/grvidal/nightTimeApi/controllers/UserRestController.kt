@@ -3,23 +3,22 @@ package com.esei.grvidal.nightTimeApi.controllers
 import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
 import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
-import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendsBusiness
-import com.esei.grvidal.nightTimeApi.serviceInterface.IDateCityService
-import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendRequestBusiness
-import com.esei.grvidal.nightTimeApi.serviceInterface.IUserService
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.*
 import com.esei.grvidal.nightTimeApi.projections.FriendProjection
 import com.esei.grvidal.nightTimeApi.projections.UserProjection
+import com.esei.grvidal.nightTimeApi.serviceInterface.*
 import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
 import com.esei.grvidal.nightTimeApi.utlis.Constants
+import org.hibernate.exception.ConstraintViolationException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.sql.SQLIntegrityConstraintViolationException
 
 /**
  * This is the User Controller
@@ -36,6 +35,9 @@ class UserRestController {
 
     @Autowired
     lateinit var dateCityService: IDateCityService
+
+    @Autowired
+    lateinit var cityService: ICityService
 
     @Autowired
     lateinit var friendRequestBusiness: IFriendRequestBusiness
@@ -60,7 +62,7 @@ class UserRestController {
         return try {
             ResponseEntity(userService.loadProjection(idUser), HttpStatus.OK)
         } catch (e: NotFoundException) {
-            ResponseEntity(e.message,HttpStatus.NOT_FOUND)
+            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
         }
     }
 
@@ -85,11 +87,11 @@ class UserRestController {
     @PostMapping("")
     fun insert(@RequestBody user: UserDTOInsert): ResponseEntity<Any> {
 
-            val id = userService.save(user)
-            val responseHeader = HttpHeaders()
-            responseHeader.set("location", Constants.URL_BASE_USER + "/" + id)
+        val id = userService.save(user)
+        val responseHeader = HttpHeaders()
+        responseHeader.set("location", Constants.URL_BASE_USER + "/" + id)
 
-            return ResponseEntity(responseHeader, HttpStatus.CREATED)
+        return ResponseEntity(responseHeader, HttpStatus.CREATED)
 
     }
 
@@ -100,14 +102,14 @@ class UserRestController {
     ): ResponseEntity<Any> {
         //todo send Token
         return try {
-            val isUser = userService.login(username,password)
+            val isUser = userService.login(username, password)
 
             if (isUser) {
                 ResponseEntity(true, HttpStatus.OK)
-            } else  {
+            } else {
                 val responseHeader = HttpHeaders()
                 responseHeader.set("Error", "Credentials don't match")
-                ResponseEntity(false,responseHeader, HttpStatus.BAD_REQUEST)
+                ResponseEntity(false, responseHeader, HttpStatus.BAD_REQUEST)
             }
 
 
@@ -130,8 +132,8 @@ class UserRestController {
 
         return try {
 
-             userService.update(idUser,user)
-            ResponseEntity( HttpStatus.OK)
+            userService.update(idUser, user)
+            ResponseEntity(HttpStatus.OK)
 
         } catch (e: NotFoundException) {
             ResponseEntity(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
@@ -148,10 +150,9 @@ class UserRestController {
             userService.remove(idUser)
             ResponseEntity(HttpStatus.NO_CONTENT)
         } catch (e: NotFoundException) {
-            ResponseEntity(e.message,HttpStatus.NOT_FOUND)
+            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
         }
     }
-
 
 
     /**
@@ -161,24 +162,27 @@ class UserRestController {
 
     @PutMapping("/{id}/date")
     fun addDate(@PathVariable("id") idUser: Long, @RequestBody dateCity: DateCityDTO): ResponseEntity<Any> {
-        return try {
-
-            userService.addDate(idUser,dateCity)
-            ResponseEntity(HttpStatus.OK)
-
-        } catch (e: NotFoundException) {
-            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
-
-        } catch (e: AlreadyExistsException) {
-            ResponseEntity(e.message, HttpStatus.ALREADY_REPORTED)
+        return if (!userService.exists(idUser))
+            ResponseEntity("No user with id $idUser found", HttpStatus.NOT_FOUND)
+        else if (!cityService.exists(dateCity.nextCityId))
+            ResponseEntity("No city with id ${dateCity.nextCityId} found", HttpStatus.NOT_FOUND)
+        else {
+            try {
+                dateCityService.addDate(idUser, dateCity)
+                ResponseEntity(HttpStatus.OK)
+            } catch (e: AlreadyExistsException) {
+                ResponseEntity(e.message, HttpStatus.ALREADY_REPORTED)
+            }
         }
+
+
     }
 
     @DeleteMapping("/{id}/date/{idDate}")
     fun deleteDate(@PathVariable("id") idUser: Long, @PathVariable("idDate") idDate: Long): ResponseEntity<Any> {
         return try {
 
-            if(userService.deleteDate(idUser,idDate))
+            if (userService.deleteDate(idUser, idDate))
                 ResponseEntity(HttpStatus.NO_CONTENT)
             else
                 ResponseEntity(HttpStatus.NOT_FOUND)
@@ -186,8 +190,6 @@ class UserRestController {
             ResponseEntity(e.message, HttpStatus.NOT_FOUND)
         }
     }
-
-
 
 
     /**
@@ -202,7 +204,7 @@ class UserRestController {
      */
     @GetMapping("/{id}/friends")
     fun getFriendships(@PathVariable("id") idUser: Long): ResponseEntity<List<FriendProjection>> {
-        return ResponseEntity( friendsBusiness.listFriendsByUser(idUser)   , HttpStatus.OK)
+        return ResponseEntity(friendsBusiness.listFriendsByUser(idUser), HttpStatus.OK)
     }
 
     /**
@@ -285,7 +287,7 @@ class UserRestController {
 
                     }
                     else -> {
-                        return ResponseEntity( HttpStatus.ALREADY_REPORTED)
+                        return ResponseEntity(HttpStatus.ALREADY_REPORTED)
                     }
                 }
 

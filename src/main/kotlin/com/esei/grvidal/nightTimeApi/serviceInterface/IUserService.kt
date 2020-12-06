@@ -34,10 +34,9 @@ interface IUserService {
     @Throws(NotFoundException::class)
     fun login(nickname: String, password: String): Boolean
 
-    @Throws(AlreadyExistsException::class ,NotFoundException::class)
-    fun addDate(idUser: Long, dateCity: DateCityDTO)
-
     @Throws(NotFoundException::class)
     fun deleteDate(idUser: Long, idDate: Long):Boolean
+
+    fun exists(idUser: Long): Boolean
 
 }

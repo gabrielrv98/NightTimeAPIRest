@@ -18,4 +18,6 @@ interface ICityService {
 
     //remove a City
     fun remove(idCity: Long)
+
+    fun exists(idCity: Long) : Boolean
 }

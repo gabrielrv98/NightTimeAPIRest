@@ -7,6 +7,7 @@ import com.esei.grvidal.nightTimeApi.repository.DateCityRepository
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.model.City
 import com.esei.grvidal.nightTimeApi.model.DateCity
+import com.esei.grvidal.nightTimeApi.model.User
 import com.esei.grvidal.nightTimeApi.serviceInterface.IDateCityService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -53,6 +54,9 @@ class DateCityService : IDateCityService {
 
     }
 
+    override fun addDate(idUser: Long, dateCity: DateCityDTO): Long {
+        return dateCityRepository.save(dateCity.toDateCity(idUser)).id
+    }
 
 
     /**
@@ -68,6 +72,17 @@ class DateCityService : IDateCityService {
         }
     }
 
+}
+
+
+fun DateCityDTO.toDateCity( userId: Long): DateCity {
+    val city =  City("","").apply{
+        this.id = nextCityId}
+
+    return DateCity(nextDate,
+            nextCity = city,
+            user = User("","","","","", LocalDate.now()).apply {
+                this.id = userId })
 }
 
 
