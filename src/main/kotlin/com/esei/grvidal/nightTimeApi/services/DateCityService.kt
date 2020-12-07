@@ -76,13 +76,10 @@ class DateCityService : IDateCityService {
 
 
 fun DateCityDTO.toDateCity( userId: Long): DateCity {
-    val city =  City("","").apply{
-        this.id = nextCityId}
-
     return DateCity(nextDate,
-            nextCity = city,
-            user = User("","","","","", LocalDate.now()).apply {
-                this.id = userId })
+            nextCity = City(nextCityId),
+            user = User(userId)
+    )
 }
 
 

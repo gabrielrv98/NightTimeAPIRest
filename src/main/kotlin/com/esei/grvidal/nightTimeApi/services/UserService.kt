@@ -110,26 +110,6 @@ class UserService : IUserService {
         return user.password == password
     }
 
-    @Throws(AlreadyExistsException::class, NotFoundException::class)
-    override fun addDate(idUser: Long, dateCity: DateCityDTO) {
-        val user = load(idUser)
-
-        //if user list is not null
-        if (user.nextDates != null) {
-            //but the date is already in one element
-            if (!user.nextDates!!.none { dateCityUser -> dateCityUser.nextDate == dateCity.nextDate })
-            //throw an exception
-                throw AlreadyExistsException("Date already selected, you can't be in two places at once")
-        }
-
-        dateCityRepository.save(
-                dateCity.toDateCity(
-                        city = cityRepository.getCityObjectById(dateCity.nextCityId)
-                                .orElseThrow { NotFoundException("No city with id ${dateCity.nextCityId} found") },
-                        user = user
-                )
-        )
-    }
 
     @Throws(NotFoundException::class)
     override fun deleteDate(idUser: Long, idDate: Long): Boolean {
@@ -146,6 +126,10 @@ class UserService : IUserService {
 
         return delete
     }
+
+    override fun exists(idUser: Long): Boolean {
+        return userRepository.findById(idUser).isPresent
+    }
 }
 
 fun UserDTOEdit.toUser(user: User): User {
@@ -159,9 +143,6 @@ fun UserDTOEdit.toUser(user: User): User {
     ).apply { id = user.id }
 }
 
-fun DateCityDTO.toDateCity(city: City, user: User): DateCity {
-    return DateCity(nextDate, city, user)
-}
 
 
 

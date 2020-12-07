@@ -27,4 +27,8 @@ class User(
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     var id: Long = 0
+
+    constructor(idUser: Long): this("","","","","",LocalDate.now()){
+        id = idUser
+    }
 }

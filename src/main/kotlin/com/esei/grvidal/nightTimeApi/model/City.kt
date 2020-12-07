@@ -13,5 +13,8 @@ class City(
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     var id: Long = 0
+    constructor(idCity: Long): this("",""){
+        id = idCity
+    }
 
 }

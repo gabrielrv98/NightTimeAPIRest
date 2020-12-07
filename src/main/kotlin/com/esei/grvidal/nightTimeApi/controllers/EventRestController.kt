@@ -44,7 +44,7 @@ class EventRestController {
     fun insert(@RequestBody eventDTO: EventDTOInsert): ResponseEntity<Any> {
         val responseHeader = HttpHeaders()
 
-        return try{
+        return try{//check if bar exists, if it does, save via DTO
             val eventId = eventService.save(
                     eventDTO.toEvent(barService.load(eventDTO.barId))
             )
