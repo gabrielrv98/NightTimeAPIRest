@@ -12,11 +12,12 @@ import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import com.esei.grvidal.nightTimeApi.serviceInterface.*
 import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
 import com.esei.grvidal.nightTimeApi.utlis.Constants
-import org.hibernate.exception.ConstraintViolationException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import java.sql.SQLIntegrityConstraintViolationException
 
@@ -105,6 +106,10 @@ class UserRestController {
             val isUser = userService.login(username, password)
 
             if (isUser) {
+               // SecurityContextHolder.getContext().authentication = Authentication()
+               // val authentication: Authentication = SecurityContextHolder.getContext().authentication;
+               // val currentPrincipalName: String = authentication.getName();
+
                 ResponseEntity(true, HttpStatus.OK)
             } else {
                 val responseHeader = HttpHeaders()
@@ -162,6 +167,7 @@ class UserRestController {
 
     @PutMapping("/{id}/date")
     fun addDate(@PathVariable("id") idUser: Long, @RequestBody dateCity: DateCityDTO): ResponseEntity<Any> {
+
         return if (!userService.exists(idUser))
             ResponseEntity("No user with id $idUser found", HttpStatus.NOT_FOUND)
         else if (!cityService.exists(dateCity.nextCityId))
