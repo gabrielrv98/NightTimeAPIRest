@@ -26,6 +26,7 @@ import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.auth.*
+import io.ktor.client.engine.*
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.StatusPages
 import io.ktor.http.HttpStatusCode
@@ -231,13 +232,28 @@ class KotlinSecurityConfiguration : WebSecurityConfigurerAdapter() {
 
  */
  */
-
+/*
 fun main(args: Array<String>) {
+
     runApplication<NightTimeApiApplication>(*args)
 }
-// fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)  didn't work at all
 
-//Copied from  https://github.com/alekseinovikov/KtorAuthenticationExample
+ */
+ fun main(args: Array<String>): Unit {
+    io.ktor.server.netty.EngineMain.main(args)
+
+}
+
+
+
+//-----------------------------------------------------------------------------------------------------------------
+        //Copied from  https://github.com/alekseinovikov/KtorAuthenticationExample
+        //https://medium.com/@alexeynovikov_89393/authentication-in-ktor-server-using-form-data-e7ab626ada97
+        //after this you should be able to use principal (current user) on the controllers
+
+        //with keys https://www.scottbrady91.com/Kotlin/JSON-Web-Token-Verification-in-Ktor-using-Kotlin-and-Java-JWT
+
+//-----------------------------------------------------------------------------------------------------------------
 fun Application.module(testing: Boolean = false) {
     val logger = LoggerFactory.getLogger(NightTimeApiApplication::class.java)!!
 
@@ -274,13 +290,11 @@ fun Application.module(testing: Boolean = false) {
         form(AuthName.FORM) {
             userParamName = FormFields.USERNAME
             passwordParamName = FormFields.PASSWORD
-            /*
             challenge {
-                logger.info ("que coñooo")
+
                 throw AuthenticationException("no se que ha pasado")
             }
 
-             */
             validate { cred: UserPasswordCredential ->
                 logger.info ("name -"+cred.name+ "  pass "+cred.password)
                 AuthProvider.tryAuth(cred.name, cred.password)
@@ -331,7 +345,6 @@ object AuthProvider {
     const val TEST_USER_PASSWORD = "pass"
 
     fun tryAuth(userName: String, password: String): UserIdPrincipal? {
-        return UserIdPrincipal(userName)
 
 
         //Here you can use DB or other ways to check user and create a Principal
@@ -339,9 +352,9 @@ object AuthProvider {
             return UserIdPrincipal(TEST_USER_NAME)
         }
 
-        println("JODEEEEEEEEEEEEERRRRRRRRRRRRRRR")
 
-        return UserIdPrincipal(TEST_USER_NAME)
+
+        return null
     }
 }
 
