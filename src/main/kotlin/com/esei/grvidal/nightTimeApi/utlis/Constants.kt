@@ -17,3 +17,17 @@ class Constants {
         const val URL_BASE_CHAT = "$URL_BASE/chat"
     }
 }
+
+object Cookies {
+    const val AUTH_COOKIE = "auth"
+}
+
+object AuthName {
+    const val SESSION = "auth_session"
+    const val FORM = "auth_form"
+}
+
+object FormFields {
+    const val USERNAME = "username"
+    const val PASSWORD = "password"
+}
