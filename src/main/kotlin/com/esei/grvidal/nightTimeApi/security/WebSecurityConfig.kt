@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 
+
+//info from https://codesample.dev/jwt-authentication-with-spring-boot-and-kotlin/
 @EnableWebSecurity
 class WebSecurityConfig(private val userService: UserService,
                         private val passwordEncoder: BCryptPasswordEncoder) : WebSecurityConfigurerAdapter() {
@@ -26,11 +28,11 @@ class WebSecurityConfig(private val userService: UserService,
                 .and()
                 // Configure login so it uses our created login page and redirects to the dashboard page upon
                 // a successful login.
-                .formLogin()
-                .loginPage("$URL_BASE_USER/login")
+                //.formLogin()
+                //.loginPage("$URL_BASE_USER/login")
                // .loginProcessingUrl(URL_BASE_USER+"/login")
-                .defaultSuccessUrl(URL_BASE_BAR, true)
-                .and()
+                //.defaultSuccessUrl(URL_BASE_BAR, true)
+                //.and()
                 // Register our authentication and authorization filters with spring security.
                 .addFilter(JWTAuthenticationFilter(authenticationManager()))
                 .addFilter(JWTAuthorizationFilter(authenticationManager()))
