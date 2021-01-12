@@ -253,6 +253,14 @@ fun main(args: Array<String>) {
 
         //with keys https://www.scottbrady91.com/Kotlin/JSON-Web-Token-Verification-in-Ktor-using-Kotlin-and-Java-JWT
 
+
+
+
+//-----------------------------------------------------------------------------------------------------------------
+        //Best ONE
+    //https://codesample.dev/jwt-authentication-with-spring-boot-and-kotlin/
+//-----------------------------------------------------------------------------------------------------------------
+
 //-----------------------------------------------------------------------------------------------------------------
 fun Application.module(testing: Boolean = false) {
     val logger = LoggerFactory.getLogger(NightTimeApiApplication::class.java)!!
