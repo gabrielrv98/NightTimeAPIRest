@@ -1,5 +1,6 @@
 package com.esei.grvidal.nightTimeApi.controllers
 
+import com.esei.grvidal.nightTimeApi.NightTimeApiApplication
 import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
 import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
@@ -12,12 +13,15 @@ import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import com.esei.grvidal.nightTimeApi.serviceInterface.*
 import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
 import com.esei.grvidal.nightTimeApi.utlis.Constants
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UsernameNotFoundException
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.web.bind.annotation.*
 import java.sql.SQLIntegrityConstraintViolationException
 
@@ -42,6 +46,7 @@ class UserRestController {
 
     @Autowired
     lateinit var friendRequestBusiness: IFriendRequestBusiness
+
 
 
     /**
@@ -85,9 +90,10 @@ class UserRestController {
      * Listen to a Post with the [Constants.URL_BASE_BAR] and a requestBody with a Bar to create a bar
      * @param user new Bar to insert in the database
      */
-    @PostMapping("")
+    @PostMapping("/register")
     fun insert(@RequestBody user: UserDTOInsert): ResponseEntity<Any> {
 
+        user.password = BCryptPasswordEncoder().encode(user.password)
         val id = userService.save(user)
         val responseHeader = HttpHeaders()
         responseHeader.set("location", Constants.URL_BASE_USER + "/" + id)
@@ -96,15 +102,17 @@ class UserRestController {
 
     }
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     fun login(
             @RequestHeader(name = "username") username: String,//todo esto o UserLoginDTO
             @RequestHeader(name = "password") password: String,
     ): ResponseEntity<Any> {
         //todo send Token
         return try {
+            //val isUser = userService.login(username, BCryptPasswordEncoder().encode(password))
+            val logger = LoggerFactory.getLogger(NightTimeApiApplication::class.java)!!
+            logger.info("username $username, password $password")
             val isUser = userService.login(username, password)
-
             if (isUser) {
                // SecurityContextHolder.getContext().authentication = Authentication()
                // val authentication: Authentication = SecurityContextHolder.getContext().authentication;
@@ -118,8 +126,10 @@ class UserRestController {
             }
 
 
-        } catch (e: Exception) {
+        } catch (e: UsernameNotFoundException) {
             ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+        } catch (e: Exception) {
+            ResponseEntity(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 

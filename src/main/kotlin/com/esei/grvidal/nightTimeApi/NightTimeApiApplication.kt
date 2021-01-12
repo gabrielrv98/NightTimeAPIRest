@@ -37,6 +37,8 @@ import io.ktor.routing.post
 import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.sessions.*
+import org.springframework.context.annotation.Bean
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import kotlin.collections.set
 
 @SpringBootApplication
@@ -145,6 +147,7 @@ class NightTimeApiApplication : CommandLineRunner {
                 birthdate = LocalDate.of(1998, 3, 14),
 
         )
+        user1.password = BCryptPasswordEncoder().encode(user1.password)
 
         userRepositories!!.save(user1)
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user1))
@@ -159,6 +162,8 @@ class NightTimeApiApplication : CommandLineRunner {
 
 
         )
+
+        user2.password = BCryptPasswordEncoder().encode(user2.password)
         userRepositories!!.save(user2)
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user2))
 
@@ -171,6 +176,8 @@ class NightTimeApiApplication : CommandLineRunner {
                 email = "ireneReina@hotmail.com",
                 birthdate = LocalDate.of(1998, 4, 12)
         )
+
+        user3.password = BCryptPasswordEncoder().encode(user3.password)
         userRepositories!!.save(user3)
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user3))
 
@@ -183,6 +190,8 @@ class NightTimeApiApplication : CommandLineRunner {
                 "joseNegro@gmail.com",
                 birthdate = LocalDate.of(1990, 4, 25)
         )
+
+        user4.password = BCryptPasswordEncoder().encode(user4.password)
         userRepositories!!.save(user4)
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityVigo, user = user4))
 
@@ -208,11 +217,15 @@ class NightTimeApiApplication : CommandLineRunner {
 
     }
 
+    @Bean
+    fun bCryptPasswordEncoder(): BCryptPasswordEncoder {
+        return BCryptPasswordEncoder()
+    }
 
 }
 
 /*
-old school ( en realidad es kotlin DSL )
+old school ( en realidad es kotlin DSL y es bastante nuevo )
 @EnableWebSecurity
 class KotlinSecurityConfiguration : WebSecurityConfigurerAdapter() {
 
@@ -232,19 +245,18 @@ class KotlinSecurityConfiguration : WebSecurityConfigurerAdapter() {
 
  */
  */
-/*
+
 fun main(args: Array<String>) {
 
     runApplication<NightTimeApiApplication>(*args)
 }
 
- */
+/*
  fun main(args: Array<String>): Unit {
     io.ktor.server.netty.EngineMain.main(args)
 
 }
-
-
+*/
 
 //-----------------------------------------------------------------------------------------------------------------
         //Copied from  https://github.com/alekseinovikov/KtorAuthenticationExample

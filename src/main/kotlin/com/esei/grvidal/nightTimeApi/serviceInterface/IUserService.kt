@@ -6,13 +6,14 @@ import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.projections.UserProjection
+import org.springframework.security.core.userdetails.UserDetails
 import java.util.*
 import kotlin.jvm.Throws
 
 /**
  * DAO Interface for Bars
  */
-interface IUserService {
+interface IUserService  {
 
     //List all the user
     fun list(): List<UserProjection>

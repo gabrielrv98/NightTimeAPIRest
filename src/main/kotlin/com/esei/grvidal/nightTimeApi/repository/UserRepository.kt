@@ -3,6 +3,7 @@ package com.esei.grvidal.nightTimeApi.repository
 import com.esei.grvidal.nightTimeApi.model.User
 import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Repository
 import java.util.*
 
@@ -15,4 +16,5 @@ interface UserRepository : JpaRepository<User, Long> {
     fun getUserById (id: Long): Optional<UserProjection>
 
     fun findByNickname(nickname: String): Optional<User>
+
 }

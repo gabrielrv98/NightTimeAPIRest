@@ -6,7 +6,7 @@ import java.time.LocalDate
 data class UserDTOInsert(
         val name: String,
         val nickname: String,
-        val password: String,
+        var password: String,
         val state: String? = null,
         val email: String,
         var birthdate: LocalDate,

@@ -14,8 +14,13 @@ import com.esei.grvidal.nightTimeApi.model.User
 import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import com.esei.grvidal.nightTimeApi.repository.CityRepository
 import com.esei.grvidal.nightTimeApi.repository.DateCityRepository
+import com.esei.grvidal.nightTimeApi.security.UserPrincipal
 import com.esei.grvidal.nightTimeApi.serviceInterface.IUserService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
 import kotlin.jvm.Throws
 
@@ -24,7 +29,7 @@ import kotlin.jvm.Throws
  *
  */
 @Service
-class UserService : IUserService {
+class UserService : IUserService , UserDetailsService {
 
     /**
      *Dependency injection with autowired
@@ -58,6 +63,14 @@ class UserService : IUserService {
 
         return userRepository.getUserById(idUser)
                 .orElseThrow { NotFoundException("Couldn't find the user with id $idUser") }
+
+    }
+
+    // UserDetailsService functions
+    override fun loadUserByUsername(nickname: String ): UserDetails {
+        val user = userRepository.findByNickname(nickname)
+                .orElseThrow { UsernameNotFoundException("Couldn't find the user with id $nickname") }
+        return UserPrincipal(user)
 
     }
 
@@ -130,6 +143,8 @@ class UserService : IUserService {
     override fun exists(idUser: Long): Boolean {
         return userRepository.findById(idUser).isPresent
     }
+
+
 }
 
 fun UserDTOEdit.toUser(user: User): User {

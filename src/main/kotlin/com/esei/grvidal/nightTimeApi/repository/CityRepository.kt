@@ -12,7 +12,7 @@ import java.util.*
  */
 @Repository
 interface CityRepository : JpaRepository<City, Long> {
-    fun getCityObjectById(id: Long): Optional<City>
+    fun getCityById(id: Long): Optional<City>
     fun getById(id: Long): Optional<CityProjection>
 
 }
