@@ -176,9 +176,6 @@ class NightTimeApiApplication : CommandLineRunner {
         //friendsRepositories!!.save(friends1w3)
 
         logger.info("Application ready to use")
-
-
-
     }
 }
 
