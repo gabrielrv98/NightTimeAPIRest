@@ -1,13 +1,15 @@
 package com.esei.grvidal.nightTimeApi.services
 
+import com.esei.grvidal.nightTimeApi.dto.FriendRequestInsertDTO
+import com.esei.grvidal.nightTimeApi.dto.toFriendRequest
 import com.esei.grvidal.nightTimeApi.repository.FriendRequestRepository
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
-import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
 import com.esei.grvidal.nightTimeApi.model.FriendRequest
 import com.esei.grvidal.nightTimeApi.model.Friends
-import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendRequestBusiness
+import com.esei.grvidal.nightTimeApi.repository.UserRepository
+import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendRequestService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.*
@@ -18,13 +20,16 @@ import kotlin.jvm.Throws
  *
  */
 @Service
-class FriendRequestBusiness : IFriendRequestBusiness {
+class FriendRequestService : IFriendRequestService {
 
     /**
      *Dependency injection with autowired
      */
     @Autowired
-    val friendRequestRepository: FriendRequestRepository? = null
+    lateinit var friendRequestRepository: FriendRequestRepository
+
+    @Autowired
+    lateinit var userRepository: UserRepository
 
     /**
      * This will list all the chats, if not, will throw a BusinessException
@@ -33,7 +38,7 @@ class FriendRequestBusiness : IFriendRequestBusiness {
     override fun list(): List<FriendRequest> {
 
         try {
-            return friendRequestRepository!!.findAll()
+            return friendRequestRepository.findAll()
         } catch (e: Exception) {
             throw ServiceException(e.message)
         }
@@ -42,7 +47,7 @@ class FriendRequestBusiness : IFriendRequestBusiness {
     @Throws(ServiceException::class)
     override fun listByUserAnswer(userId: Long): List<FriendRequest> {
         try {
-            return friendRequestRepository!!.findFriendRequestByUserAnswer_Id(userId)
+            return friendRequestRepository.findFriendRequestByUserAnswer_Id(userId)
 
         } catch (e: Exception) {
             throw ServiceException(e.message)
@@ -58,7 +63,7 @@ class FriendRequestBusiness : IFriendRequestBusiness {
     override fun load(friendRequestId: Long): FriendRequest {
         val op: Optional<FriendRequest>
         try {
-            op = friendRequestRepository!!.findById(friendRequestId)
+            op = friendRequestRepository.findById(friendRequestId)
         } catch (e: Exception) {
             throw ServiceException(e.message)
         }
@@ -74,28 +79,37 @@ class FriendRequestBusiness : IFriendRequestBusiness {
     /**
      * This will save a new [Friends], if not, will throw an Exception
      */
-    @Throws(ServiceException::class, AlreadyExistsException::class)
-    override fun save(friendRequest: FriendRequest): FriendRequest {
-        try {
+    override fun save(friendRequest: FriendRequestInsertDTO): Long {
 
-            var op = friendRequestRepository!!.findFriendRequestByUserAsk_IdAndUserAnswer_Id(
-                    friendRequest.userAsk.id, friendRequest.userAnswer.id)
+
+        //Check if the relation already exists
+        var op = friendRequestRepository.findFriendRequestByUserAsk_IdAndUserAnswer_Id(
+            friendRequest.idUserAsk, friendRequest.idUserAnswer
+        )
+        if (!op.isPresent) {
+
+            //check if the opposite relation already exists
+            op = friendRequestRepository.findFriendRequestByUserAsk_IdAndUserAnswer_Id(
+                friendRequest.idUserAnswer, friendRequest.idUserAsk
+            )
             if (!op.isPresent) {
-                op = friendRequestRepository!!.findFriendRequestByUserAsk_IdAndUserAnswer_Id(
-                        friendRequest.userAnswer.id, friendRequest.userAsk.id)
-                if (!op.isPresent) {
-                    friendRequest.answer = AnswerOptions.NOT_ANSWERED
-                    return friendRequestRepository!!.save(friendRequest)
-                }
+
+                //Check if the userAsk exists
+                val userAsk = userRepository.findById(friendRequest.idUserAsk)
+                    .orElseThrow { NotFoundException("User who asks with id ${friendRequest.idUserAsk} not found") }
+
+                //Check if the userAnswer exists
+                val userAnswer = userRepository.findById(friendRequest.idUserAnswer)
+                    .orElseThrow { NotFoundException("User who answers with id ${friendRequest.idUserAnswer} not found") }
+
+
+                return friendRequestRepository.save(
+                    friendRequest.toFriendRequest(userAsk, userAnswer)
+                ).id
             }
-            throw AlreadyExistsException("Relation already exists")
-
-
-        } catch (e: AlreadyExistsException) {
-            throw AlreadyExistsException(e.message)
-        } catch (e: Exception) {
-            throw ServiceException(e.message)
         }
+        throw AlreadyExistsException("Relation already exists")
+
     }
 
     /**

@@ -10,14 +10,10 @@ import com.esei.grvidal.nightTimeApi.projections.UserProjection
  */
 interface IFriendsBusiness {
 
-    //List all the chats  //testing propose
-    fun list(): List<Friends>
 
-    //List all the chats of one user //api propose
-    fun listUserByUser(userId: Long): List<UserProjection>
+    //Lists all the users that are friend of one User //api propose
+    fun listUsersFromFriendsByUser(userId: Long): List<UserProjection>
 
-    fun listChatsByUser(userId: Long): List<Friends>
-    fun listFriendsByUser(userId: Long): List<FriendProjection>
 
     //List all the messages in one chat of one user //api propose
     fun listMessagesFromChat(friendsId: Long): List<Message>

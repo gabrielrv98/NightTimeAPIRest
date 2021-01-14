@@ -27,72 +27,40 @@ class FriendsBusiness : IFriendsBusiness {
      *Dependency injection with autowired
      */
     @Autowired
-    val friendsRepository: FriendsRepository? = null
+    lateinit var friendsRepository: FriendsRepository
 
-    /**
-     *Dependency injection with autowired
-     */
-    @Autowired
-    val messageRepository: MessageRepository? = null
-
-    /**
-     * This will list all the chats, if not, will throw a BusinessException
-     */
-    @Throws(ServiceException::class)
-    override fun list(): List<Friends> {
-
-        try {
-            return friendsRepository!!.findAll()
-        } catch (e: Exception) {
-            throw ServiceException(e.message)
-        }
-    }
+    lateinit var messageRepository: MessageRepository
 
     /**
      * Lists all the friendships of one User
      */
-    override fun listFriendsByUser(userId: Long): List<FriendProjection> {
+    private fun listFriendsByUser(userId: Long): List<FriendProjection> {
 
-
-        friendsRepository?.let {
-            return it.findFriendsByUser1_IdOrUser2_IdAndAnswer(userId, userId, AnswerOptions.YES)
-        }
-        return listOf()
+        return friendsRepository.findFriendsByUser1_IdOrUser2_IdAndAnswer(userId, userId, AnswerOptions.YES)
 
     }
 
     /**
-     * Lists all the friendships of one User
+     * Lists all the users that are friend of one User
      */
-    override fun listUserByUser(userId: Long): List<UserProjection> {
+    override fun listUsersFromFriendsByUser(userId: Long): List<UserProjection> {
 
+        //empty list
         var list: List<UserProjection> = listOf()
 
-        friendsRepository?.let {
-            it.findFriendsByUser1_IdOrUser2_IdAndAnswer(userId, userId, AnswerOptions.YES).forEach {friendProjection ->
-                if (friendProjection.getUser1().getId() == userId) list = list.plus(friendProjection.getUser2())
-                else if (friendProjection.getUser2().getId() == userId) list = list.plus(friendProjection.getUser1())
+        //Gets all the Friendships
+        listFriendsByUser(userId)
+            .forEach { friendProjection -> // Adds to the list the friend who aren't the user himself
+                if (friendProjection.getUser1().getId() == userId)
+                    list = list.plus(friendProjection.getUser2())
+                else if (friendProjection.getUser2().getId() == userId)
+                    list = list.plus(friendProjection.getUser1())
             }
 
-        }
         return list
 
     }
 
-    /**
-     * Lists all the friendships of one User
-     */
-    @Throws(NotFoundException::class, ServiceException::class)
-    override fun listChatsByUser(userId: Long): List<Friends> {
-
-
-        friendsRepository?.let {
-            return it.findFriendsByUser1_IdOrUser2_Id(userId, userId)
-
-        }
-        return listOf()
-
-    }
 
     /**
      * Lists all the chats of one User
@@ -101,13 +69,10 @@ class FriendsBusiness : IFriendsBusiness {
     override fun listMessagesFromChat(friendsId: Long): List<Message> {
         try {
 
-            return messageRepository!!.findAllByFriends_Id(friendsId)
+            return messageRepository.findAllByFriends_Id(friendsId)
 
         } catch (e: NotFoundException) {
             throw NotFoundException(e.message)
-
-        } catch (e: Exception) {
-            throw ServiceException(e.message)
         }
     }
 

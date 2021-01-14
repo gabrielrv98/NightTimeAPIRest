@@ -1,6 +1,7 @@
 package com.esei.grvidal.nightTimeApi.controllers
 
 import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
+import com.esei.grvidal.nightTimeApi.dto.FriendRequestInsertDTO
 import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
@@ -8,7 +9,6 @@ import com.esei.grvidal.nightTimeApi.exception.NoAuthorizationException
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.*
-import com.esei.grvidal.nightTimeApi.projections.FriendProjection
 import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import com.esei.grvidal.nightTimeApi.serviceInterface.*
 import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
@@ -39,7 +39,7 @@ class UserRestController {
     lateinit var cityService: ICityService
 
     @Autowired
-    lateinit var friendRequestBusiness: IFriendRequestBusiness
+    lateinit var friendRequestService: IFriendRequestService
 
 
     /**
@@ -66,6 +66,7 @@ class UserRestController {
     }
 
 
+
     /**
      * Listen to a Post with the [Constants.URL_BASE_BAR] and a requestBody with a Bar to create a bar
      * @param user new Bar to insert in the database
@@ -88,17 +89,17 @@ class UserRestController {
      */
     @PostMapping("/login")
     fun login(
-            @RequestHeader(name = "username") username: String,//todo esto o UserLoginDTO
-            @RequestHeader(name = "password") password: String,
+        @RequestHeader(name = "username") username: String,//todo esto o UserLoginDTO
+        @RequestHeader(name = "password") password: String,
     ): ResponseEntity<Any> {
         //todo send Token
         return try {
             val isUser = userService.login(username, password)
 
             if (isUser) {
-               // SecurityContextHolder.getContext().authentication = Authentication()
-               // val authentication: Authentication = SecurityContextHolder.getContext().authentication;
-               // val currentPrincipalName: String = authentication.getName();
+                // SecurityContextHolder.getContext().authentication = Authentication()
+                // val authentication: Authentication = SecurityContextHolder.getContext().authentication;
+                // val currentPrincipalName: String = authentication.getName();
 
                 ResponseEntity(true, HttpStatus.OK)
             } else {
@@ -200,12 +201,12 @@ class UserRestController {
         return try {
 
             userService.deleteDate(idUser, idDate)
-            ResponseEntity(HttpStatus.NO_CONTENT)
+            ResponseEntity("Successfully delete",HttpStatus.NO_CONTENT)
 
         } catch (e: NotFoundException) {
             ResponseEntity(e.message, HttpStatus.NOT_FOUND)
 
-        }catch (e: NoAuthorizationException){
+        } catch (e: NoAuthorizationException) {
             ResponseEntity(e.message, HttpStatus.FORBIDDEN)
         }
     }
@@ -215,70 +216,66 @@ class UserRestController {
      *  Friends related code starts here
      */
 
-
     /**
      * Listen to a Get with the [Constants.URL_BASE_BAR] and an Id as a parameter to show one Bar
      *
-     *  @return  A List<[Friends]> with all the friends of the [idUser]
-     */
-    @GetMapping("/{id}/friends")
-    fun getFriendships(@PathVariable("id") idUser: Long): ResponseEntity<List<FriendProjection>> {
-        return ResponseEntity(friendsBusiness.listFriendsByUser(idUser), HttpStatus.OK)
-    }
-
-    /**
-     * Listen to a Get with the [Constants.URL_BASE_BAR] and an Id as a parameter to show one Bar
+     * @return A List<[UserProjection]> with all the friends of the user
      *
-     * @return A List<[User]> with all the friends of the user
-     *
-     * @deprecated
      */
     @GetMapping("/{id}/friends/users")
     fun getUsersFromFriendList(@PathVariable("id") idUser: Long): ResponseEntity<List<UserProjection>> {
-        return try {
 
-            val userList: List<UserProjection> = friendsBusiness.listUserByUser(idUser)
+        return ResponseEntity(
+            friendsBusiness.listUsersFromFriendsByUser(idUser),
+            HttpStatus.OK)
 
-            ResponseEntity(userList, HttpStatus.OK)
-        } catch (e: ServiceException) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        } catch (e: NotFoundException) {
-            ResponseEntity(HttpStatus.NOT_FOUND)
-        }
     }
 
     /**
-     * Listen to a Post with the [Constants.URL_BASE_BAR] and a requestBody with a Bar to create a bar
+     * Listen to a Post with a requestBody with a [FriendRequest] to request a new [Friends]
+     *
      * @param friendRequest new [FriendRequest] to insert in the database
-     * // todo always send friends with id = 0
+     *
+     *
      */
     @PostMapping("/{id}/friends")
-    fun insertRequest(@PathVariable("id") idUser: Long, @RequestBody friendRequest: FriendRequest): ResponseEntity<Any> {
+    fun insertRequestFriendShip(
+        @PathVariable("id") idUser: Long,
+        @RequestBody friendRequest: FriendRequestInsertDTO
+    ): ResponseEntity<Any> {
         val responseHeader = HttpHeaders()
         return try {
 
-            if (idUser == friendRequest.userAsk.id) {
-                friendRequestBusiness.save(friendRequest)
+            //Checks the user who made the post is the one who asks
+            if (idUser == friendRequest.idUserAsk) {
 
-                responseHeader.set("location", Constants.URL_BASE_USER + "/" + friendRequest.id)
+                val id = friendRequestService.save(friendRequest)
+
+                responseHeader.set("location", "${Constants.URL_BASE_USER}/$idUser/chat/$id")
                 ResponseEntity(responseHeader, HttpStatus.CREATED)
+
             } else {
-                responseHeader.set("Error", "User is not in the friendship")
-                ResponseEntity(responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
+                responseHeader.set("Error", "User must be the one who asks")
+                ResponseEntity(responseHeader, HttpStatus.FORBIDDEN)
             }
+
+        }catch (e: NotFoundException) {
+            responseHeader.set("User not found", e.message)
+            ResponseEntity(responseHeader, HttpStatus.NOT_FOUND)
 
         } catch (e: AlreadyExistsException) {
             responseHeader.set("Error", e.message)
-            ResponseEntity(responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
-        } catch (e: ServiceException) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+            ResponseEntity(responseHeader, HttpStatus.ALREADY_REPORTED)
         }
     }
 
     @PatchMapping("/{id}/friends")
-    fun updateRequest(@PathVariable("id") idUser: Long, @RequestBody friendRequest: FriendRequest): ResponseEntity<Any> {
+    fun updateRequest(
+        @PathVariable("id") idUser: Long,
+        @RequestBody friendRequest: FriendRequest
+    ): ResponseEntity<Any> {
         val responseHeader = HttpHeaders()
-        val friendRequestDB = friendRequestBusiness.load(friendRequestId = friendRequest.id)
+        val friendRequestDB = friendRequestService.load(friendRequestId = friendRequest.id)
         try {
 
             //check the idUser is the user who can update the Request
@@ -293,7 +290,7 @@ class UserRestController {
                         friendsBusiness.save(newFriends)
                         responseHeader.set("location", Constants.URL_BASE_USER + "/" + newFriends.id)
 
-                        friendRequestBusiness.remove(friendRequestDB.id)
+                        friendRequestService.remove(friendRequestDB.id)
                         return ResponseEntity(responseHeader, HttpStatus.OK)
 
                         //answer no
@@ -301,7 +298,7 @@ class UserRestController {
                     AnswerOptions.NO -> {
 
                         //remove request
-                        friendRequestBusiness.remove(friendRequestDB.id)
+                        friendRequestService.remove(friendRequestDB.id)
                         return ResponseEntity(responseHeader, HttpStatus.OK)
 
                     }
@@ -331,7 +328,10 @@ class UserRestController {
      * @return The check of a deleted [Friends]
      */
     @DeleteMapping("/{id}/friends/{idFriends}")
-    fun deleteFriendship(@PathVariable("id") idUser: Long, @PathVariable("idFriends") idFriends: Long): ResponseEntity<Any> {
+    fun deleteFriendship(
+        @PathVariable("id") idUser: Long,
+        @PathVariable("idFriends") idFriends: Long
+    ): ResponseEntity<Any> {
         return try {
             val responseHeader = HttpHeaders()
 
@@ -364,13 +364,15 @@ class UserRestController {
 
             var filtered: List<Friends> = listOf()
             //move this to services
-
+/*
             friendsBusiness.listChatsByUser(idUser).onEach {
                 if (it.messages != null) {
                     if (it.messages!!.isNotEmpty())
                         filtered = filtered.plus(it)
                 }
             }
+
+ */
 
             ResponseEntity(filtered, HttpStatus.OK)
         } catch (e: ServiceException) {
@@ -388,8 +390,8 @@ class UserRestController {
      */
     @GetMapping("/{idUser}/chat/{idFriend}")
     fun loadFriendWithMessages(
-            @PathVariable("idUser") idUser: Long,
-            @PathVariable("idFriend") idFriend: Long,
+        @PathVariable("idUser") idUser: Long,
+        @PathVariable("idFriend") idFriend: Long,
     ): ResponseEntity<Any> {
 
         return try {

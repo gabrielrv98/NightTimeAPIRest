@@ -129,16 +129,7 @@ class UserService : IUserService {
     }
 }
 
-fun UserDTOEdit.toUser(user: User): User {
-    return User(
-            name ?: user.name,
-            nickname = user.nickname,
-            password ?: user.password,
-            state,
-            email ?: user.email,
-            birthdate = user.birthdate
-    ).apply { id = user.id }
-}
+
 
 
 

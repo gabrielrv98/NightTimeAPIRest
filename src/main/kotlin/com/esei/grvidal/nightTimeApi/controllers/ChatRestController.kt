@@ -23,17 +23,7 @@ class ChatRestController {
     val friendsBusiness: IFriendsBusiness? = null
 
 
-    /**
-     * Listen to a Get with the [Constants.URL_BASE_BAR] to show all Chats // TESTING PROPOSE
-     */
-    @GetMapping("")
-    fun list(): ResponseEntity<List<Friends>> {
-        return try {
-            ResponseEntity(friendsBusiness!!.list(), HttpStatus.OK)
-        } catch (e: Exception) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        }
-    }
+
 
 
     /**
