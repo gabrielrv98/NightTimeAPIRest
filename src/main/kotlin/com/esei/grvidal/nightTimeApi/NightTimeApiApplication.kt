@@ -164,11 +164,11 @@ class NightTimeApiApplication : CommandLineRunner {
 
 
 
-        val friends = friendsRepositories!!.findFriendsByUser1_IdOrUser2_Id(user1.id, user1.id)[0]
-        var msg = Message("Hola nuria", LocalDate.now(), LocalTime.now(), friends, friends.user1)
+        val friends = friendsRepositories!!.findFriendsByUserAsk_IdOrUserAnswer_Id(user1.id, user1.id)[0]
+        var msg = Message("Hola nuria", LocalDate.now(), LocalTime.now(), friends, friends.userAsk)
 
         messageRepositories!!.save(msg)
-        msg = Message("Adios Gabriel", LocalDate.now().plusDays(1), LocalTime.now().plusHours(1), friends, friends.user2)
+        msg = Message("Adios Gabriel", LocalDate.now().plusDays(1), LocalTime.now().plusHours(1), friends, friends.userAnswer)
         messageRepositories!!.save(msg)
 
         //val friends1w3 = Friends(user1,user3)

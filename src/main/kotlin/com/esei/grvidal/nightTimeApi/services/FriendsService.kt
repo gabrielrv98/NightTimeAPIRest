@@ -1,5 +1,7 @@
 package com.esei.grvidal.nightTimeApi.services
 
+import com.esei.grvidal.nightTimeApi.dto.FriendsInsertDTO
+import com.esei.grvidal.nightTimeApi.dto.toFriendRequest
 import com.esei.grvidal.nightTimeApi.repository.FriendsRepository
 import com.esei.grvidal.nightTimeApi.repository.MessageRepository
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
@@ -9,6 +11,7 @@ import com.esei.grvidal.nightTimeApi.model.Friends
 import com.esei.grvidal.nightTimeApi.model.Message
 import com.esei.grvidal.nightTimeApi.projections.FriendProjection
 import com.esei.grvidal.nightTimeApi.projections.UserProjection
+import com.esei.grvidal.nightTimeApi.repository.UserRepository
 import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendsBusiness
 import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,7 +24,7 @@ import kotlin.jvm.Throws
  *
  */
 @Service
-class FriendsBusiness : IFriendsBusiness {
+class FriendsService : IFriendsBusiness {
 
     /**
      *Dependency injection with autowired
@@ -29,14 +32,18 @@ class FriendsBusiness : IFriendsBusiness {
     @Autowired
     lateinit var friendsRepository: FriendsRepository
 
+    @Autowired
     lateinit var messageRepository: MessageRepository
+
+    @Autowired
+    lateinit var userRepository: UserRepository
 
     /**
      * Lists all the friendships of one User
      */
     private fun listFriendsByUser(userId: Long): List<FriendProjection> {
 
-        return friendsRepository.findFriendsByUser1_IdOrUser2_IdAndAnswer(userId, userId, AnswerOptions.YES)
+        return friendsRepository.findFriendsByUserAsk_IdOrUserAnswer_IdAndAnswer(userId, userId, AnswerOptions.YES)
 
     }
 
@@ -51,10 +58,10 @@ class FriendsBusiness : IFriendsBusiness {
         //Gets all the Friendships
         listFriendsByUser(userId)
             .forEach { friendProjection -> // Adds to the list the friend who aren't the user himself
-                if (friendProjection.getUser1().getId() == userId)
-                    list = list.plus(friendProjection.getUser2())
-                else if (friendProjection.getUser2().getId() == userId)
-                    list = list.plus(friendProjection.getUser1())
+                if (friendProjection.getUserAsk().getId() == userId)
+                    list = list.plus(friendProjection.getUserAnswer())
+                else if (friendProjection.getUserAnswer().getId() == userId)
+                    list = list.plus(friendProjection.getUserAsk())
             }
 
         return list
@@ -80,12 +87,14 @@ class FriendsBusiness : IFriendsBusiness {
     /**
      * This will show one Chat, if not, will throw a BusinessException or
      * if the object cant be found, it will throw a NotFoundException
+     *
+     * todo acabar
      */
     @Throws(ServiceException::class, NotFoundException::class)
     override fun load(friendsId: Long): Friends {
         val op: Optional<Friends>
         try {
-            op = friendsRepository!!.findById(friendsId)
+            op = friendsRepository.findById(friendsId)
         } catch (e: Exception) {
             throw ServiceException(e.message)
         }
@@ -98,51 +107,56 @@ class FriendsBusiness : IFriendsBusiness {
 
     }
 
+
     /**
      * This will save a new [Friends], if not, will throw an Exception
      */
-    @Throws(ServiceException::class, AlreadyExistsException::class)
-    override fun save(friends: Friends): Friends {
-        try {
+    override fun save(friends: FriendsInsertDTO): Long {
 
-            val list = friendsRepository!!.findFriendsByUser1_IdOrUser2_Id(friends.user1.id, friends.user1.id)
-            list.forEach {
-                if (it.user1.id == friends.user2.id || it.user2.id == friends.user2.id)
-                    throw AlreadyExistsException("Friendship already exists")
+        //Check if the relation already exists
+        var op = friendsRepository.findUserAsk_IdAndUserAnswer_Id(
+            friends.idUserAsk, friends.idUserAnswer
+        )
+        if (!op.isPresent) {
+
+            //check if the opposite relation already exists
+            op = friendsRepository.findUserAsk_IdAndUserAnswer_Id(
+                friends.idUserAnswer, friends.idUserAsk
+            )
+            if (!op.isPresent) {
+
+                //Check if the userAsk exists
+                val userAsk = userRepository.findById(friends.idUserAsk)
+                    .orElseThrow { NotFoundException("User who asks with id ${friends.idUserAsk} not found") }
+
+                //Check if the userAnswer exists
+                val userAnswer = userRepository.findById(friends.idUserAnswer)
+                    .orElseThrow { NotFoundException("User who answers with id ${friends.idUserAnswer} not found") }
+
+
+                return friendsRepository.save(
+                    friends.toFriendRequest(userAsk, userAnswer)
+                ).id
             }
-            return friendsRepository!!.save(friends)
-
-
-        } catch (e: AlreadyExistsException) {
-            throw AlreadyExistsException(e.message)
-        } catch (e: Exception) {
-            throw ServiceException(e.message)
         }
+        throw AlreadyExistsException("Relation already exists")
     }
 
     /**
      * This will remove a CHAT through its id, if not, will throw an Exception, or if it cant find it, it will throw a NotFoundException
      * //TODO It shouldn't be removed
+     * todo check what happens if you do a .deletBy of a nonExist relation
      */
     @Throws(ServiceException::class, NotFoundException::class)
     override fun remove(friendsId: Long) {
-        val op: Optional<Friends>
+
+        val op = friendsRepository.findById(friendsId)
+            .orElseThrow { NotFoundException("No Friends with id $friendsId where found") }
 
         try {
-            op = friendsRepository!!.findById(friendsId)
+            friendsRepository.deleteById(friendsId)
         } catch (e: Exception) {
             throw ServiceException(e.message)
-        }
-
-        if (!op.isPresent) {
-            throw NotFoundException("No se encontro al chat con el id $friendsId")
-        } else {
-
-            try {
-                friendsRepository!!.deleteById(friendsId)
-            } catch (e: Exception) {
-                throw ServiceException(e.message)
-            }
         }
 
     }
@@ -156,10 +170,10 @@ class FriendsBusiness : IFriendsBusiness {
         try {
             val friends = msg.friends
 
-            if (friends.user1 != msg.user && friends.user2 != msg.user)
+            if (friends.userAsk != msg.user && friends.userAnswer != msg.user)
                 throw ServiceException("User it's not on the friendship")
             else {
-                return messageRepository!!.save(msg)
+                return messageRepository.save(msg)
             }
 
         } catch (e: Exception) {

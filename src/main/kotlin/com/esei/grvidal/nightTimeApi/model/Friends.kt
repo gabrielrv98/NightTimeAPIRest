@@ -10,13 +10,13 @@ import javax.persistence.*
         generator = ObjectIdGenerators.PropertyGenerator::class,
         property = "id")//todo no se como funcionara
 class Friends(
-        @ManyToOne
+    @ManyToOne
         @JoinColumn(name="user_1")
-        var user1: User,
+        var userAsk: User,
 
-        @ManyToOne
+    @ManyToOne
         @JoinColumn(name="user_2")
-        var user2: User
+        var userAnswer: User
 
 ) {
     var answer: AnswerOptions? = AnswerOptions.NOT_ANSWERED
