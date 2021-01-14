@@ -5,7 +5,7 @@ import java.time.LocalDate
 
 class UserDTOEdit(
         val name: String?,
-        val password: String?,
+        var password: String?,
         val state: String? = null,
         val email: String?
 )

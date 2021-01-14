@@ -47,6 +47,7 @@ class JWTAuthenticationFilter(private val authManager: AuthenticationManager) : 
                 .withExpiresAt(Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .sign(Algorithm.HMAC512(SECRET))
         response.addCookie(Cookie(AUTH_COOKIE, token))
+        logger.info("JWTAuthenticationFilter: cookie -> $AUTH_COOKIE, token -> $token")
         chain.doFilter(request, response)
     }
 }

@@ -20,19 +20,19 @@ class WebSecurityConfig(private val userService: UserService,
         http.cors().and().csrf().disable()
                 .authorizeRequests()
                 // Allow anyone to access /register and /login end points.
-                .antMatchers(URL_BASE_USER+"/register").permitAll()
-                .antMatchers(URL_BASE_USER+"/login").permitAll()
-                .antMatchers("swagger-ui.html").permitAll()
+                .antMatchers("$URL_BASE_USER/register").permitAll()
+                .antMatchers("$URL_BASE_USER/login").permitAll()
+                .antMatchers("/swagger-ui.html").permitAll()
                 // All other requests require a user to be authenticated
                 .anyRequest().authenticated()
                 .and()
                 // Configure login so it uses our created login page and redirects to the dashboard page upon
                 // a successful login.
-                //.formLogin()
-                //.loginPage("$URL_BASE_USER/login")
-               // .loginProcessingUrl(URL_BASE_USER+"/login")
-                //.defaultSuccessUrl(URL_BASE_BAR, true)
-                //.and()
+                .formLogin()
+                .loginPage("$URL_BASE_USER/login")
+                .loginProcessingUrl(URL_BASE_USER+"/login")
+                .defaultSuccessUrl(URL_BASE_BAR, true)
+                .and()
                 // Register our authentication and authorization filters with spring security.
                 .addFilter(JWTAuthenticationFilter(authenticationManager()))
                 .addFilter(JWTAuthorizationFilter(authenticationManager()))

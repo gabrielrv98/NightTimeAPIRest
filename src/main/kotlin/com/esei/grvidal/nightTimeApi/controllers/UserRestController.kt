@@ -30,7 +30,7 @@ import java.sql.SQLIntegrityConstraintViolationException
  */
 @RestController
 @RequestMapping(Constants.URL_BASE_USER)
-class UserRestController {
+class UserRestController @Autowired constructor(val passwordEncoder: BCryptPasswordEncoder) {
 
     @Autowired
     lateinit var userService: IUserService
@@ -93,7 +93,7 @@ class UserRestController {
     @PostMapping("/register")
     fun insert(@RequestBody user: UserDTOInsert): ResponseEntity<Any> {
 
-        user.password = BCryptPasswordEncoder().encode(user.password)
+        user.password = passwordEncoder.encode(user.password)
         val id = userService.save(user)
         val responseHeader = HttpHeaders()
         responseHeader.set("location", Constants.URL_BASE_USER + "/" + id)
@@ -109,10 +109,11 @@ class UserRestController {
     ): ResponseEntity<Any> {
         //todo send Token
         return try {
-            //val isUser = userService.login(username, BCryptPasswordEncoder().encode(password))
+
             val logger = LoggerFactory.getLogger(NightTimeApiApplication::class.java)!!
             logger.info("username $username, password $password")
-            val isUser = userService.login(username, password)
+            //val isUser = userService.login(username, passwordEncoder.encode(password))
+            val isUser = userService.login(username,  password)
             if (isUser) {
                // SecurityContextHolder.getContext().authentication = Authentication()
                // val authentication: Authentication = SecurityContextHolder.getContext().authentication;
@@ -146,6 +147,10 @@ class UserRestController {
     fun update(@PathVariable("id") idUser: Long, @RequestBody user: UserDTOEdit): ResponseEntity<Any> {
 
         return try {
+
+            user.password?.let{
+                user.password = passwordEncoder.encode(user.password)
+            }
 
             userService.update(idUser, user)
             ResponseEntity(HttpStatus.OK)

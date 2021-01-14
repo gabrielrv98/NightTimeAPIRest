@@ -1,5 +1,6 @@
 package com.esei.grvidal.nightTimeApi.services
 
+import com.esei.grvidal.nightTimeApi.NightTimeApiApplication
 import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
 import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
@@ -16,6 +17,7 @@ import com.esei.grvidal.nightTimeApi.repository.CityRepository
 import com.esei.grvidal.nightTimeApi.repository.DateCityRepository
 import com.esei.grvidal.nightTimeApi.security.UserPrincipal
 import com.esei.grvidal.nightTimeApi.serviceInterface.IUserService
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
@@ -117,9 +119,12 @@ class UserService : IUserService , UserDetailsService {
                 .orElseThrow { NotFoundException("No users with name $nickname were found") }
     }
 
+    val logger = LoggerFactory.getLogger(NightTimeApiApplication::class.java)!!
+
     @Throws(NotFoundException::class)
     override fun login(nickname: String, password: String): Boolean {
         val user = loadByNickname(nickname)
+        logger.info("UserService: login: password header $password // passwordDB: ${user.password} // same = "+ user.password.equals(password) )
         return user.password == password
     }
 

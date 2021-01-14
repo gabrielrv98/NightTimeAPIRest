@@ -147,7 +147,7 @@ class NightTimeApiApplication : CommandLineRunner {
                 birthdate = LocalDate.of(1998, 3, 14),
 
         )
-        user1.password = BCryptPasswordEncoder().encode(user1.password)
+        user1.password = bCryptPasswordEncoder().encode(user1.password)
 
         userRepositories!!.save(user1)
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user1))
@@ -163,7 +163,7 @@ class NightTimeApiApplication : CommandLineRunner {
 
         )
 
-        user2.password = BCryptPasswordEncoder().encode(user2.password)
+        user2.password = bCryptPasswordEncoder().encode(user2.password)
         userRepositories!!.save(user2)
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user2))
 
@@ -177,7 +177,7 @@ class NightTimeApiApplication : CommandLineRunner {
                 birthdate = LocalDate.of(1998, 4, 12)
         )
 
-        user3.password = BCryptPasswordEncoder().encode(user3.password)
+        user3.password = bCryptPasswordEncoder().encode(user3.password)
         userRepositories!!.save(user3)
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user3))
 
@@ -191,7 +191,7 @@ class NightTimeApiApplication : CommandLineRunner {
                 birthdate = LocalDate.of(1990, 4, 25)
         )
 
-        user4.password = BCryptPasswordEncoder().encode(user4.password)
+        user4.password = bCryptPasswordEncoder().encode(user4.password)
         userRepositories!!.save(user4)
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityVigo, user = user4))
 
