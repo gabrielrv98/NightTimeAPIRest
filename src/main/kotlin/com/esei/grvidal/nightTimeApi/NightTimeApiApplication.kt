@@ -184,3 +184,4 @@ class NightTimeApiApplication : CommandLineRunner {
 fun main(args: Array<String>) {
     runApplication<NightTimeApiApplication>(*args)
 }
+

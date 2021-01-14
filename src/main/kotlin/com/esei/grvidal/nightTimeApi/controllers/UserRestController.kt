@@ -16,11 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.security.core.Authentication
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.web.bind.annotation.*
-import java.sql.SQLIntegrityConstraintViolationException
 
 /**
  * This is the User Controller
@@ -90,7 +86,6 @@ class UserRestController {
     fun insert(@RequestBody user: UserDTOInsert): ResponseEntity<Any> {
 
 
-        user.password = BCryptPasswordEncoder().encode ( user.password )
         val id = userService.save(user)
         val responseHeader = HttpHeaders()
         responseHeader.set("location", Constants.URL_BASE_USER + "/" + id)
@@ -99,7 +94,7 @@ class UserRestController {
 
     }
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     fun login(
             @RequestHeader(name = "username") username: String,//todo esto o UserLoginDTO
             @RequestHeader(name = "password") password: String,
