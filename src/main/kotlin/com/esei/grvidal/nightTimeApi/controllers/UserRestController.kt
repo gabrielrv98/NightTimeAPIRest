@@ -4,6 +4,7 @@ import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
 import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
+import com.esei.grvidal.nightTimeApi.exception.NoAuthorizationException
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.*
@@ -64,19 +65,6 @@ class UserRestController {
         }
     }
 
-    /**
-     * Listen to a Get with the [Constants.URL_BASE_BAR] and an Id as a parameter to show one Bar
-     */
-    @GetMapping("/{id}/test")
-    fun load(@PathVariable("id") idUser: Long): ResponseEntity<Any> {
-
-        return try {
-            ResponseEntity(userService.loadProjection(idUser), HttpStatus.OK)
-        } catch (e: NotFoundException) {
-            ResponseEntity(HttpStatus.NOT_FOUND)
-        }
-    }
-
 
     /**
      * Listen to a Post with the [Constants.URL_BASE_BAR] and a requestBody with a Bar to create a bar
@@ -94,6 +82,10 @@ class UserRestController {
 
     }
 
+    /**
+     * TODO finish this
+     *
+     */
     @PostMapping("/login")
     fun login(
             @RequestHeader(name = "username") username: String,//todo esto o UserLoginDTO
@@ -123,12 +115,12 @@ class UserRestController {
 
 
     /**
-     * Listen to a Patch with the [Constants.URL_BASE_BAR] and a requestBody with a User to update a User
+     * Listen to a Patch with the [Constants.URL_BASE_BAR] and a requestBody with a [UserDTOEdit] to update a User
      *
-     * @param idUser id of the bar that will be updated
+     * @param idUser id of the user that will be updated
      * @param user attributes to modify
      *
-     * No nickname changes for now
+     * No nickname changes
      */
     @PatchMapping("/{id}")
     fun update(@PathVariable("id") idUser: Long, @RequestBody user: UserDTOEdit): ResponseEntity<Any> {
@@ -146,6 +138,8 @@ class UserRestController {
 
     /**
      * Listen to a Delete with the [Constants.URL_BASE_BAR] and a Id as a parameter to delete a Bar
+     *
+     * @param idUser id of the bar that will be updated
      */
     @DeleteMapping("/{id}")
     fun delete(@PathVariable("id") idUser: Long): ResponseEntity<Any> {
@@ -163,6 +157,15 @@ class UserRestController {
      */
 
 
+    /**
+     * Listen to a Put with a [DateCityDTO] and an User ID, then adds the DateCity to the db
+     *
+     * @param idUser id of the user that will be updated
+     * @param dateCity specification of the new date
+     *
+     * Checks that the idUser and the nextCityId exists, if they don't it returns an HTTPResponse with the code [HttpStatus.NOT_FOUND]
+     * otherwise will try to update it. In case the date already existed it will respond with a [HttpStatus.ALREADY_REPORTED]
+     */
     @PutMapping("/{id}/date")
     fun addDate(@PathVariable("id") idUser: Long, @RequestBody dateCity: DateCityDTO): ResponseEntity<Any> {
 
@@ -182,16 +185,28 @@ class UserRestController {
 
     }
 
+    /**
+     * Listen to a DELETE with a [idDate] and an User ID, then deletes the DateCity from the db
+     *
+     * @param idUser id of the user that will be updated
+     * @param idDate Id of the date
+     *
+     * Try to delete it, if there is no problem it will return [HttpStatus.NO_CONTENT] or if the [idDate] doesn't exist
+     * it will return [HttpStatus.NOT_FOUND] or if the [idUser] doesn't match with the owner of the [idDate]
+     * it will return [HttpStatus.FORBIDDEN]
+     */
     @DeleteMapping("/{id}/date/{idDate}")
     fun deleteDate(@PathVariable("id") idUser: Long, @PathVariable("idDate") idDate: Long): ResponseEntity<Any> {
         return try {
 
-            if (userService.deleteDate(idUser, idDate))
-                ResponseEntity(HttpStatus.NO_CONTENT)
-            else
-                ResponseEntity(HttpStatus.NOT_FOUND)
+            userService.deleteDate(idUser, idDate)
+            ResponseEntity(HttpStatus.NO_CONTENT)
+
         } catch (e: NotFoundException) {
             ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+
+        }catch (e: NoAuthorizationException){
+            ResponseEntity(e.message, HttpStatus.FORBIDDEN)
         }
     }
 

@@ -21,6 +21,7 @@ interface IUserService {
     @Throws(NotFoundException::class)
     fun loadProjection(idUser: Long): UserProjection
 
+
     //Save a new user
     fun save(user: UserDTOInsert): Long
 
@@ -35,7 +36,7 @@ interface IUserService {
     fun login(nickname: String, password: String): Boolean
 
     @Throws(NotFoundException::class)
-    fun deleteDate(idUser: Long, idDate: Long):Boolean
+    fun deleteDate(idUser: Long, idDate: Long)
 
     fun exists(idUser: Long): Boolean
 

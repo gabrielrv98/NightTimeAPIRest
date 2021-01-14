@@ -5,6 +5,7 @@ import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
 import com.esei.grvidal.nightTimeApi.dto.toUser
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
+import com.esei.grvidal.nightTimeApi.exception.NoAuthorizationException
 import com.esei.grvidal.nightTimeApi.repository.UserRepository
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
@@ -112,19 +113,15 @@ class UserService : IUserService {
 
 
     @Throws(NotFoundException::class)
-    override fun deleteDate(idUser: Long, idDate: Long): Boolean {
-        val user = load(idUser)
-        var delete = false
+    override fun deleteDate(idUser: Long, idDate: Long) {
 
-        if (user.nextDates != null) {
-            val element = user.nextDates!!.filter { it.id == idDate }
-            if (element.isNotEmpty()) {
-                delete = true
-                dateCityRepository.deleteById(idDate)
-            }
-        }
+        val date = dateCityRepository.findById(idDate)
+            .orElseThrow{ NotFoundException("No date selected with id $idDate")}
 
-        return delete
+        if(date.user.id == idUser)
+            dateCityRepository.deleteById(idDate)
+        else throw NoAuthorizationException("User ID doesn't match")
+
     }
 
     override fun exists(idUser: Long): Boolean {
