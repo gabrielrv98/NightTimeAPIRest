@@ -31,7 +31,7 @@ interface IFriendshipBusiness {
 
     //Updates a  FriendShip
     @Throws(NotFoundException::class)
-    fun update(friendship: FriendshipUpdateDTO)
+    fun update(friendshipParam: FriendshipUpdateDTO)
 
 
     //remove a chat with cascade on delete //api propose
