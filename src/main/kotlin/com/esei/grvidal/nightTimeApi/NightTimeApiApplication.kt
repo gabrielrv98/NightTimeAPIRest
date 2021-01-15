@@ -2,7 +2,6 @@ package com.esei.grvidal.nightTimeApi
 
 import com.esei.grvidal.nightTimeApi.repository.*
 import com.esei.grvidal.nightTimeApi.model.*
-import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
@@ -11,7 +10,6 @@ import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.runApplication
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import java.time.LocalDate
-import java.time.LocalTime
 
 @SpringBootApplication
 @EnableJpaRepositories("com.esei.grvidal.nightTimeApi.repository")
@@ -34,7 +32,7 @@ class NightTimeApiApplication : CommandLineRunner {
     lateinit var userRepositories: UserRepository
 
     @Autowired
-    lateinit var friendsRepositories: FriendsRepository
+    lateinit var friendshipRepositories: FriendshipRepository
 
     @Autowired
     lateinit var messageRepositories: MessageRepository
@@ -160,22 +158,22 @@ class NightTimeApiApplication : CommandLineRunner {
         userRepositories.save(user4)
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityVigo, user = user4))
 
-        friendsRepositories.save(Friends(user1,user2))
+        friendshipRepositories.save(Friendship(user1,user2))
 
-        friendsRepositories.save(Friends(user3,user2))
+        friendshipRepositories.save(Friendship(user3,user2))
 
-        //val friends = friendsRepositories.findFriendsByUserAsk_IdOrUserAnswer_Id(user1.id,user1.id)[0]
+        //val friendship = friendshipRepositories.findFriendsByUserAsk_IdOrUserAnswer_Id(user1.id,user1.id)[0]
 
 
-        //var msg = Message("Hola nuria", LocalDate.now(), LocalTime.now(), friends, friends.userAsk)
+        //var msg = Message("Hola nuria", LocalDate.now(), LocalTime.now(), friendship, friendship.userAsk)
 
         //messageRepositories.save(msg)
-        //msg = Message("Adios Gabriel", LocalDate.now().plusDays(1), LocalTime.now().plusHours(1), friends, friends.userAnswer)
+        //msg = Message("Adios Gabriel", LocalDate.now().plusDays(1), LocalTime.now().plusHours(1), friendship, friendship.userAnswer)
         //messageRepositories.save(msg)
 
-        //val friends1w3 = Friends(user1,user3)
+        //val friends1w3 = Friendship(user1,user3)
 
-        //friendsRepositories!!.save(friends1w3)
+        //friendshipRepositories!!.save(friends1w3)
 
         logger.info("Application ready to use")
     }

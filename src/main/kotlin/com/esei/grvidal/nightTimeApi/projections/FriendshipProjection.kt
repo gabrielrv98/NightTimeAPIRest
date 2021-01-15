@@ -2,7 +2,7 @@ package com.esei.grvidal.nightTimeApi.projections
 
 import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
 
-interface FriendProjection {
+interface FriendshipProjection {
 
     fun getId(): Long
     fun getUserAsk(): UserProjection

@@ -1,10 +1,8 @@
 package com.esei.grvidal.nightTimeApi.dto
 
-import com.esei.grvidal.nightTimeApi.model.Friends
-import com.esei.grvidal.nightTimeApi.model.User
 import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
 
-data class FriendsUpdateDTO(
+data class FriendshipUpdateDTO(
     val id: Long,
     val answer: AnswerOptions
 )

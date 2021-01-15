@@ -1,12 +1,10 @@
 package com.esei.grvidal.nightTimeApi.controllers
 
-import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendsBusiness
+import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendshipBusiness
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
-import com.esei.grvidal.nightTimeApi.model.Friends
 import com.esei.grvidal.nightTimeApi.utlis.Constants
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -20,7 +18,7 @@ class ChatRestController {
 
 
     @Autowired
-    val friendsBusiness: IFriendsBusiness? = null
+    val friendshipBusiness: IFriendshipBusiness? = null
 
 
 
@@ -33,7 +31,7 @@ class ChatRestController {
     @GetMapping("/{id}")
     fun load(@PathVariable("id") idChat: Long): ResponseEntity<Any> {
         return try {
-            ResponseEntity(friendsBusiness!!.load(idChat), HttpStatus.OK)
+            ResponseEntity(friendshipBusiness!!.load(idChat), HttpStatus.OK)
         } catch (e: ServiceException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         } catch (e: NotFoundException) {
@@ -47,7 +45,7 @@ class ChatRestController {
     @DeleteMapping("/{id}")
     fun delete(@PathVariable("id") idChat: Long): ResponseEntity<Any> {
         return try {
-            friendsBusiness!!.remove(idChat)
+            friendshipBusiness!!.remove(idChat)
             ResponseEntity(HttpStatus.OK)
         } catch (e: ServiceException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)

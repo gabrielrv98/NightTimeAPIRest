@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository
  */
 @Repository
 interface MessageRepository : JpaRepository<Message, Long> {
-    fun findAllByFriends_Id(chat_id: Long) : List<Message>
+    fun findAllByFriendship_Id(chat_id: Long) : List<Message>
 
 }

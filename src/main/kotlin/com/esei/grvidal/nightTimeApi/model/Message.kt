@@ -11,15 +11,15 @@ import javax.persistence.*
         generator = ObjectIdGenerators.PropertyGenerator::class,
         property = "id")
 class Message(
-        var text: String,
-        var date: LocalDate,
-        var hour: LocalTime,
+    var text: String,
+    var date: LocalDate,
+    var hour: LocalTime,
 
-        @ManyToOne
+    @ManyToOne
         @JoinColumn(name = "friends_id", nullable = false)
-        var friends: Friends,
+        var friendship: Friendship,
 
-        @ManyToOne
+    @ManyToOne
         @JoinColumn(name = "user_id", nullable = false)
         var user: User
 ) {

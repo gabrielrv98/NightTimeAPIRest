@@ -9,7 +9,7 @@ import javax.persistence.*
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator::class,
         property = "id")//todo no se como funcionara
-class Friends(
+class Friendship(
     @ManyToOne
         @JoinColumn(name="user_Ask")
         var userAsk: User,
@@ -21,7 +21,7 @@ class Friends(
 ) {
     var answer: AnswerOptions? = AnswerOptions.NOT_ANSWERED
 
-    @OneToMany(mappedBy = "friends")
+    @OneToMany(mappedBy = "friendship")
     var messages : Set<Message> ? = null
 
     @Id

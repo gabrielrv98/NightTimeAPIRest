@@ -1,23 +1,22 @@
 package com.esei.grvidal.nightTimeApi.services
 
-import com.esei.grvidal.nightTimeApi.dto.FriendsInsertDTO
-import com.esei.grvidal.nightTimeApi.dto.FriendsUpdateDTO
+import com.esei.grvidal.nightTimeApi.dto.FriendshipInsertDTO
+import com.esei.grvidal.nightTimeApi.dto.FriendshipUpdateDTO
 import com.esei.grvidal.nightTimeApi.dto.toFriendRequest
-import com.esei.grvidal.nightTimeApi.repository.FriendsRepository
+import com.esei.grvidal.nightTimeApi.repository.FriendshipRepository
 import com.esei.grvidal.nightTimeApi.repository.MessageRepository
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
-import com.esei.grvidal.nightTimeApi.model.Friends
+import com.esei.grvidal.nightTimeApi.model.Friendship
 import com.esei.grvidal.nightTimeApi.model.Message
-import com.esei.grvidal.nightTimeApi.projections.FriendProjection
+import com.esei.grvidal.nightTimeApi.projections.FriendshipProjection
 import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import com.esei.grvidal.nightTimeApi.repository.UserRepository
-import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendsBusiness
+import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendshipBusiness
 import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import java.util.*
 import kotlin.jvm.Throws
 
 /**
@@ -25,13 +24,13 @@ import kotlin.jvm.Throws
  *
  */
 @Service
-class FriendsService : IFriendsBusiness {
+class FriendshipService : IFriendshipBusiness {
 
     /**
      *Dependency injection with autowired
      */
     @Autowired
-    lateinit var friendsRepository: FriendsRepository
+    lateinit var friendshipRepository: FriendshipRepository
 
     @Autowired
     lateinit var messageRepository: MessageRepository
@@ -42,9 +41,9 @@ class FriendsService : IFriendsBusiness {
     /**
      * Lists all the friendships of one User
      */
-    private fun listFriendsByUser(userId: Long): List<FriendProjection> {
+    private fun listFriendsByUser(userId: Long): List<FriendshipProjection> {
 
-        return friendsRepository.findFriendsByUserAsk_IdOrUserAnswer_IdAndAnswer(userId, userId, AnswerOptions.YES)
+        return friendshipRepository.findFriendshipByUserAsk_IdOrUserAnswer_IdAndAnswer(userId, userId, AnswerOptions.YES)
 
     }
 
@@ -77,7 +76,7 @@ class FriendsService : IFriendsBusiness {
     override fun listMessagesFromChat(friendsId: Long): List<Message> {
         try {
 
-            return messageRepository.findAllByFriends_Id(friendsId)
+            return messageRepository.findAllByFriendship_Id(friendsId)
 
         } catch (e: NotFoundException) {
             throw NotFoundException(e.message)
@@ -92,55 +91,55 @@ class FriendsService : IFriendsBusiness {
      * todo acabar
      */
     @Throws( NotFoundException::class)
-    override fun load(friendsId: Long): Friends {
+    override fun load(friendsId: Long): Friendship {
 
 
-        return friendsRepository.findById(friendsId)
-            .orElseThrow { NotFoundException("No se encontro al bar con el id $friendsId")  }
+        return friendshipRepository.findById(friendsId)
+            .orElseThrow { NotFoundException("Couldn't find relationship with id $friendsId")  }
 
 
     }
 
 
     /**
-     * This will save a new [Friends], if not, will throw an Exception
+     * This will save a new [Friendship], if not, will throw an Exception
      */
-    override fun save(friends: FriendsInsertDTO): Long {
+    override fun save(friendship: FriendshipInsertDTO): Long {
 
         //Check if the relation already exists
-        var op = friendsRepository.findFriendsByUserAsk_IdAndUserAnswer_Id(
-            friends.idUserAsk, friends.idUserAnswer
+        var op = friendshipRepository.findFriendshipByUserAsk_IdAndUserAnswer_Id(
+            friendship.idUserAsk, friendship.idUserAnswer
         )
         if (!op.isPresent) {
 
             //check if the opposite relation already exists
-            op = friendsRepository.findFriendsByUserAsk_IdAndUserAnswer_Id(
-                friends.idUserAnswer, friends.idUserAsk
+            op = friendshipRepository.findFriendshipByUserAsk_IdAndUserAnswer_Id(
+                friendship.idUserAnswer, friendship.idUserAsk
             )
             if (!op.isPresent) {
 
                 //Check if the userAsk exists
-                val userAsk = userRepository.findById(friends.idUserAsk)
-                    .orElseThrow { NotFoundException("User who asks with id ${friends.idUserAsk} not found") }
+                val userAsk = userRepository.findById(friendship.idUserAsk)
+                    .orElseThrow { NotFoundException("User who asks with id ${friendship.idUserAsk} not found") }
 
                 //Check if the userAnswer exists
-                val userAnswer = userRepository.findById(friends.idUserAnswer)
-                    .orElseThrow { NotFoundException("User who answers with id ${friends.idUserAnswer} not found") }
+                val userAnswer = userRepository.findById(friendship.idUserAnswer)
+                    .orElseThrow { NotFoundException("User who answers with id ${friendship.idUserAnswer} not found") }
 
 
-                return friendsRepository.save(
-                    friends.toFriendRequest(userAsk, userAnswer)
+                return friendshipRepository.save(
+                    friendship.toFriendRequest(userAsk, userAnswer)
                 ).id
             }
         }
         throw AlreadyExistsException("Relation already exists")
     }
 
-    override fun update(friends: FriendsUpdateDTO) {
-        val friendship = friendsRepository.findById(friends.id)
-            .orElseThrow { NotFoundException("No friendship with id ${friends.id} were found") }
-        friendship.answer = friends.answer
-        friendsRepository.save(friendship)
+    override fun update(friendshipParam: FriendshipUpdateDTO) {
+        val friendship = friendshipRepository.findById(friendshipParam.id)
+            .orElseThrow { NotFoundException("No friendship with id ${friendshipParam.id} were found") }
+        friendship.answer = friendshipParam.answer
+        friendshipRepository.save(friendship)
     }
 
     /**
@@ -151,20 +150,20 @@ class FriendsService : IFriendsBusiness {
     @Throws(ServiceException::class, NotFoundException::class)
     override fun remove(friendsId: Long) {
 
-        friendsRepository.findById(friendsId)
-            .orElseThrow { NotFoundException("No Friends with id $friendsId were found") }
+        friendshipRepository.findById(friendsId)
+            .orElseThrow { NotFoundException("No Friendship with id $friendsId were found") }
 
-        friendsRepository.deleteById(friendsId)
+        friendshipRepository.deleteById(friendsId)
 
     }
 
     /**
      * This will save a new Message, if not, will throw an Exception
-     * Checks if the signed user is in the friends relationship
+     * Checks if the signed user is in the friendship relationship
      */
     @Throws(ServiceException::class)
     override fun saveMsg(msg: Message): Message {
-            val friends = msg.friends
+            val friends = msg.friendship
 
             if (friends.userAsk != msg.user && friends.userAnswer != msg.user)
                 throw ServiceException("User it's not on the friendship")
@@ -172,7 +171,7 @@ class FriendsService : IFriendsBusiness {
                 return messageRepository.save(msg)
             }
 
-         
+
     }
 }
 

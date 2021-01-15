@@ -1,15 +1,15 @@
 package com.esei.grvidal.nightTimeApi.dto
 
-import com.esei.grvidal.nightTimeApi.model.Friends
+import com.esei.grvidal.nightTimeApi.model.Friendship
 import com.esei.grvidal.nightTimeApi.model.User
 
-data class FriendsInsertDTO(
+data class FriendshipInsertDTO(
         var idUserAsk: Long,
         val idUserAnswer: Long
 )
 
-fun FriendsInsertDTO.toFriendRequest(userAsk: User, userAnswer: User): Friends {
-    return Friends(
+fun FriendshipInsertDTO.toFriendRequest(userAsk: User, userAnswer: User): Friendship {
+    return Friendship(
             userAsk,
             userAnswer
     )

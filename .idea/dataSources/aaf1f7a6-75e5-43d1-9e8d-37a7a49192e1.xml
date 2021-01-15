@@ -1070,7 +1070,7 @@ ALL PRIVILEGES|nighttimedb!
     <table id="337" parent="4" name="bar"/>
     <table id="338" parent="4" name="city"/>
     <table id="339" parent="4" name="event"/>
-    <table id="340" parent="4" name="friends"/>
+    <table id="340" parent="4" name="friendship"/>
     <table id="341" parent="4" name="hibernate_sequence"/>
     <table id="342" parent="4" name="message"/>
     <table id="343" parent="4" name="next_date_city"/>
@@ -1204,11 +1204,11 @@ ALL PRIVILEGES|nighttimedb!
       <Position>4</Position>
       <DataType>bigint(20)|0s</DataType>
     </column>
-    <index id="375" parent="340" name="FKh81ilefrk4b2n0h2rwg11pjp9">
+    <index id="375" parent="340" name="FKmvis2hfqhj6rxoknyhvrmjfld">
       <ColNames>user_answer</ColNames>
       <Type>btree</Type>
     </index>
-    <index id="376" parent="340" name="FKgtkt64o5h4y0cipapg35uom5v">
+    <index id="376" parent="340" name="FKi1sbnccdku5y9ykw573ocqt75">
       <ColNames>user_ask</ColNames>
       <Type>btree</Type>
     </index>
@@ -1217,12 +1217,12 @@ ALL PRIVILEGES|nighttimedb!
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="378" parent="340" name="FKh81ilefrk4b2n0h2rwg11pjp9">
+    <foreign-key id="378" parent="340" name="FKmvis2hfqhj6rxoknyhvrmjfld">
       <ColNames>user_answer</ColNames>
       <RefTableName>user</RefTableName>
       <RefColNames>id</RefColNames>
     </foreign-key>
-    <foreign-key id="379" parent="340" name="FKgtkt64o5h4y0cipapg35uom5v">
+    <foreign-key id="379" parent="340" name="FKi1sbnccdku5y9ykw573ocqt75">
       <ColNames>user_ask</ColNames>
       <RefTableName>user</RefTableName>
       <RefColNames>id</RefColNames>
@@ -1258,7 +1258,7 @@ ALL PRIVILEGES|nighttimedb!
       <DataType>bigint(20)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <index id="387" parent="342" name="FKots1xpkl890s9bdpxwwcxeny1">
+    <index id="387" parent="342" name="FKbfvyg0lafa96dyji6l5igsl4p">
       <ColNames>friends_id</ColNames>
       <Type>btree</Type>
     </index>
@@ -1271,9 +1271,9 @@ ALL PRIVILEGES|nighttimedb!
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="390" parent="342" name="FKots1xpkl890s9bdpxwwcxeny1">
+    <foreign-key id="390" parent="342" name="FKbfvyg0lafa96dyji6l5igsl4p">
       <ColNames>friends_id</ColNames>
-      <RefTableName>friends</RefTableName>
+      <RefTableName>friendship</RefTableName>
       <RefColNames>id</RefColNames>
     </foreign-key>
     <foreign-key id="391" parent="342" name="FKb3y6etti1cfougkdr0qiiemgv">
