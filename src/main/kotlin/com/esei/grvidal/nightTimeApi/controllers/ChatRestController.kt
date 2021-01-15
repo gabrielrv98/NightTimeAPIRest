@@ -18,10 +18,7 @@ class ChatRestController {
 
 
     @Autowired
-    val friendshipService: IFriendshipService? = null
-
-
-
+    lateinit var friendshipService: IFriendshipService
 
 
     /**
@@ -31,7 +28,7 @@ class ChatRestController {
     @GetMapping("/{id}")
     fun load(@PathVariable("id") idChat: Long): ResponseEntity<Any> {
         return try {
-            ResponseEntity(friendshipService!!.load(idChat), HttpStatus.OK)
+            ResponseEntity(friendshipService.load(idChat), HttpStatus.OK)
         } catch (e: ServiceException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         } catch (e: NotFoundException) {
@@ -45,7 +42,7 @@ class ChatRestController {
     @DeleteMapping("/{id}")
     fun delete(@PathVariable("id") idChat: Long): ResponseEntity<Any> {
         return try {
-            friendshipService!!.remove(idChat)
+            friendshipService.remove(idChat)
             ResponseEntity(HttpStatus.OK)
         } catch (e: ServiceException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
