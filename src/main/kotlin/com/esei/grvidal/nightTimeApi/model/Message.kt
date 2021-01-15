@@ -10,13 +10,14 @@ import javax.persistence.*
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator::class,
         property = "id")
+@Table(name ="message")
 class Message(
     var text: String,
     var date: LocalDate,
     var hour: LocalTime,
 
     @ManyToOne
-        @JoinColumn(name = "friends_id", nullable = false)
+        @JoinColumn(name = "friendship_id", nullable = false)
         var friendship: Friendship,
 
     @ManyToOne

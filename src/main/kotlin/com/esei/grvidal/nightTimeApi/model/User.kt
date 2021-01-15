@@ -9,6 +9,7 @@ import javax.persistence.*
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator::class,
         property = "id")
+@Table(name="user")
 class User(
         var name: String,
         @Column(unique = true, length = 20)

@@ -1,6 +1,6 @@
 package com.esei.grvidal.nightTimeApi.controllers
 
-import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendshipBusiness
+import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendshipService
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.utlis.Constants
@@ -18,7 +18,7 @@ class ChatRestController {
 
 
     @Autowired
-    val friendshipBusiness: IFriendshipBusiness? = null
+    val friendshipService: IFriendshipService? = null
 
 
 
@@ -31,7 +31,7 @@ class ChatRestController {
     @GetMapping("/{id}")
     fun load(@PathVariable("id") idChat: Long): ResponseEntity<Any> {
         return try {
-            ResponseEntity(friendshipBusiness!!.load(idChat), HttpStatus.OK)
+            ResponseEntity(friendshipService!!.load(idChat), HttpStatus.OK)
         } catch (e: ServiceException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         } catch (e: NotFoundException) {
@@ -45,7 +45,7 @@ class ChatRestController {
     @DeleteMapping("/{id}")
     fun delete(@PathVariable("id") idChat: Long): ResponseEntity<Any> {
         return try {
-            friendshipBusiness!!.remove(idChat)
+            friendshipService!!.remove(idChat)
             ResponseEntity(HttpStatus.OK)
         } catch (e: ServiceException) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.runApplication
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import java.time.LocalDate
+import java.time.LocalTime
 
 @SpringBootApplication
 @EnableJpaRepositories("com.esei.grvidal.nightTimeApi.repository")
@@ -162,14 +163,20 @@ class NightTimeApiApplication : CommandLineRunner {
 
         friendshipRepositories.save(Friendship(user3,user2))
 
-        //val friendship = friendshipRepositories.findFriendsByUserAsk_IdOrUserAnswer_Id(user1.id,user1.id)[0]
+        friendshipRepositories.save(Friendship(user4,user1))
+
+        var friendship = friendshipRepositories.findFriendsByUserAsk_IdOrUserAnswer_Id(user1.id,user1.id)[0]
+        var msg = Message("Hola nuria", LocalDate.now(), LocalTime.now(), friendship, friendship.userAsk)
+        messageRepositories.save(msg)
+        msg = Message("Adios Gabriel", LocalDate.now().plusDays(1), LocalTime.now().plusHours(1), friendship, friendship.userAnswer)
+        messageRepositories.save(msg)
+
+        friendship = friendshipRepositories.findFriendsByUserAsk_IdOrUserAnswer_Id(user1.id,user1.id)[1]
+        msg = Message("Hola Josune", LocalDate.now(), LocalTime.now(), friendship, friendship.userAnswer)
+        messageRepositories.save(msg)
 
 
-        //var msg = Message("Hola nuria", LocalDate.now(), LocalTime.now(), friendship, friendship.userAsk)
 
-        //messageRepositories.save(msg)
-        //msg = Message("Adios Gabriel", LocalDate.now().plusDays(1), LocalTime.now().plusHours(1), friendship, friendship.userAnswer)
-        //messageRepositories.save(msg)
 
         //val friends1w3 = Friendship(user1,user3)
 

@@ -10,10 +10,11 @@ import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Friendship
 import com.esei.grvidal.nightTimeApi.model.Message
+import com.esei.grvidal.nightTimeApi.projections.ChatProjection
 import com.esei.grvidal.nightTimeApi.projections.FriendshipProjection
 import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import com.esei.grvidal.nightTimeApi.repository.UserRepository
-import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendshipBusiness
+import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendshipService
 import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -24,7 +25,7 @@ import kotlin.jvm.Throws
  *
  */
 @Service
-class FriendshipService : IFriendshipBusiness {
+class FriendshipService : IFriendshipService {
 
     /**
      *Dependency injection with autowired
@@ -66,6 +67,13 @@ class FriendshipService : IFriendshipBusiness {
 
         return list
 
+    }
+
+    /**
+     * Lists all friendships with Messages from an User
+     */
+    override fun listUsersWithChatFromFriendsByUser(userId: Long): List<Any> {
+        return friendshipRepository.getChatsWithMessages(userId)
     }
 
 

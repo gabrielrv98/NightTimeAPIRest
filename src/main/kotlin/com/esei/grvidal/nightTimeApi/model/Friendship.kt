@@ -9,6 +9,7 @@ import javax.persistence.*
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator::class,
         property = "id")//todo no se como funcionara
+@Table(name = "friendship")
 class Friendship(
     @ManyToOne
         @JoinColumn(name="user_Ask")

@@ -27,13 +27,37 @@ class UserRestController {
     lateinit var userService: IUserService
 
     @Autowired
-    lateinit var friendshipService: IFriendshipBusiness
+    lateinit var friendshipService: IFriendshipService
 
     @Autowired
     lateinit var dateCityService: IDateCityService
 
     @Autowired
     lateinit var cityService: ICityService
+
+    private val myHashMap : HashMap<Long,String> = hashMapOf()
+
+    /**
+     * Listen to a Get with the [Constants.URL_BASE_BAR] to show all Bars
+     */
+    @PutMapping("/hash/{idUser}/{secret}")
+    fun putHash(@PathVariable("idUser") idUser: Long,
+                @PathVariable("secret") secret: String): ResponseEntity<Any> {
+
+        myHashMap[idUser] = secret
+        return ResponseEntity(true, HttpStatus.OK)
+
+    }
+
+    /**
+     * Listen to a Get with the [Constants.URL_BASE_BAR] to show all Bars
+     */
+    @GetMapping("/hash/{idUser}/")
+    fun getHash(@PathVariable("idUser") idUser: Long): ResponseEntity<Any> {
+
+        return ResponseEntity(myHashMap[idUser], HttpStatus.OK)
+
+    }
 
 
 
@@ -208,7 +232,9 @@ class UserRestController {
 
 
     /**
+     * -----------------------------------------------------------
      *  Friendship related code starts here
+     * -----------------------------------------------------------
      */
 
     /**
@@ -219,7 +245,7 @@ class UserRestController {
      */
     @GetMapping("/{id}/friends/users")
     fun getUsersFromFriendList(@PathVariable("id") idUser: Long): ResponseEntity<List<UserProjection>> {
-
+//todo acabar funciona mal
         return ResponseEntity(
             friendshipService.listUsersFromFriendsByUser(idUser),
             HttpStatus.OK)
@@ -227,9 +253,9 @@ class UserRestController {
     }
 
     /**
-     * Listen to a Post with a requestBody with a [FriendRequest] to request a new [Friendship]
+     * Listen to a Post with a requestBody with a [FriendshipInsertDTO] to request a new [Friendship]
      *
-     * @param friend new [FriendRequest] to insert in the database
+     * @param friendship Two users' id pared as userAsk and userAnswer
      *
      */
     @PostMapping("/{id}/friends")
@@ -344,33 +370,24 @@ class UserRestController {
         }
     }
 
+
+    /**
+     * -----------------------------------------------------------
+     *  Chat related code starts here
+     * -----------------------------------------------------------
+     */
+
     /**
      * Listen to a Get with the [Constants.URL_BASE_BAR] and an Id as a parameter to show one Bar
      *
      * @return a [List<[Friendship]>] with all the friendship with any messages
      */
     @GetMapping("/{idUser}/chat")
-    fun getChatWithMessages(@PathVariable("idUser") idUser: Long): ResponseEntity<Any> {
-        return try {
-
-            var filtered: List<Friendship> = listOf()
-            //move this to services
-/*
-            friendshipBusiness.listChatsByUser(idUser).onEach {
-                if (it.messages != null) {
-                    if (it.messages!!.isNotEmpty())
-                        filtered = filtered.plus(it)
-                }
-            }
-
- */
-
-            ResponseEntity(filtered, HttpStatus.OK)
-        } catch (e: ServiceException) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        } catch (e: NotFoundException) {
-            ResponseEntity(HttpStatus.NOT_FOUND)
-        }
+    fun getFriendshipWithMessages(@PathVariable("idUser") idUser: Long): ResponseEntity<Any> {
+        return ResponseEntity(
+            friendshipService.listUsersWithChatFromFriendsByUser(idUser),
+            HttpStatus.OK
+        )
     }
 
 

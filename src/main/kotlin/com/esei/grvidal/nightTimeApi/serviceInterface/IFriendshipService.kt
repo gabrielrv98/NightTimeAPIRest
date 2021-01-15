@@ -13,11 +13,14 @@ import kotlin.jvm.Throws
 /**
  * DAO Interface for Bars
  */
-interface IFriendshipBusiness {
+interface IFriendshipService {
 
 
     //Lists all the users that are friend of one User //api propose
     fun listUsersFromFriendsByUser(userId: Long): List<UserProjection>
+
+    //Lists all the users that have any message on the chat with the user
+    fun listUsersWithChatFromFriendsByUser(userId: Long): List<Any>
 
 
     //List all the messages in one chat of one user //api propose

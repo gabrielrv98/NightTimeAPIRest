@@ -1248,7 +1248,7 @@ ALL PRIVILEGES|nighttimedb!
       <Position>4</Position>
       <DataType>varchar(255)|0s</DataType>
     </column>
-    <column id="385" parent="342" name="friends_id">
+    <column id="385" parent="342" name="friendship_id">
       <Position>5</Position>
       <DataType>bigint(20)|0s</DataType>
       <NotNull>1</NotNull>
@@ -1258,8 +1258,8 @@ ALL PRIVILEGES|nighttimedb!
       <DataType>bigint(20)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <index id="387" parent="342" name="FKbfvyg0lafa96dyji6l5igsl4p">
-      <ColNames>friends_id</ColNames>
+    <index id="387" parent="342" name="FKd33w6rxva1qixwgx0xlwycd2q">
+      <ColNames>friendship_id</ColNames>
       <Type>btree</Type>
     </index>
     <index id="388" parent="342" name="FKb3y6etti1cfougkdr0qiiemgv">
@@ -1271,8 +1271,8 @@ ALL PRIVILEGES|nighttimedb!
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="390" parent="342" name="FKbfvyg0lafa96dyji6l5igsl4p">
-      <ColNames>friends_id</ColNames>
+    <foreign-key id="390" parent="342" name="FKd33w6rxva1qixwgx0xlwycd2q">
+      <ColNames>friendship_id</ColNames>
       <RefTableName>friendship</RefTableName>
       <RefColNames>id</RefColNames>
     </foreign-key>
