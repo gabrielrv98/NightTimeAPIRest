@@ -351,17 +351,15 @@ class UserRestController {
         @PathVariable("idFriends") idFriends: Long
     ): ResponseEntity<Any> {
         return try {
-            val responseHeader = HttpHeaders()
 
             val friends = friendshipService.load(idFriends)
 
             if (friends.getUserAsk().getId() == idUser || friends.getUserAnswer().getId() == idUser) {
                 friendshipService.remove(idFriends)
 
-                ResponseEntity(HttpStatus.NO_CONTENT)
+                ResponseEntity("Sucesfully delete ",HttpStatus.NO_CONTENT)
             } else {
-                responseHeader.set("Error", "User is not in the friendship")
-                ResponseEntity(HttpStatus.FORBIDDEN)
+                ResponseEntity("Error: User is not in the friendship", HttpStatus.FORBIDDEN)
             }
 
         } catch (e: NotFoundException) {

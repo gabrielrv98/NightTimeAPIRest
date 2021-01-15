@@ -22,7 +22,7 @@ class Friendship(
 ) {
     var answer: AnswerOptions? = AnswerOptions.NOT_ANSWERED
 
-    @OneToMany(mappedBy = "friendship")
+    @OneToMany(mappedBy = "friendship",cascade = [CascadeType.REMOVE])
     var messages : Set<Message> ? = null
 
     @Id
