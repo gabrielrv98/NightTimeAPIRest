@@ -91,13 +91,10 @@ class FriendshipService : IFriendshipBusiness {
      * todo acabar
      */
     @Throws( NotFoundException::class)
-    override fun load(friendsId: Long): Friendship {
+    override fun load(friendsId: Long): FriendshipProjection {
 
-
-        return friendshipRepository.findById(friendsId)
+        return friendshipRepository.findFriendshipById(friendsId)
             .orElseThrow { NotFoundException("Couldn't find relationship with id $friendsId")  }
-
-
     }
 
 
@@ -132,7 +129,7 @@ class FriendshipService : IFriendshipBusiness {
                 ).id
             }
         }
-        throw AlreadyExistsException("Relation already exists")
+        throw AlreadyExistsException("Relationship already exists")
     }
 
     override fun update(friendshipParam: FriendshipUpdateDTO) {
@@ -144,15 +141,9 @@ class FriendshipService : IFriendshipBusiness {
 
     /**
      * This will remove a CHAT through its id, if not, will throw an Exception, or if it cant find it, it will throw a NotFoundException
-     * //TODO It shouldn't be removed
-     * todo check what happens if you do a .deletBy of a nonExist relation
+     * //TODO Should be marked as "deleted" instead of being deleted
      */
-    @Throws(ServiceException::class, NotFoundException::class)
     override fun remove(friendsId: Long) {
-
-        friendshipRepository.findById(friendsId)
-            .orElseThrow { NotFoundException("No Friendship with id $friendsId were found") }
-
         friendshipRepository.deleteById(friendsId)
 
     }

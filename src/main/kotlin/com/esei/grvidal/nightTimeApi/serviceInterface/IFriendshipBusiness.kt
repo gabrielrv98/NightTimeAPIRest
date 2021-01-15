@@ -6,6 +6,7 @@ import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Friendship
 import com.esei.grvidal.nightTimeApi.model.Message
+import com.esei.grvidal.nightTimeApi.projections.FriendshipProjection
 import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import kotlin.jvm.Throws
 
@@ -23,7 +24,7 @@ interface IFriendshipBusiness {
     fun listMessagesFromChat(friendsId: Long): List<Message>
 
     //Show one chat
-    fun load(friendsId: Long): Friendship
+    fun load(friendsId: Long): FriendshipProjection
 
     //Save a new FriendShip
     @Throws(NotFoundException::class, AlreadyExistsException::class)

@@ -271,12 +271,12 @@ class UserRestController {
             val friendRequestDB = friendshipService.load( friendRequest.id)
 
             //only non accepted requests can be updated
-            if(friendRequestDB.answer == AnswerOptions.YES)
+            if(friendRequestDB.getAnswer() == AnswerOptions.YES)
                 return ResponseEntity("Friendship already accepted, can only be deleted", HttpStatus.FORBIDDEN)
 
 
             //check the idUser is the user who can update the Request
-            if (idUser == friendRequestDB.userAnswer.id ) {
+            if (idUser == friendRequestDB.getUserAnswer().getId() ) {
 
                 //Answer yes
                 when (friendRequest.answer) {
@@ -292,7 +292,7 @@ class UserRestController {
                     AnswerOptions.NO -> {
 
                         //remove request
-                        friendshipService.remove(friendRequestDB.id)
+                        friendshipService.remove(friendRequestDB.getId())
                         return ResponseEntity(responseHeader, HttpStatus.OK)
 
                     }
@@ -330,17 +330,14 @@ class UserRestController {
 
             val friends = friendshipService.load(idFriends)
 
-            if (friends.userAsk.id == idUser || friends.userAnswer.id == idUser) {
+            if (friends.getUserAsk().getId() == idUser || friends.getUserAnswer().getId() == idUser) {
                 friendshipService.remove(idFriends)
 
                 ResponseEntity(HttpStatus.NO_CONTENT)
             } else {
-                responseHeader.set("Error", "User is not the friendship")
+                responseHeader.set("Error", "User is not in the friendship")
                 ResponseEntity(HttpStatus.FORBIDDEN)
             }
-
-        } catch (e: ServiceException) {
-            ResponseEntity(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
 
         } catch (e: NotFoundException) {
             ResponseEntity(e.message, HttpStatus.NOT_FOUND)
@@ -392,7 +389,7 @@ class UserRestController {
             //Security checks. If the idChat belongs to any Chat of the user
             // In the future idUser will be a secure hashed string
             val friends = friendshipService.load(idFriend)
-            if (friends.userAsk.id != idUser && friends.userAnswer.id != idUser)
+            if (friends.getUserAsk().getId() != idUser && friends.getUserAnswer().getId() != idUser)
                 ResponseEntity(HttpStatus.NOT_FOUND)
             else
                 ResponseEntity(friends, HttpStatus.OK)
@@ -420,7 +417,7 @@ class UserRestController {
 
             val responseHeader = HttpHeaders()
             val friendsDB = friendshipService.load(msg.friendship.id)
-            if (friendsDB.userAsk.id != idUser && friendsDB.userAnswer.id != idUser)
+            if (friendsDB.getUserAsk().getId() != idUser && friendsDB.getUserAnswer().getId() != idUser)
                 ResponseEntity(HttpStatus.NOT_FOUND)
             else {
                 friendshipService.saveMsg(msg)

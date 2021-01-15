@@ -13,6 +13,9 @@ import java.util.*
 @Repository
 interface FriendshipRepository : JpaRepository<Friendship, Long> {
 
+    //Returns a projection of a Friendship
+    fun findFriendshipById(id: Long): Optional<FriendshipProjection>
+
     //Returns all the FriendsShips where an user is involved
     //fun findFriendsByUserAsk_IdOrUserAnswer_Id(user1_id: Long, user2_id: Long) : List<Friendship>
 
