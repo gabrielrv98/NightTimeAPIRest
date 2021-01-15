@@ -44,7 +44,9 @@ class FriendshipService : IFriendshipService {
      */
     private fun listFriendsByUser(userId: Long): List<FriendshipProjection> {
 
-        return friendshipRepository.findFriendshipByUserAsk_IdOrUserAnswer_IdAndAnswer(userId, userId, AnswerOptions.YES)
+
+        return friendshipRepository.findFriendshipsFromUser( userId)
+        //return friendshipRepository.findFriendshipByUserAsk_IdOrUserAnswer_IdAndAnswer(userId, userId, AnswerOptions.YES)
 
     }
 

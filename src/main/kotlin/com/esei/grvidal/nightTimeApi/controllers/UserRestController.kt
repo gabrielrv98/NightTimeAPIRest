@@ -245,7 +245,6 @@ class UserRestController {
      */
     @GetMapping("/{id}/friends/users")
     fun getUsersFromFriendList(@PathVariable("id") idUser: Long): ResponseEntity<List<UserProjection>> {
-//todo acabar funciona mal
         return ResponseEntity(
             friendshipService.listUsersFromFriendsByUser(idUser),
             HttpStatus.OK)
