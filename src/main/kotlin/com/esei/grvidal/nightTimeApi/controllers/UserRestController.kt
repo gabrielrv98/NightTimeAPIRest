@@ -258,7 +258,7 @@ class UserRestController {
             ResponseEntity(responseHeader, HttpStatus.NOT_FOUND)
 
         } catch (e: AlreadyExistsException) {
-            responseHeader.set("Error", e.message)
+            responseHeader.set("Duplicated", e.message)
             ResponseEntity(responseHeader, HttpStatus.ALREADY_REPORTED)
         }
     }
@@ -269,8 +269,14 @@ class UserRestController {
         @RequestBody friendRequest: FriendsUpdateDTO
     ): ResponseEntity<Any> {
         val responseHeader = HttpHeaders()
-        val friendRequestDB = friendsService.load( friendRequest.id)
+
         try {
+            val friendRequestDB = friendsService.load( friendRequest.id)
+
+            //only non accepted requests can be updated
+            if(friendRequestDB.answer == AnswerOptions.YES)
+                return ResponseEntity("Friendship already accepted, can only be deleted", HttpStatus.FORBIDDEN)
+
 
             //check the idUser is the user who can update the Request
             if (idUser == friendRequestDB.userAnswer.id ) {
@@ -279,9 +285,8 @@ class UserRestController {
                 when (friendRequest.answer) {
                     AnswerOptions.YES -> {
 
-                        friendRequestDB.answer = AnswerOptions.YES
                         friendsService.update(friendRequest)
-                        responseHeader.set("location", Constants.URL_BASE_USER + "/" + friendRequest.id)
+                        responseHeader.set("Friendship Id", "${friendRequest.id}")
 
                         return ResponseEntity(responseHeader, HttpStatus.OK)
 
@@ -305,11 +310,11 @@ class UserRestController {
             return ResponseEntity(responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
 
 
-        } catch (e: AlreadyExistsException) {
-            responseHeader.set("Error", e.message)
-            return ResponseEntity(responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
-        } catch (e: ServiceException) {
-            return ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+        } catch (e: NotFoundException) {
+            return ResponseEntity(e.message,HttpStatus.NOT_FOUND)
+
+        }catch (e: AlreadyExistsException) {
+            return ResponseEntity(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
         }
 
     }
@@ -335,13 +340,14 @@ class UserRestController {
                 ResponseEntity(HttpStatus.NO_CONTENT)
             } else {
                 responseHeader.set("Error", "User is not the friendship")
-                ResponseEntity(HttpStatus.NOT_FOUND)
+                ResponseEntity(HttpStatus.FORBIDDEN)
             }
 
         } catch (e: ServiceException) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+            ResponseEntity(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
+
         } catch (e: NotFoundException) {
-            ResponseEntity(HttpStatus.NOT_FOUND)
+            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
         }
     }
 

@@ -42,22 +42,6 @@ class ChatRestController {
     }
 
     /**
-     * Listen to a Post with the [Constants.URL_BASE_BAR] and a requestBody with a Chat to create a chat entry
-     * @param friends new Chat to insert in the database
-     */
-    @PostMapping("")
-    fun insert(@RequestBody friends: Friends): ResponseEntity<Any> {
-        return try {
-            friendsBusiness!!.save(friends)
-            val responseHeader = HttpHeaders()
-            responseHeader.set("location", Constants.URL_BASE_CHAT + "/" + friends.id)
-            ResponseEntity(responseHeader, HttpStatus.CREATED)
-        } catch (e: ServiceException) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        }
-    }
-
-    /**
      * Listen to a Delete with the [Constants.URL_BASE_BAR] and a Id as a parameter to delete a Chat // TESTING PROPOSE
      */
     @DeleteMapping("/{id}")

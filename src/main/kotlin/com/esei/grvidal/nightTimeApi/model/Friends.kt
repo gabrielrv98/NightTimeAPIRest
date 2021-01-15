@@ -11,11 +11,11 @@ import javax.persistence.*
         property = "id")//todo no se como funcionara
 class Friends(
     @ManyToOne
-        @JoinColumn(name="user_1")
+        @JoinColumn(name="user_Ask")
         var userAsk: User,
 
     @ManyToOne
-        @JoinColumn(name="user_2")
+        @JoinColumn(name="user_Answer")
         var userAnswer: User
 
 ) {

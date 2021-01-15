@@ -2,6 +2,7 @@ package com.esei.grvidal.nightTimeApi
 
 import com.esei.grvidal.nightTimeApi.repository.*
 import com.esei.grvidal.nightTimeApi.model.*
+import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
@@ -18,25 +19,25 @@ import java.time.LocalTime
 class NightTimeApiApplication : CommandLineRunner {
 
     @Autowired
-    val barRepository: BarRepository? = null
+    lateinit var barRepository: BarRepository
 
     @Autowired
     lateinit var dateCityRepository: DateCityRepository
 
     @Autowired
-    val eventRepositories: EventRepository? = null
+    lateinit var eventRepositories: EventRepository
 
     @Autowired
-    val cityRepositories: CityRepository? = null
+    lateinit var cityRepositories: CityRepository
 
     @Autowired
-    val userRepositories: UserRepository? = null
+    lateinit var userRepositories: UserRepository
 
     @Autowired
-    val friendsRepositories: FriendsRepository? = null
+    lateinit var friendsRepositories: FriendsRepository
 
     @Autowired
-    val messageRepositories: MessageRepository? = null
+    lateinit var messageRepositories: MessageRepository
 
 
     val logger = LoggerFactory.getLogger(NightTimeApiApplication::class.java)!!
@@ -46,8 +47,8 @@ class NightTimeApiApplication : CommandLineRunner {
         val cityOu = City("Ourense","Spain")
         val cityVigo = City("Vigo","Spain")
 
-        cityRepositories!!.save(cityOu)
-        cityRepositories!!.save(cityVigo)
+        cityRepositories.save(cityOu)
+        cityRepositories.save(cityVigo)
 
         val bar1 = Bar(
                 "Luxus",
@@ -62,7 +63,7 @@ class NightTimeApiApplication : CommandLineRunner {
                 saturdaySchedule = "14:40-21:20"
         )
 
-        barRepository!!.save(bar1)
+        barRepository.save(bar1)
 
         val bar2 = Bar(
                 "Patio andaluz",
@@ -76,7 +77,7 @@ class NightTimeApiApplication : CommandLineRunner {
                 fridaySchedule = null,
                 saturdaySchedule = "14:40-21:20"
         )
-        barRepository!!.save(bar2)
+        barRepository.save(bar2)
 
 
         val event1 = Event( "copas a menos de 1 euro",date = LocalDate.now(), bar = bar1)
@@ -85,9 +86,9 @@ class NightTimeApiApplication : CommandLineRunner {
 
 
 
-        eventRepositories!!.save(event1)
-        eventRepositories!!.save(event2)
-        eventRepositories!!.save(event3)
+        eventRepositories.save(event1)
+        eventRepositories.save(event2)
+        eventRepositories.save(event3)
 
         val bar3 = Bar(
                 "Faro de Vigo",
@@ -101,11 +102,11 @@ class NightTimeApiApplication : CommandLineRunner {
                 fridaySchedule = null,
                 saturdaySchedule = "14:40-21:20"
         )
-        barRepository!!.save(bar3)
+        barRepository.save(bar3)
 
 
         val event4 = Event( "Todo barato",date = LocalDate.now(), bar = bar3)
-        eventRepositories!!.save(event4)
+        eventRepositories.save(event4)
 
 
 
@@ -119,7 +120,7 @@ class NightTimeApiApplication : CommandLineRunner {
 
         )
 
-        userRepositories!!.save(user1)
+        userRepositories.save(user1)
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user1))
 
         val user2 = User(
@@ -132,7 +133,7 @@ class NightTimeApiApplication : CommandLineRunner {
 
 
         )
-        userRepositories!!.save(user2)
+        userRepositories.save(user2)
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user2))
 
 
@@ -144,7 +145,7 @@ class NightTimeApiApplication : CommandLineRunner {
                 email = "ireneReina@hotmail.com",
                 birthdate = LocalDate.of(1998, 4, 12)
         )
-        userRepositories!!.save(user3)
+        userRepositories.save(user3)
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user3))
 
 
@@ -156,20 +157,21 @@ class NightTimeApiApplication : CommandLineRunner {
                 "joseNegro@gmail.com",
                 birthdate = LocalDate.of(1990, 4, 25)
         )
-        userRepositories!!.save(user4)
+        userRepositories.save(user4)
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityVigo, user = user4))
 
-        friendsRepositories!!.save(Friends(user1,user2))
-        friendsRepositories!!.save(Friends(user3,user2))
+        friendsRepositories.save(Friends(user1,user2))
+
+        friendsRepositories.save(Friends(user3,user2))
+
+        //val friends = friendsRepositories.findFriendsByUserAsk_IdOrUserAnswer_Id(user1.id,user1.id)[0]
 
 
+        //var msg = Message("Hola nuria", LocalDate.now(), LocalTime.now(), friends, friends.userAsk)
 
-        val friends = friendsRepositories!!.findFriendsByUserAsk_IdOrUserAnswer_Id(user1.id, user1.id)[0]
-        var msg = Message("Hola nuria", LocalDate.now(), LocalTime.now(), friends, friends.userAsk)
-
-        messageRepositories!!.save(msg)
-        msg = Message("Adios Gabriel", LocalDate.now().plusDays(1), LocalTime.now().plusHours(1), friends, friends.userAnswer)
-        messageRepositories!!.save(msg)
+        //messageRepositories.save(msg)
+        //msg = Message("Adios Gabriel", LocalDate.now().plusDays(1), LocalTime.now().plusHours(1), friends, friends.userAnswer)
+        //messageRepositories.save(msg)
 
         //val friends1w3 = Friends(user1,user3)
 

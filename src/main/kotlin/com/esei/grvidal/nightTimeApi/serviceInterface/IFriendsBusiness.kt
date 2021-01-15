@@ -32,8 +32,8 @@ interface IFriendsBusiness {
     fun save(friends: FriendsInsertDTO): Long
 
     //Updates a  FriendShip
-    @Throws(NotFoundException::class, AlreadyExistsException::class)
-    fun update(friends: FriendsUpdateDTO): Long
+    @Throws(NotFoundException::class)
+    fun update(friends: FriendsUpdateDTO)
 
 
     //remove a chat with cascade on delete //api propose
