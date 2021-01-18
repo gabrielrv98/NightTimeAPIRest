@@ -6,6 +6,8 @@ import com.esei.grvidal.nightTimeApi.exception.NoAuthorizationException
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.*
+import com.esei.grvidal.nightTimeApi.projections.ChatView
+import com.esei.grvidal.nightTimeApi.projections.UserFriendView
 import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import com.esei.grvidal.nightTimeApi.serviceInterface.*
 import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
@@ -240,15 +242,14 @@ class UserRestController {
     /**
      * Listen to a Get with the [Constants.URL_BASE_BAR] and an Id as a parameter to show one Bar
      *
-     * @return A List<[UserProjection]> with all the friendship of the user
+     * @return A List<[UserFriendView]> with all the friendship of the user
      *
      */
     @GetMapping("/{id}/friends/users")
-    fun getUsersFromFriendList(@PathVariable("id") idUser: Long): ResponseEntity<List<UserProjection>> {
+    fun getUsersFromFriendList(@PathVariable("id") idUser: Long): ResponseEntity<List<UserFriendView>> {
         return ResponseEntity(
             friendshipService.listUsersFromFriendsByUser(idUser),
             HttpStatus.OK)
-
     }
 
     /**
@@ -375,12 +376,12 @@ class UserRestController {
      */
 
     /**
-     * Listen to a Get with the [Constants.URL_BASE_BAR] and an Id as a parameter to show one Bar
+     * Recives a idUser to show all the Friendships
      *
      * @return a [List<[Friendship]>] with all the friendship with any messages
      */
     @GetMapping("/{idUser}/chat")
-    fun getFriendshipWithMessages(@PathVariable("idUser") idUser: Long): ResponseEntity<Any> {
+    fun getFriendshipWithMessages(@PathVariable("idUser") idUser: Long): ResponseEntity<List<ChatView>> {
         return ResponseEntity(
             friendshipService.listUsersWithChatFromFriendsByUser(idUser),
             HttpStatus.OK
@@ -426,7 +427,7 @@ class UserRestController {
      * @param msg new [Message] to insert in the database
      */
     @PostMapping("/{idUser}/chat")
-    fun insertMessage(@PathVariable("idUser") idUser: Long, @RequestBody msg: Message): ResponseEntity<Any> {
+    fun insertMessage(@PathVariable("idUser") idUser: Long, @RequestHeader("auth") auth: String, @RequestBody msg: MessageForm): ResponseEntity<Any> {
         return try {
 
             val responseHeader = HttpHeaders()

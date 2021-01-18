@@ -10,18 +10,17 @@ import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Friendship
 import com.esei.grvidal.nightTimeApi.model.Message
-import com.esei.grvidal.nightTimeApi.projections.ChatProjection
+import com.esei.grvidal.nightTimeApi.projections.ChatView
 import com.esei.grvidal.nightTimeApi.projections.FriendshipProjection
-import com.esei.grvidal.nightTimeApi.projections.UserProjection
+import com.esei.grvidal.nightTimeApi.projections.UserFriendView
 import com.esei.grvidal.nightTimeApi.repository.UserRepository
 import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendshipService
-import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import kotlin.jvm.Throws
 
 /**
- * Bar service, is the implementation of the DAO interface
+ * Friendship.kt service, is the implementation of the DAO interface
  *
  */
 @Service
@@ -43,39 +42,24 @@ class FriendshipService : IFriendshipService {
      * Lists all the friendships of one User
      */
     private fun listFriendsByUser(userId: Long): List<FriendshipProjection> {
-
-
         return friendshipRepository.findFriendshipsFromUser( userId)
-        //return friendshipRepository.findFriendshipByUserAsk_IdOrUserAnswer_IdAndAnswer(userId, userId, AnswerOptions.YES)
-
     }
 
     /**
      * Lists all the users that are friend of one User
      */
-    override fun listUsersFromFriendsByUser(userId: Long): List<UserProjection> {
+    override fun listUsersFromFriendsByUser(userId: Long): List<UserFriendView> {
 
-        //empty list
-        var list: List<UserProjection> = listOf()
+        return  listFriendsByUser(userId).map{ UserFriendView(it,userId)}
 
-        //Gets all the Friendships
-        listFriendsByUser(userId)
-            .forEach { friendProjection -> // Adds to the list the friend who aren't the user himself
-                if (friendProjection.getUserAsk().getId() == userId)
-                    list = list.plus(friendProjection.getUserAnswer())
-                else if (friendProjection.getUserAnswer().getId() == userId)
-                    list = list.plus(friendProjection.getUserAsk())
-            }
-
-        return list
 
     }
 
     /**
      * Lists all friendships with Messages from an User
      */
-    override fun listUsersWithChatFromFriendsByUser(userId: Long): List<Any> {
-        return friendshipRepository.getChatsWithMessages(userId)
+    override fun listUsersWithChatFromFriendsByUser(userId: Long): List<ChatView> {
+        return friendshipRepository.getChatsWithMessages(userId).map { ChatView(it, userId) }
     }
 
 

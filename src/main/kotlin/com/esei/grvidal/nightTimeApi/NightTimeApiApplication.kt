@@ -2,6 +2,7 @@ package com.esei.grvidal.nightTimeApi
 
 import com.esei.grvidal.nightTimeApi.repository.*
 import com.esei.grvidal.nightTimeApi.model.*
+import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
@@ -159,7 +160,9 @@ class NightTimeApiApplication : CommandLineRunner {
         userRepositories.save(user4)
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityVigo, user = user4))
 
-        friendshipRepositories.save(Friendship(user1,user2))
+        val friend1_2 =  Friendship(user1,user2)
+        friend1_2.answer = AnswerOptions.YES
+        friendshipRepositories.save(friend1_2)
 
         friendshipRepositories.save(Friendship(user3,user2))
 
