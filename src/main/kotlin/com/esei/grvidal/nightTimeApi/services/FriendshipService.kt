@@ -82,9 +82,8 @@ class FriendshipService : IFriendshipService {
      * This will show one Chat, if not, will throw a BusinessException or
      * if the object cant be found, it will throw a NotFoundException
      *
-     * todo acabar
+     *
      */
-    @Throws( NotFoundException::class)
     override fun load(friendsId: Long): FriendshipProjection {
 
         return friendshipRepository.findFriendshipById(friendsId)

@@ -8,7 +8,6 @@ import com.esei.grvidal.nightTimeApi.model.Message
 import com.esei.grvidal.nightTimeApi.projections.ChatView
 import com.esei.grvidal.nightTimeApi.projections.FriendshipProjection
 import com.esei.grvidal.nightTimeApi.projections.UserFriendView
-import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import kotlin.jvm.Throws
 
 /**
@@ -28,6 +27,7 @@ interface IFriendshipService {
     fun listMessagesFromChat(friendsId: Long): List<Message>
 
     //Show one chat
+    @Throws( NotFoundException::class)
     fun load(friendsId: Long): FriendshipProjection
 
     //Save a new FriendShip

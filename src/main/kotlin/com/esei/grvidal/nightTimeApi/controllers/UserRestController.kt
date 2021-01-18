@@ -1,10 +1,7 @@
 package com.esei.grvidal.nightTimeApi.controllers
 
 import com.esei.grvidal.nightTimeApi.dto.*
-import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
-import com.esei.grvidal.nightTimeApi.exception.NoAuthorizationException
-import com.esei.grvidal.nightTimeApi.exception.ServiceException
-import com.esei.grvidal.nightTimeApi.exception.NotFoundException
+import com.esei.grvidal.nightTimeApi.exception.*
 import com.esei.grvidal.nightTimeApi.model.*
 import com.esei.grvidal.nightTimeApi.projections.ChatView
 import com.esei.grvidal.nightTimeApi.projections.UserFriendView
@@ -17,6 +14,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import kotlin.jvm.Throws
 
 /**
  * This is the User Controller
@@ -37,27 +35,39 @@ class UserRestController {
     @Autowired
     lateinit var cityService: ICityService
 
-    private val myHashMap : HashMap<Long,String> = hashMapOf()
+    @Autowired
+    lateinit var messageService: IMessageService
+
+    private val tokenSimple : HashMap<Long,String> = hashMapOf()
+
+    @Throws( NotLoggedException::class )
+    private fun securityCheck(id: Long, token: String): Boolean{
+        tokenSimple.get(id)?.let{
+            return it == token
+        }
+        throw NotLoggedException("No token associated with this user id $id")
+
+    }
 
     /**
-     * Listen to a Get with the [Constants.URL_BASE_BAR] to show all Bars
+     * TEST
      */
     @PutMapping("/hash/{idUser}/{secret}")
     fun putHash(@PathVariable("idUser") idUser: Long,
                 @PathVariable("secret") secret: String): ResponseEntity<Any> {
 
-        myHashMap[idUser] = secret
+        tokenSimple[idUser] = secret
         return ResponseEntity(true, HttpStatus.OK)
 
     }
 
     /**
-     * Listen to a Get with the [Constants.URL_BASE_BAR] to show all Bars
+     * TEST
      */
     @GetMapping("/hash/{idUser}/")
     fun getHash(@PathVariable("idUser") idUser: Long): ResponseEntity<Any> {
 
-        return ResponseEntity(myHashMap[idUser], HttpStatus.OK)
+        return ResponseEntity(tokenSimple[idUser], HttpStatus.OK)
 
     }
 
@@ -110,7 +120,7 @@ class UserRestController {
      */
     @PostMapping("/login")
     fun login(
-        @RequestHeader(name = "username") username: String,//todo esto o UserLoginDTO
+        @RequestHeader(name = "username") username: String,
         @RequestHeader(name = "password") password: String,
     ): ResponseEntity<Any> {
         //todo send Token
@@ -358,7 +368,7 @@ class UserRestController {
             if (friends.getUserAsk().getId() == idUser || friends.getUserAnswer().getId() == idUser) {
                 friendshipService.remove(idFriends)
 
-                ResponseEntity("Sucesfully delete ",HttpStatus.NO_CONTENT)
+                ResponseEntity("Successfully delete ",HttpStatus.NO_CONTENT)
             } else {
                 ResponseEntity("Error: User is not in the friendship", HttpStatus.FORBIDDEN)
             }
@@ -376,7 +386,7 @@ class UserRestController {
      */
 
     /**
-     * Recives a idUser to show all the Friendships
+     * Receives a idUser to show all the Friendships
      *
      * @return a [List<[Friendship]>] with all the friendship with any messages
      */
@@ -392,28 +402,38 @@ class UserRestController {
     /**
      * Listen to a Get with the [Constants.URL_BASE_BAR] and an Id as a parameter to show one Bar
      *
-     * @return a [Friendship] object with the specified [idFriend] if the [idUser] is in that [Friendship]
+     * @return a [Friendship] object with the specified [idFriendship] if the [idUser] is in that [Friendship]
      */
-    @GetMapping("/{idUser}/chat/{idFriend}")
-    fun loadFriendWithMessages(
+    @GetMapping("/{idUser}/chat/{idFriendship}")
+    fun getChat(
         @PathVariable("idUser") idUser: Long,
-        @PathVariable("idFriend") idFriend: Long,
+        @PathVariable("idFriendship") idFriendship: Long,
+        @RequestHeader("auth") token: String
     ): ResponseEntity<Any> {
 
         return try {
-            //Security checks. If the idChat belongs to any Chat of the user
-            // In the future idUser will be a secure hashed string
-            val friends = friendshipService.load(idFriend)
+
+        //checking token todo quitar comentarios
+        //if(!securityCheck(idUser,auth))
+        //        ResponseEntity("Security error, credentials don't match",HttpStatus.UNAUTHORIZED)
+
+
+            //Security checks. If the idUser belongs to any user of the chat
+            val friends = friendshipService.load(idFriendship)
             if (friends.getUserAsk().getId() != idUser && friends.getUserAnswer().getId() != idUser)
                 ResponseEntity(HttpStatus.NOT_FOUND)
-            else
-                ResponseEntity(friends, HttpStatus.OK)
 
+            else {
+                ResponseEntity(messageService.getChat(idFriendship, idUser), HttpStatus.OK)
+            }
 
         } catch (e: ServiceException) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+            ResponseEntity(e.message,HttpStatus.INTERNAL_SERVER_ERROR)
         } catch (e: NotFoundException) {
-            ResponseEntity(HttpStatus.NOT_FOUND)
+            ResponseEntity(e.message,HttpStatus.NOT_FOUND)
+
+        } catch (e: NotLoggedException){
+            ResponseEntity(e.message, HttpStatus.FORBIDDEN)
         }
     }
 
@@ -427,23 +447,44 @@ class UserRestController {
      * @param msg new [Message] to insert in the database
      */
     @PostMapping("/{idUser}/chat")
-    fun insertMessage(@PathVariable("idUser") idUser: Long, @RequestHeader("auth") auth: String, @RequestBody msg: MessageForm): ResponseEntity<Any> {
+    fun insertMessage(
+        @PathVariable("idUser") idUser: Long,
+        //@RequestHeader("auth") auth: String,
+        @RequestBody msg: MessageForm
+    ): ResponseEntity<Any> {
         return try {
-
             val responseHeader = HttpHeaders()
-            val friendsDB = friendshipService.load(msg.friendship.id)
-            if (friendsDB.getUserAsk().getId() != idUser && friendsDB.getUserAnswer().getId() != idUser)
-                ResponseEntity(HttpStatus.NOT_FOUND)
-            else {
-                friendshipService.saveMsg(msg)
-                responseHeader.set("location", Constants.URL_BASE_BAR + "/" + msg.id)
 
-                ResponseEntity(responseHeader, HttpStatus.OK)
+            //checking token todo quitar comentarios
+            //if(!securityCheck(idUser,auth))
+            //        ResponseEntity("Security error, credentials don't match",HttpStatus.UNAUTHORIZED)
+
+            //Load the friendship to check the user
+            val friendsDB   = friendshipService.load(msg.friendshipId)
+
+            //If the user who signed the text, is not on the friendship
+            if (friendsDB.getUserAsk().getId() != idUser && friendsDB.getUserAnswer().getId() != idUser)
+                ResponseEntity("User must be in the friendship", HttpStatus.NOT_FOUND)
+            else {
+                val id = messageService.save(msg, idUser)
+                responseHeader.set("location", Constants.URL_BASE_BAR + "/" + id)
+
+                ResponseEntity(responseHeader, HttpStatus.CREATED)
             }
-        } catch (e: ServiceException) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+
+
+
+        } catch (e: NotFoundException) {
+            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+
+        } catch (e: NotLoggedException){
+            ResponseEntity(e.message, HttpStatus.FORBIDDEN)
         }
     }
+
+
+
+
 
     /**
      * Listen to a Get with the [Constants.URL_BASE_BAR] and an Id as a parameter to show one Bar
@@ -489,5 +530,4 @@ class UserRestController {
 
      */
 
-//todo 401 no permisos
 }
