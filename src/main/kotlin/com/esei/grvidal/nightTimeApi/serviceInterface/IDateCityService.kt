@@ -2,6 +2,7 @@ package com.esei.grvidal.nightTimeApi.serviceInterface
 
 import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
 import com.esei.grvidal.nightTimeApi.model.DateCity
+import javassist.NotFoundException
 import java.time.LocalDate
 
 /**
@@ -16,6 +17,8 @@ interface IDateCityService {
     fun save(dateCity: DateCity): DateCity
 
     fun getTotalPeopleByDateAndCity(nextCity_id: Long, nextDate: LocalDate): Int
+
+    @Throws(NotFoundException::class)
     fun addDate(idUser: Long, dateCity: DateCityDTO):Long
 
 }

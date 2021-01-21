@@ -33,16 +33,13 @@ class UserRestController {
     lateinit var dateCityService: IDateCityService
 
     @Autowired
-    lateinit var cityService: ICityService
-
-    @Autowired
     lateinit var messageService: IMessageService
 
-    private val tokenSimple : HashMap<Long,String> = hashMapOf()
+    private val tokenSimple: HashMap<Long, String> = hashMapOf()
 
-    @Throws( NotLoggedException::class )
-    private fun securityCheck(id: Long, token: String): Boolean{
-        tokenSimple.get(id)?.let{
+    @Throws(NotLoggedException::class)
+    private fun securityCheck(id: Long, token: String): Boolean {
+        tokenSimple.get(id)?.let {
             return it == token
         }
         throw NotLoggedException("No token associated with this user id $id")
@@ -53,8 +50,10 @@ class UserRestController {
      * TEST
      */
     @PutMapping("/hash/{idUser}/{secret}")
-    fun putHash(@PathVariable("idUser") idUser: Long,
-                @PathVariable("secret") secret: String): ResponseEntity<Any> {
+    fun putHash(
+        @PathVariable("idUser") idUser: Long,
+        @PathVariable("secret") secret: String
+    ): ResponseEntity<Any> {
 
         tokenSimple[idUser] = secret
         return ResponseEntity(true, HttpStatus.OK)
@@ -70,7 +69,6 @@ class UserRestController {
         return ResponseEntity(tokenSimple[idUser], HttpStatus.OK)
 
     }
-
 
 
     /**
@@ -95,7 +93,6 @@ class UserRestController {
             ResponseEntity(e.message, HttpStatus.NOT_FOUND)
         }
     }
-
 
 
     /**
@@ -203,14 +200,16 @@ class UserRestController {
 
         return if (!userService.exists(idUser))
             ResponseEntity("No user with id $idUser found", HttpStatus.NOT_FOUND)
-        else if (!cityService.exists(dateCity.nextCityId))
-            ResponseEntity("No city with id ${dateCity.nextCityId} found", HttpStatus.NOT_FOUND)
         else {
-            try {
+
+            return try {
                 dateCityService.addDate(idUser, dateCity)
                 ResponseEntity(HttpStatus.OK)
             } catch (e: AlreadyExistsException) {
                 ResponseEntity(e.message, HttpStatus.ALREADY_REPORTED)
+
+            } catch (e: NotFoundException) {
+                ResponseEntity(e.message, HttpStatus.NOT_FOUND)
             }
         }
 
@@ -232,7 +231,7 @@ class UserRestController {
         return try {
 
             userService.deleteDate(idUser, idDate)
-            ResponseEntity("Successfully delete",HttpStatus.NO_CONTENT)
+            ResponseEntity("Successfully delete", HttpStatus.NO_CONTENT)
 
         } catch (e: NotFoundException) {
             ResponseEntity(e.message, HttpStatus.NOT_FOUND)
@@ -259,7 +258,8 @@ class UserRestController {
     fun getUsersFromFriendList(@PathVariable("id") idUser: Long): ResponseEntity<List<UserFriendView>> {
         return ResponseEntity(
             friendshipService.listUsersFromFriendsByUser(idUser),
-            HttpStatus.OK)
+            HttpStatus.OK
+        )
     }
 
     /**
@@ -288,7 +288,7 @@ class UserRestController {
                 ResponseEntity("Error: User must be the one who asks", HttpStatus.FORBIDDEN)
             }
 
-        }catch (e: NotFoundException) {
+        } catch (e: NotFoundException) {
             ResponseEntity(e.message, HttpStatus.NOT_FOUND)
 
         } catch (e: AlreadyExistsException) {
@@ -300,22 +300,16 @@ class UserRestController {
     fun getFriendRequest(
         @PathVariable("id") idUser: Long
         //, @RequestHeader("auth") auth: String
-    ): ResponseEntity<Any>{
+    ): ResponseEntity<Any> {
 
         //checking token todo quitar comentarios auth
         //if(!securityCheck(idUser,auth))
         //        ResponseEntity("Security error, credentials don't match",HttpStatus.UNAUTHORIZED)
 
-        return ResponseEntity(friendshipService.getFriendsRequest(idUser),HttpStatus.OK)
+        return ResponseEntity(friendshipService.getFriendsRequest(idUser), HttpStatus.OK)
 
     }
-    /**
-     * Returns all the friendships where the answer is 0 ( not answered)
-     */
 
-    /**
-     * Lists all the users that where the friendship answer is [answer], by default [answer] is 1 (YES) ( they are friends)
-     */
 
     @PatchMapping("/{id}/friends")
     fun updateRequest(
@@ -325,15 +319,15 @@ class UserRestController {
         val responseHeader = HttpHeaders()
 
         try {
-            val friendRequestDB = friendshipService.load( friendRequest.id)
+            val friendRequestDB = friendshipService.load(friendRequest.id)
 
             //only non accepted requests can be updated
-            if(friendRequestDB.getAnswer() == AnswerOptions.YES)
+            if (friendRequestDB.getAnswer() == AnswerOptions.YES)
                 return ResponseEntity("Friendship already accepted, can only be deleted", HttpStatus.FORBIDDEN)
 
 
             //check the idUser is the user who can update the Request
-            if (idUser == friendRequestDB.getUserAnswer().getId() ) {
+            if (idUser == friendRequestDB.getUserAnswer().getId()) {
 
                 //Answer yes
                 when (friendRequest.answer) {
@@ -364,9 +358,9 @@ class UserRestController {
 
 
         } catch (e: NotFoundException) {
-            return ResponseEntity(e.message,HttpStatus.NOT_FOUND)
+            return ResponseEntity(e.message, HttpStatus.NOT_FOUND)
 
-        }catch (e: AlreadyExistsException) {
+        } catch (e: AlreadyExistsException) {
             return ResponseEntity(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
         }
 
@@ -389,7 +383,7 @@ class UserRestController {
             if (friends.getUserAsk().getId() == idUser || friends.getUserAnswer().getId() == idUser) {
                 friendshipService.remove(idFriends)
 
-                ResponseEntity("Successfully delete ",HttpStatus.NO_CONTENT)
+                ResponseEntity("Successfully delete ", HttpStatus.NO_CONTENT)
             } else {
                 ResponseEntity("Error: User is not in the friendship", HttpStatus.FORBIDDEN)
             }
@@ -434,26 +428,25 @@ class UserRestController {
 
         return try {
 
-        //checking token todo quitar comentarios
-        //if(!securityCheck(idUser,auth))
-        //        ResponseEntity("Security error, credentials don't match",HttpStatus.UNAUTHORIZED)
+            //checking token todo quitar comentarios
+            //if(!securityCheck(idUser,auth))
+            //        ResponseEntity("Security error, credentials don't match",HttpStatus.UNAUTHORIZED)
 
 
             //Security checks. If the idUser belongs to any user of the chat
             val friends = friendshipService.load(idFriendship)
             if (friends.getUserAsk().getId() != idUser && friends.getUserAnswer().getId() != idUser)
                 ResponseEntity(HttpStatus.NOT_FOUND)
-
             else {
                 ResponseEntity(messageService.getChat(idFriendship, idUser), HttpStatus.OK)
             }
 
         } catch (e: ServiceException) {
-            ResponseEntity(e.message,HttpStatus.INTERNAL_SERVER_ERROR)
+            ResponseEntity(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
         } catch (e: NotFoundException) {
-            ResponseEntity(e.message,HttpStatus.NOT_FOUND)
+            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
 
-        } catch (e: NotLoggedException){
+        } catch (e: NotLoggedException) {
             ResponseEntity(e.message, HttpStatus.FORBIDDEN)
         }
     }
@@ -481,7 +474,7 @@ class UserRestController {
             //        ResponseEntity("Security error, credentials don't match",HttpStatus.UNAUTHORIZED)
 
             //Load the friendship to check the user
-            val friendsDB   = friendshipService.load(msg.friendshipId)
+            val friendsDB = friendshipService.load(msg.friendshipId)
 
             //If the user who signed the text, is not on the friendship
             if (friendsDB.getUserAsk().getId() != idUser && friendsDB.getUserAnswer().getId() != idUser)
@@ -494,17 +487,13 @@ class UserRestController {
             }
 
 
-
         } catch (e: NotFoundException) {
             ResponseEntity(e.message, HttpStatus.NOT_FOUND)
 
-        } catch (e: NotLoggedException){
+        } catch (e: NotLoggedException) {
             ResponseEntity(e.message, HttpStatus.FORBIDDEN)
         }
     }
-
-
-
 
 
     /**
@@ -513,13 +502,13 @@ class UserRestController {
      *
      * ADVICE: This method doesn't work with Swagger because Get request with bodies are not allowed
      *
-     * @return a Response with two headers, "total" for total people, and "friends" for user's friends
+     * @return a Response with two headers, "total" for total people, and "friends" for user's friends. Also a body with the events on that date
      */
     @GetMapping("/{idUser}/date")
     fun getPeopleAndFriends(
-            @PathVariable("idUser") idUser: Long,
-            //@RequestHeader("auth") auth: String,
-            @RequestBody dateCity: DateCityDTO,
+        @PathVariable("idUser") idUser: Long,
+        //@RequestHeader("auth") auth: String,
+        @RequestBody dateCity: DateCityDTO,
     ): ResponseEntity<Any> {
         return try {
             //checking token todo quitar comentarios auth
@@ -528,21 +517,22 @@ class UserRestController {
 
             val responseHeader = HttpHeaders()
 
-            if(userService.exists(idUser)) {
+            if (userService.exists(idUser)) {
 
                 responseHeader.set("total", userService.getTotal(dateCity).toString())
                 responseHeader.set("friends", friendshipService.getFriendsOnDate(idUser, dateCity).toString())
 
+
+
                 ResponseEntity(null, responseHeader, HttpStatus.OK)
 
-            }else ResponseEntity("No user with id $idUser were found", HttpStatus.NOT_FOUND)
+            } else ResponseEntity("No user with id $idUser were found", HttpStatus.NOT_FOUND)
 
 
-        }  catch (e: NotLoggedException){
+        } catch (e: NotLoggedException) {
             ResponseEntity(e.message, HttpStatus.FORBIDDEN)
         }
     }
-
 
 
 }

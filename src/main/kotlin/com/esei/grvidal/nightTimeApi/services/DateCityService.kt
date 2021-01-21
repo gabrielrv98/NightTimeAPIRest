@@ -8,6 +8,7 @@ import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.model.City
 import com.esei.grvidal.nightTimeApi.model.DateCity
 import com.esei.grvidal.nightTimeApi.model.User
+import com.esei.grvidal.nightTimeApi.repository.CityRepository
 import com.esei.grvidal.nightTimeApi.serviceInterface.IDateCityService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -24,10 +25,12 @@ class DateCityService : IDateCityService {
     /**
      *Dependency injection with autowired
      */
+    @Autowired
+    lateinit var dateCityRepository: DateCityRepository
 
 
     @Autowired
-    lateinit var dateCityRepository: DateCityRepository
+    lateinit var cityRepository: CityRepository
 
 
     /**
@@ -55,6 +58,8 @@ class DateCityService : IDateCityService {
     }
 
     override fun addDate(idUser: Long, dateCity: DateCityDTO): Long {
+        if (!cityRepository.existsById(dateCity.nextCityId))
+            throw NotFoundException("No city with id ${dateCity.nextCityId} found")
         return dateCityRepository.save(dateCity.toDateCity(idUser)).id
     }
 
