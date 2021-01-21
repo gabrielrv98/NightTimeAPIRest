@@ -2,6 +2,7 @@ package com.esei.grvidal.nightTimeApi.repository
 
 import com.esei.grvidal.nightTimeApi.model.Friendship
 import com.esei.grvidal.nightTimeApi.projections.FriendshipProjection
+import com.esei.grvidal.nightTimeApi.projections.UserFriendView
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
@@ -21,7 +22,7 @@ interface FriendshipRepository : JpaRepository<Friendship, Long> {
     fun findFriendsByUserAsk_IdOrUserAnswer_Id(user1_id: Long, user2_id: Long) : List<Friendship>
 
     //Returns all the FriendsShips where an user is involved and has a specific answer
-    @Query(value = "SELECT f FROM Friendship f WHERE (f.userAsk.id = ?1 OR f.userAnswer.id = ?1) AND f.answer = 1 ")
+    @Query(value = "SELECT f FROM Friendship f WHERE (f.userAsk.id = ?1 OR f.userAnswer.id = ?1) AND f.answer = com.esei.grvidal.nightTimeApi.utlis.AnswerOptions.YES ")
     fun findFriendshipsFromUser(user_id: Long) : List<FriendshipProjection>
 
     //Returns a friendShip with the specified users IDs
@@ -31,23 +32,25 @@ interface FriendshipRepository : JpaRepository<Friendship, Long> {
     @Query(value = "SELECT DISTINCT f FROM Friendship f INNER JOIN Message m ON f.id = m.friendship.id WHERE f.userAsk.id = ?1 OR f.userAnswer.id = ?1")
     fun getChatsWithMessages(idUser: Long): List<Friendship>
 
-    @Query(value = "SELECT COUNT (T.total) FROM(" +
-            " SELECT F.id, F.user_ask AS total FROM friendship AS F " +
-            "JOIN next_date_city AS DT " +
-            "ON F.user_answer = DT.user_id " +
-            "WHERE F.user_ask = ?1" +
-            "AND DT.city_id = ?2" +
-            "AND DT.next_date = ?3" +
-            " ) AS T",nativeQuery = true)
-    fun getFriendsFromUserAskOnDateOriginal(idUser: Long, idCity: Long, date: LocalDate) : Int
-
+    /**
+     *  Returns the number of friends of user_ask with id [idUser] who checked the date [date] in the city with id [idCity]
+     */
     @Query(value = "SELECT COUNT(F.id) " +
             "FROM Friendship AS F JOIN DateCity AS DC on F.userAnswer.id = DC.user.id WHERE F.answer= 1 AND F.userAsk.id = ?1 AND DC.nextCity.id = ?2 AND DC.nextDate = ?3")
     fun getFriendsFromUserAskOnDate(idUser: Long, idCity: Long, date: LocalDate) : Int
 
+    /**
+     *  Returns the number of friends of user_answer with id [idUser] who checked the date [date] in the city with id [idCity]
+     */
     @Query(value = "SELECT COUNT(F.id) " +
             "FROM Friendship AS F JOIN DateCity AS DC on F.userAsk.id = DC.user.id WHERE F.answer= 1 AND F.userAnswer.id = ?1 AND DC.nextCity.id = ?2 AND DC.nextDate = ?3")
     fun getFriendsFromAnswerOnDate(idUser: Long, idCity: Long, date: LocalDate) : Int
+
+    /**
+     * Returns a list of [Friendship] where the user must answer and the answer is undefined
+     */
+    @Query(value = "SELECT f FROM Friendship f WHERE  f.userAnswer.id = ?1 AND f.answer = com.esei.grvidal.nightTimeApi.utlis.AnswerOptions.NOT_ANSWERED")
+    fun getFriendshipsRequest(user_id: Long) : List<FriendshipProjection>
 
 
 

@@ -9,6 +9,7 @@ import com.esei.grvidal.nightTimeApi.model.Message
 import com.esei.grvidal.nightTimeApi.projections.ChatView
 import com.esei.grvidal.nightTimeApi.projections.FriendshipProjection
 import com.esei.grvidal.nightTimeApi.projections.UserFriendView
+import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
 import kotlin.jvm.Throws
 
 /**
@@ -22,10 +23,6 @@ interface IFriendshipService {
 
     //Lists all the users that have any message on the chat with the user
     fun listUsersWithChatFromFriendsByUser(userId: Long): List<ChatView>
-
-
-    //List all the messages in one chat of one user //api propose
-    fun listMessagesFromChat(friendsId: Long): List<Message>
 
     //Show one chat
     @Throws( NotFoundException::class)
@@ -45,5 +42,9 @@ interface IFriendshipService {
 
     fun saveMsg(msg: Message): Message
 
+    //Returns the number of friends of an user on a date on a place
     fun getFriendsOnDate(idUser: Long, dateCityDTO: DateCityDTO): Int
+
+    //Returns a list with all the friendships not accepted yet
+    fun getFriendsRequest(idUser: Long): List<UserFriendView>
 }

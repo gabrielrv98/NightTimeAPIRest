@@ -40,20 +40,10 @@ class FriendshipService : IFriendshipService {
     lateinit var userRepository: UserRepository
 
     /**
-     * Lists all the friendships of one User
-     */
-    private fun listFriendsByUser(userId: Long): List<FriendshipProjection> {
-        return friendshipRepository.findFriendshipsFromUser(userId)
-    }
-
-    /**
-     * Lists all the users that are friend of one User
+     * Lists all the users that where the friendship answer is 1 (YES) ( they are friends)
      */
     override fun listUsersFromFriendsByUser(userId: Long): List<UserFriendView> {
-
-        return listFriendsByUser(userId).map { UserFriendView(it, userId) }
-
-
+        return friendshipRepository.findFriendshipsFromUser(userId).map { UserFriendView(it, userId) }
     }
 
     /**
@@ -61,21 +51,6 @@ class FriendshipService : IFriendshipService {
      */
     override fun listUsersWithChatFromFriendsByUser(userId: Long): List<ChatView> {
         return friendshipRepository.getChatsWithMessages(userId).map { ChatView(it, userId) }
-    }
-
-
-    /**
-     * Lists all the chats of one User
-     */
-    @Throws(NotFoundException::class, ServiceException::class)
-    override fun listMessagesFromChat(friendsId: Long): List<Message> {
-        try {
-
-            return messageRepository.findAllByFriendship_Id(friendsId)
-
-        } catch (e: NotFoundException) {
-            throw NotFoundException(e.message)
-        }
     }
 
 
@@ -163,6 +138,10 @@ class FriendshipService : IFriendshipService {
         var numberFriends = friendshipRepository.getFriendsFromUserAskOnDate(idUser,dateCityDTO.nextCityId,dateCityDTO.nextDate)
         numberFriends += friendshipRepository.getFriendsFromAnswerOnDate(idUser,dateCityDTO.nextCityId,dateCityDTO.nextDate)
         return numberFriends
+    }
+
+    override fun getFriendsRequest(idUser: Long): List<UserFriendView> {
+        return friendshipRepository.getFriendshipsRequest(idUser).map{ UserFriendView(it,idUser) }
     }
 }
 

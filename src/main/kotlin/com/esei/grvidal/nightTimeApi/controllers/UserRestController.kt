@@ -296,6 +296,27 @@ class UserRestController {
         }
     }
 
+    @GetMapping("/{id}/friends")
+    fun getFriendRequest(
+        @PathVariable("id") idUser: Long
+        //, @RequestHeader("auth") auth: String
+    ): ResponseEntity<Any>{
+
+        //checking token todo quitar comentarios auth
+        //if(!securityCheck(idUser,auth))
+        //        ResponseEntity("Security error, credentials don't match",HttpStatus.UNAUTHORIZED)
+
+        return ResponseEntity(friendshipService.getFriendsRequest(idUser),HttpStatus.OK)
+
+    }
+    /**
+     * Returns all the friendships where the answer is 0 ( not answered)
+     */
+
+    /**
+     * Lists all the users that where the friendship answer is [answer], by default [answer] is 1 (YES) ( they are friends)
+     */
+
     @PatchMapping("/{id}/friends")
     fun updateRequest(
         @PathVariable("id") idUser: Long,

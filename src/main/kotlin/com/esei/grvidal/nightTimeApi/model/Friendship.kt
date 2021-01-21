@@ -20,6 +20,7 @@ class Friendship(
         var userAnswer: User
 
 ) {
+    @Enumerated(EnumType.STRING)
     var answer: AnswerOptions? = AnswerOptions.NOT_ANSWERED
 
     @OneToMany(mappedBy = "friendship",cascade = [CascadeType.REMOVE])
