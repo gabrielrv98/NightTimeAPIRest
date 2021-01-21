@@ -455,7 +455,7 @@ class UserRestController {
         return try {
             val responseHeader = HttpHeaders()
 
-            //checking token todo quitar comentarios
+            //checking token todo quitar comentarios auth
             //if(!securityCheck(idUser,auth))
             //        ResponseEntity("Security error, credentials don't match",HttpStatus.UNAUTHORIZED)
 
@@ -487,47 +487,41 @@ class UserRestController {
 
 
     /**
-     * Listen to a Get with the [Constants.URL_BASE_BAR] and an Id as a parameter to show one Bar
+     * Listen to a Get with a [DateCityDTO] and an IdUser to return the total number of people and number of friends
+     * who checked that day in the same city
      *
-     * @return a [List<[Friendship]>] with all the friendship with any messages
+     * ADVICE: This method doesn't work with Swagger because Get request with bodies are not allowed
+     *
+     * @return a Response with two headers, "total" for total people, and "friends" for user's friends
      */
-    /*
     @GetMapping("/{idUser}/date")
     fun getPeopleAndFriends(
             @PathVariable("idUser") idUser: Long,
-            @RequestBody dateCity: DateCity,
+            //@RequestHeader("auth") auth: String,
+            @RequestBody dateCity: DateCityDTO,
     ): ResponseEntity<Any> {
         return try {
+            //checking token todo quitar comentarios auth
+            //if(!securityCheck(idUser,auth))
+            //        ResponseEntity("Security error, credentials don't match",HttpStatus.UNAUTHORIZED)
+
             val responseHeader = HttpHeaders()
 
-            val user = userService.load(idUser)
+            if(userService.exists(idUser)) {
 
-            var number = dateCityService.getTotalPeopleByDateAndCity(dateCity.nextCity.id, dateCity.nextDate)
-            if (user.dateCity?.nextCity?.id == dateCity.nextCity.id && user.dateCity?.nextDate == dateCity.nextDate) {
-                number -= 1
-            }
+                responseHeader.set("total", userService.getTotal(dateCity).toString())
+                responseHeader.set("friends", friendshipService.getFriendsOnDate(idUser, dateCity).toString())
 
-            responseHeader.set("Total", number.toString())
-            var number2 = 0
-            getUsersFromFriendList(idUser).body?.let {
-                it.forEach { userFriend ->
-                    userFriend.getDateCity()?.let { userFriendDateCity ->
-                        if (userFriendDateCity.getNextDate() == dateCity.nextDate &&
-                                userFriendDateCity.getNextCity().getId() == dateCity.nextCity.id)
-                            number2 += 1
-                    }
-                }
-            }
-            responseHeader.set("Friendship", number2.toString())
+                ResponseEntity(null, responseHeader, HttpStatus.OK)
 
-            ResponseEntity(responseHeader, HttpStatus.I_AM_A_TEAPOT)
-        } catch (e: ServiceException) {
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        } catch (e: NotFoundException) {
-            ResponseEntity(HttpStatus.NOT_FOUND)
+            }else ResponseEntity("No user with id $idUser were found", HttpStatus.NOT_FOUND)
+
+
+        }  catch (e: NotLoggedException){
+            ResponseEntity(e.message, HttpStatus.FORBIDDEN)
         }
     }
 
-     */
+
 
 }

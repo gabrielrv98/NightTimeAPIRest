@@ -1,5 +1,6 @@
 package com.esei.grvidal.nightTimeApi.serviceInterface
 
+import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
 import com.esei.grvidal.nightTimeApi.dto.FriendshipInsertDTO
 import com.esei.grvidal.nightTimeApi.dto.FriendshipUpdateDTO
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
@@ -43,4 +44,6 @@ interface IFriendshipService {
     fun remove(friendsId: Long)
 
     fun saveMsg(msg: Message): Message
+
+    fun getFriendsOnDate(idUser: Long, dateCityDTO: DateCityDTO): Int
 }

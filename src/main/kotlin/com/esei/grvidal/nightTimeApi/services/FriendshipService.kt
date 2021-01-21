@@ -1,5 +1,6 @@
 package com.esei.grvidal.nightTimeApi.services
 
+import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
 import com.esei.grvidal.nightTimeApi.dto.FriendshipInsertDTO
 import com.esei.grvidal.nightTimeApi.dto.FriendshipUpdateDTO
 import com.esei.grvidal.nightTimeApi.dto.toFriendRequest
@@ -42,7 +43,7 @@ class FriendshipService : IFriendshipService {
      * Lists all the friendships of one User
      */
     private fun listFriendsByUser(userId: Long): List<FriendshipProjection> {
-        return friendshipRepository.findFriendshipsFromUser( userId)
+        return friendshipRepository.findFriendshipsFromUser(userId)
     }
 
     /**
@@ -50,7 +51,7 @@ class FriendshipService : IFriendshipService {
      */
     override fun listUsersFromFriendsByUser(userId: Long): List<UserFriendView> {
 
-        return  listFriendsByUser(userId).map{ UserFriendView(it,userId)}
+        return listFriendsByUser(userId).map { UserFriendView(it, userId) }
 
 
     }
@@ -87,7 +88,7 @@ class FriendshipService : IFriendshipService {
     override fun load(friendsId: Long): FriendshipProjection {
 
         return friendshipRepository.findFriendshipById(friendsId)
-            .orElseThrow { NotFoundException("Couldn't find relationship with id $friendsId")  }
+            .orElseThrow { NotFoundException("Couldn't find relationship with id $friendsId") }
     }
 
 
@@ -147,15 +148,21 @@ class FriendshipService : IFriendshipService {
      */
     @Throws(ServiceException::class)
     override fun saveMsg(msg: Message): Message {
-            val friends = msg.friendship
+        val friends = msg.friendship
 
-            if (friends.userAsk != msg.user && friends.userAnswer != msg.user)
-                throw ServiceException("User it's not on the friendship")
-            else {
-                return messageRepository.save(msg)
-            }
+        if (friends.userAsk != msg.user && friends.userAnswer != msg.user)
+            throw ServiceException("User it's not on the friendship")
+        else {
+            return messageRepository.save(msg)
+        }
+    }
 
 
+    override fun getFriendsOnDate(idUser: Long, dateCityDTO: DateCityDTO): Int {
+
+        var numberFriends = friendshipRepository.getFriendsFromUserAskOnDate(idUser,dateCityDTO.nextCityId,dateCityDTO.nextDate)
+        numberFriends += friendshipRepository.getFriendsFromAnswerOnDate(idUser,dateCityDTO.nextCityId,dateCityDTO.nextDate)
+        return numberFriends
     }
 }
 

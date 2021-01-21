@@ -40,4 +40,7 @@ interface IUserService {
 
     fun exists(idUser: Long): Boolean
 
+    //Get the total of users on a date in a specific city
+    fun getTotal(dateCityDTO: DateCityDTO): Int
+
 }

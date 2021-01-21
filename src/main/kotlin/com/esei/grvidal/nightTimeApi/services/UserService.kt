@@ -1,5 +1,6 @@
 package com.esei.grvidal.nightTimeApi.services
 
+import com.esei.grvidal.nightTimeApi.NightTimeApiApplication
 import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
 import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
@@ -16,6 +17,7 @@ import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import com.esei.grvidal.nightTimeApi.repository.CityRepository
 import com.esei.grvidal.nightTimeApi.repository.DateCityRepository
 import com.esei.grvidal.nightTimeApi.serviceInterface.IUserService
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import kotlin.jvm.Throws
@@ -126,6 +128,14 @@ class UserService : IUserService {
 
     override fun exists(idUser: Long): Boolean {
         return userRepository.findById(idUser).isPresent
+    }
+
+    override fun getTotal(dateCityDTO: DateCityDTO): Int {
+        return userRepository.getTotalOnDate(
+            cityId = dateCityDTO.nextCityId,
+            date = dateCityDTO.nextDate
+        )
+
     }
 }
 
