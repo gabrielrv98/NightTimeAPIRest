@@ -1,7 +1,5 @@
 package com.esei.grvidal.nightTimeApi.projections
 
-import com.esei.grvidal.nightTimeApi.model.City
-
 interface BarFullProjection {
     fun getId() : Long
     fun getName() : String

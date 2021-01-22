@@ -1,5 +1,6 @@
 package com.esei.grvidal.nightTimeApi.controllers
 
+import com.esei.grvidal.nightTimeApi.NightTimeApiApplication
 import com.esei.grvidal.nightTimeApi.dto.*
 import com.esei.grvidal.nightTimeApi.exception.*
 import com.esei.grvidal.nightTimeApi.model.*
@@ -9,16 +10,20 @@ import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import com.esei.grvidal.nightTimeApi.serviceInterface.*
 import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
 import com.esei.grvidal.nightTimeApi.utlis.Constants
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.time.LocalTime
+import kotlin.collections.HashMap
 import kotlin.jvm.Throws
+import kotlin.random.Random
 
 /**
  * This is the User Controller
- * todo FALTA PAGINACION, AÑADIR SEGURIDAD
+ *
  */
 @RestController
 @RequestMapping(Constants.URL_BASE_USER)
@@ -36,41 +41,20 @@ class UserRestController {
     @Autowired
     lateinit var messageService: IMessageService
 
-    private val tokenSimple: HashMap<Long, String> = hashMapOf()
+
+    val logger = LoggerFactory.getLogger(NightTimeApiApplication::class.java)!!//todo testtting propouses
+
+
+    private val tokenSimple: HashMap<Long, Int> = hashMapOf()
 
     @Throws(NotLoggedException::class)
-    private fun securityCheck(id: Long, token: String): Boolean {
+    private fun securityCheck(id: Long, token: Int): Boolean {
         tokenSimple.get(id)?.let {
             return it == token
         }
         throw NotLoggedException("No token associated with this user id $id")
 
     }
-
-    /**
-     * TEST
-     */
-    @PutMapping("/hash/{idUser}/{secret}")
-    fun putHash(
-        @PathVariable("idUser") idUser: Long,
-        @PathVariable("secret") secret: String
-    ): ResponseEntity<Any> {
-
-        tokenSimple[idUser] = secret
-        return ResponseEntity(true, HttpStatus.OK)
-
-    }
-
-    /**
-     * TEST
-     */
-    @GetMapping("/hash/{idUser}/")
-    fun getHash(@PathVariable("idUser") idUser: Long): ResponseEntity<Any> {
-
-        return ResponseEntity(tokenSimple[idUser], HttpStatus.OK)
-
-    }
-
 
     /**
      * Listen to a Get with the [Constants.URL_BASE_BAR] to show all Bars
@@ -103,14 +87,27 @@ class UserRestController {
     @PostMapping("")
     fun insert(@RequestBody user: UserDTOInsert): ResponseEntity<Any> {
 
+        return try {
 
-        val id = userService.save(user)
-        val responseHeader = HttpHeaders()
-        responseHeader.set("location", Constants.URL_BASE_USER + "/" + id)
+            val id = userService.save(user)
+            val responseHeader = HttpHeaders()
+            responseHeader.set("location", Constants.URL_BASE_USER + "/" + id)
 
-        return ResponseEntity(responseHeader, HttpStatus.CREATED)
+            ResponseEntity(responseHeader, HttpStatus.CREATED)
 
+        } catch (e: ServiceException) {
+            ResponseEntity(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
+
+        }catch (e: AlreadyExistsException){
+            ResponseEntity(e.message, HttpStatus.ALREADY_REPORTED)
+        }
     }
+
+    private fun tokenGen(): Int { //todo improve the password
+        val local = LocalTime.now()
+        return Random( local.nano + local.second).nextBits(150)
+    }
+
 
     /**
      * TODO finish this
@@ -124,23 +121,46 @@ class UserRestController {
         //todo send Token
         return try {
             val isUser = userService.login(username, password)
+            val responseHeader = HttpHeaders()
 
-            if (isUser) {
-                // SecurityContextHolder.getContext().authentication = Authentication()
-                // val authentication: Authentication = SecurityContextHolder.getContext().authentication;
-                // val currentPrincipalName: String = authentication.getName();
+            if (isUser != -1L) {
 
-                ResponseEntity(true, HttpStatus.OK)
+                if (tokenSimple[isUser] == null) {
+                    val token = tokenGen()
+                    // SecurityContextHolder.getContext().authentication = Authentication()
+                    // val authentication: Authentication = SecurityContextHolder.getContext().authentication;
+                    // val currentPrincipalName: String = authentication.getName();
+
+                    tokenSimple.put(isUser,token)
+                    responseHeader.set("token", token.toString())
+                    ResponseEntity(true, responseHeader, HttpStatus.OK)
+
+                } else {
+                    responseHeader.set("Error", "User already logged in")//todo or restart the token
+                    ResponseEntity(false, responseHeader, HttpStatus.OK)
+                }
+
+
             } else {
-                val responseHeader = HttpHeaders()
+
                 responseHeader.set("Error", "Credentials don't match")
                 ResponseEntity(false, responseHeader, HttpStatus.BAD_REQUEST)
             }
 
 
-        } catch (e: Exception) {
+        } catch (e: NotFoundException) {
             ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+
+        } catch (e: ServiceException) {
+            ResponseEntity(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
+
         }
+    }
+
+    @PostMapping("/{id}/logoff")
+    fun logoff(@PathVariable("id") idUser: Long): ResponseEntity<Any> {
+        tokenSimple.remove(idUser)
+        return ResponseEntity("Good bye", HttpStatus.NO_CONTENT)
     }
 
 

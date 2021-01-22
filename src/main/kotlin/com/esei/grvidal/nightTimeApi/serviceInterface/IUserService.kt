@@ -5,6 +5,7 @@ import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
+import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import java.util.*
 import kotlin.jvm.Throws
@@ -23,6 +24,7 @@ interface IUserService {
 
 
     //Save a new user
+    @Throws(ServiceException::class, AlreadyExistsException::class)
     fun save(user: UserDTOInsert): Long
 
     @Throws(NotFoundException::class)
@@ -32,8 +34,8 @@ interface IUserService {
     @Throws(NotFoundException::class)
     fun remove(idUser: Long)
 
-    @Throws(NotFoundException::class)
-    fun login(nickname: String, password: String): Boolean
+    @Throws(NotFoundException::class, ServiceException::class)
+    fun login(nickname: String, password: String): Long
 
     @Throws(NotFoundException::class)
     fun deleteDate(idUser: Long, idDate: Long)

@@ -1,24 +1,21 @@
 package com.esei.grvidal.nightTimeApi.services
 
-import com.esei.grvidal.nightTimeApi.NightTimeApiApplication
 import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
 import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
 import com.esei.grvidal.nightTimeApi.dto.toUser
+import com.esei.grvidal.nightTimeApi.encryptation.Encoding
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.exception.NoAuthorizationException
 import com.esei.grvidal.nightTimeApi.repository.UserRepository
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
-import com.esei.grvidal.nightTimeApi.model.City
-import com.esei.grvidal.nightTimeApi.model.DateCity
 import com.esei.grvidal.nightTimeApi.model.User
 import com.esei.grvidal.nightTimeApi.projections.UserProjection
-import com.esei.grvidal.nightTimeApi.repository.CityRepository
 import com.esei.grvidal.nightTimeApi.repository.DateCityRepository
 import com.esei.grvidal.nightTimeApi.serviceInterface.IUserService
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import kotlin.jvm.Throws
 
@@ -36,10 +33,9 @@ class UserService : IUserService {
     lateinit var userRepository: UserRepository
 
     @Autowired
-    lateinit var cityRepository: CityRepository
-
-    @Autowired
     lateinit var dateCityRepository: DateCityRepository
+
+    //val logger = LoggerFactory.getLogger(NightTimeApiApplication::class.java)!!
 
 
     /**
@@ -60,7 +56,7 @@ class UserService : IUserService {
     override fun loadProjection(idUser: Long): UserProjection {
 
         return userRepository.getUserById(idUser)
-                .orElseThrow { NotFoundException("Couldn't find the user with id $idUser") }
+            .orElseThrow { NotFoundException("Couldn't find the user with id $idUser") }
 
     }
 
@@ -72,7 +68,7 @@ class UserService : IUserService {
     private fun load(idUser: Long): User {
 
         return userRepository.findById(idUser)
-                .orElseThrow { NotFoundException("Couldn't find the user with id $idUser") }
+            .orElseThrow { NotFoundException("Couldn't find the user with id $idUser") }
 
     }
 
@@ -81,7 +77,21 @@ class UserService : IUserService {
      * should return a user or its ID
      */
     override fun save(user: UserDTOInsert): Long {
-        return userRepository.save(user.toUser()).id
+
+        //Encrypting password
+        user.password = Encoding.encrypt(
+            strToEncrypt = user.password,
+            secret_key = user.nickname
+        )
+
+        try{
+            return userRepository.save(user.toUser()).id
+
+        }catch (e: DataIntegrityViolationException){
+            throw AlreadyExistsException("1 User with nickname ${user.nickname} already exists")
+        }
+
+
     }
 
     override fun update(idUser: Long, user: UserDTOEdit) {
@@ -93,7 +103,7 @@ class UserService : IUserService {
     /**
      * This will remove a bars through its id, if not, will throw an Exception, or if it cant find it, it will throw a NotFoundException
      */
-    @Throws(NotFoundException::class)
+
     override fun remove(idUser: Long) {
 
         val user = loadProjection(idUser)
@@ -104,23 +114,30 @@ class UserService : IUserService {
     @Throws(NotFoundException::class)
     private fun loadByNickname(nickname: String): User {
         return userRepository.findByNickname(nickname)
-                .orElseThrow { NotFoundException("No users with name $nickname were found") }
+            .orElseThrow { NotFoundException("No users with name $nickname were found") }
     }
 
-    @Throws(NotFoundException::class)
-    override fun login(nickname: String, password: String): Boolean {
+
+    override fun login(nickname: String, password: String): Long {
+
         val user = loadByNickname(nickname)
-        return user.password == password
+
+        val decodedPassword = Encoding.decrypt(
+            key = user.nickname,
+            strToDecrypt = user.password
+        )
+
+        return if (decodedPassword == password) user.id
+                else (-1)
     }
 
 
-    @Throws(NotFoundException::class)
     override fun deleteDate(idUser: Long, idDate: Long) {
 
         val date = dateCityRepository.findById(idDate)
-            .orElseThrow{ NotFoundException("No date selected with id $idDate")}
+            .orElseThrow { NotFoundException("No date selected with id $idDate") }
 
-        if(date.user.id == idUser)
+        if (date.user.id == idUser)
             dateCityRepository.deleteById(idDate)
         else throw NoAuthorizationException("User ID doesn't match")
 
