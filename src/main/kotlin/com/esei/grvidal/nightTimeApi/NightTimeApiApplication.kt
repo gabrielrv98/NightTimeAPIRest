@@ -110,6 +110,67 @@ class NightTimeApiApplication : CommandLineRunner {
 
 
 
+        var bar = Bar(
+            "Night",
+            "NightOwner",
+            "Rua cabeza de manzaneda",
+            city = cityOu,
+            mondaySchedule = null,
+            tuesdaySchedule = "11:00-20:30",
+            wednesdaySchedule = "12:00-22:00",
+            thursdaySchedule = null,
+            fridaySchedule = "11:00-20:30",
+            saturdaySchedule = "14:40-21:20",
+            sundaySchedule = "09:30-21:30"
+        )
+        barRepository.save(bar)
+
+
+        var event = Event( "2 x 1",date = LocalDate.now().plusDays(1), bar = bar)
+        eventRepositories.save(event)
+
+
+        bar = Bar(
+            "Lokal",
+            "Lokal Owner Garcia",
+            "Praza Correxidor",
+            city = cityOu,
+            mondaySchedule = "12:00-22:00",
+            tuesdaySchedule = "11:00-20:30",
+            wednesdaySchedule = null,
+            thursdaySchedule = "14:40-21:20",
+            fridaySchedule = "11:00-20:30",
+            saturdaySchedule = null,
+            sundaySchedule = "09:30-21:30"
+        )
+        barRepository.save(bar)
+
+
+        event = Event( "2 x 1",date = LocalDate.now().plusDays(1), bar = bar)
+        eventRepositories.save(event)
+
+
+        bar = Bar(
+            "Studio 34",
+            "Studio Owner Santiago",
+            "Rua Concordia",
+            city = cityOu,
+            mondaySchedule = "12:00-22:00",
+            tuesdaySchedule = "11:00-20:30",
+            wednesdaySchedule = null,
+            thursdaySchedule = "14:40-21:20",
+            fridaySchedule = "11:00-20:30",
+            saturdaySchedule = null,
+            sundaySchedule = "09:30-21:30"
+        )
+        barRepository.save(bar)
+
+
+        event = Event( "Musica en vivo",date = LocalDate.now().plusDays(3), bar = bar)
+        eventRepositories.save(event)
+
+
+
         val user1 = User(
                 "Gabriel Rguez",
                 "grvidal",

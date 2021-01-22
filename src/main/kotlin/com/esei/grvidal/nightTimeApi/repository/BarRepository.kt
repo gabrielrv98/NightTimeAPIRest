@@ -5,19 +5,23 @@ import com.esei.grvidal.nightTimeApi.projections.BarDetailsProjection
 import com.esei.grvidal.nightTimeApi.projections.BarFullProjection
 import com.esei.grvidal.nightTimeApi.projections.BarProjection
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
+import org.springframework.data.domain.Pageable
 import java.util.*
 
 /**
  * Repository, this will link our Business with the Entities by JPA repository and add the basic functionalities
  */
 @Repository
-interface BarRepository : JpaRepository<Bar, Long> {
+interface BarRepository : JpaRepository<Bar, Long>{
+
     @Deprecated("only testing")
     fun getFullBarById(id: Long): BarFullProjection
 
     //return all the bars that has the city in common
-    fun getBarsByCity_Id(city_id: Long): List<BarProjection>
+    fun findByCity_Id(city_id: Long, pageable: Pageable) : List<BarProjection>
+
 
     fun getBarDetailsById(id: Long): Optional<BarDetailsProjection>
 

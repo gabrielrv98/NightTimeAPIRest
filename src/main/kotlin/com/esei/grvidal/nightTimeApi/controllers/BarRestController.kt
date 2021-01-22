@@ -39,9 +39,10 @@ class BarRestController {
      * TODO ADD PAGEABLE
      */
     @GetMapping("/byCity/{idCity}")
-    fun listByCity(@PathVariable("idCity") cityId: Long): ResponseEntity<List<BarProjection>> {
+    fun listByCity(@PathVariable("idCity") cityId: Long,
+                   @RequestParam(defaultValue = "1") page: Int): ResponseEntity<List<BarProjection>> {
 
-        return ResponseEntity(barService.listByCity(cityId), HttpStatus.OK)
+        return ResponseEntity(barService.listByCity(cityId,page), HttpStatus.OK)
 
     }
 

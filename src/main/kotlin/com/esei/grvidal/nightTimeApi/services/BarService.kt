@@ -11,6 +11,9 @@ import com.esei.grvidal.nightTimeApi.projections.BarProjection
 import com.esei.grvidal.nightTimeApi.serviceInterface.IBarService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.EmptyResultDataAccessException
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import kotlin.jvm.Throws
 
@@ -34,8 +37,11 @@ class BarService : IBarService {
     /**
      * List all the bars in the given city [cityId]
      */
-    override fun listByCity(cityId: Long): List<BarProjection> {
-        return barRepository.getBarsByCity_Id(cityId)
+    override fun listByCity(cityId: Long, page: Int, size: Int): List<BarProjection> {
+        return barRepository.findByCity_Id(
+            city_id = cityId,
+            pageable = PageRequest.of(page, size)
+        )
     }
 
     /**
@@ -44,7 +50,7 @@ class BarService : IBarService {
     @Throws(NotFoundException::class)
     override fun getDetails(idBar: Long): BarDetailsProjection {
         return barRepository.getBarDetailsById(idBar)
-                .orElseThrow { NotFoundException("No bar with id $idBar have been found") }
+            .orElseThrow { NotFoundException("No bar with id $idBar have been found") }
 
 
     }
@@ -55,7 +61,7 @@ class BarService : IBarService {
     @Throws(NotFoundException::class)
     override fun load(idBar: Long): Bar {
         return barRepository.findById(idBar)
-                .orElseThrow { NotFoundException("No bar with id $idBar have been found") }
+            .orElseThrow { NotFoundException("No bar with id $idBar have been found") }
     }
 
     /**
@@ -76,9 +82,9 @@ class BarService : IBarService {
 
         val cityEdit = barEdit.cityId?.let {
             cityRepository.findById(it)
-                    .orElse(barOriginal.city)
+                .orElse(barOriginal.city)
         }
-                ?: barOriginal.city
+            ?: barOriginal.city
 
 
         //updating the bar
