@@ -18,6 +18,7 @@ import kotlin.jvm.Throws
 
 /**
  * This is the User Controller
+ * todo FALTA PAGINACION, AÑADIR SEGURIDAD
  */
 @RestController
 @RequestMapping(Constants.URL_BASE_USER)

@@ -3,7 +3,6 @@ package com.esei.grvidal.nightTimeApi.services
 import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
 import com.esei.grvidal.nightTimeApi.dto.FriendshipInsertDTO
 import com.esei.grvidal.nightTimeApi.dto.FriendshipUpdateDTO
-import com.esei.grvidal.nightTimeApi.dto.toFriendRequest
 import com.esei.grvidal.nightTimeApi.repository.FriendshipRepository
 import com.esei.grvidal.nightTimeApi.repository.MessageRepository
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
@@ -72,15 +71,19 @@ class FriendshipService : IFriendshipService {
      */
     override fun save(friendship: FriendshipInsertDTO): Long {
 
+        //Check if the userAnswer exists
+        val userAnswer = userRepository.findByNickname(friendship.userAnswer)
+            .orElseThrow { NotFoundException("No user with nickname ${friendship.userAnswer} were found") }
+
         //Check if the relation already exists
         var op = friendshipRepository.findFriendshipByUserAsk_IdAndUserAnswer_Id(
-            friendship.idUserAsk, friendship.idUserAnswer
+            friendship.idUserAsk, userAnswer.id
         )
         if (!op.isPresent) {
 
             //check if the opposite relation already exists
             op = friendshipRepository.findFriendshipByUserAsk_IdAndUserAnswer_Id(
-                friendship.idUserAnswer, friendship.idUserAsk
+                userAnswer.id, friendship.idUserAsk
             )
             if (!op.isPresent) {
 
@@ -88,13 +91,8 @@ class FriendshipService : IFriendshipService {
                 val userAsk = userRepository.findById(friendship.idUserAsk)
                     .orElseThrow { NotFoundException("User who asks with id ${friendship.idUserAsk} not found") }
 
-                //Check if the userAnswer exists
-                val userAnswer = userRepository.findById(friendship.idUserAnswer)
-                    .orElseThrow { NotFoundException("User who answers with id ${friendship.idUserAnswer} not found") }
-
-
                 return friendshipRepository.save(
-                    friendship.toFriendRequest(userAsk, userAnswer)
+                    Friendship(userAsk, userAnswer)
                 ).id
             }
         }
