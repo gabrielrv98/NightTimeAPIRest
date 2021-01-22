@@ -5,12 +5,12 @@ import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
 import com.esei.grvidal.nightTimeApi.dto.toUser
 import com.esei.grvidal.nightTimeApi.encryptation.Encoding
-import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.exception.NoAuthorizationException
 import com.esei.grvidal.nightTimeApi.repository.UserRepository
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.User
+import com.esei.grvidal.nightTimeApi.model.nicknameLenght
 import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import com.esei.grvidal.nightTimeApi.repository.DateCityRepository
 import com.esei.grvidal.nightTimeApi.serviceInterface.IUserService
@@ -78,6 +78,10 @@ class UserService : IUserService {
      */
     override fun save(user: UserDTOInsert): Long {
 
+        //checking user constraints
+        if (user.nickname.length > nicknameLenght)
+            throw ServiceException("User's nickname is too long")
+
         //Encrypting password
         user.password = Encoding.encrypt(
             strToEncrypt = user.password,
@@ -87,9 +91,13 @@ class UserService : IUserService {
         try{
             return userRepository.save(user.toUser()).id
 
-        }catch (e: DataIntegrityViolationException){
-            throw AlreadyExistsException("1 User with nickname ${user.nickname} already exists")
+        }catch (e: DataIntegrityViolationException){//todo improve this
+            throw ServiceException("User with nickname ${user.nickname} already exists \n" +
+                    e.message.toString())
         }
+/*
+
+        */
 
 
     }

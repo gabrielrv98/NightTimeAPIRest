@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import java.time.LocalDate
 import javax.persistence.*
 
+public const val nicknameLenght = 30
+
 @Entity
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator::class,
@@ -12,7 +14,7 @@ import javax.persistence.*
 @Table(name="User")
 class User(
         var name: String,
-        @Column(unique = true, length = 20)
+        @Column(unique = true, length = 30)
         var nickname: String,
         var password: String,
         var state: String? = null,
