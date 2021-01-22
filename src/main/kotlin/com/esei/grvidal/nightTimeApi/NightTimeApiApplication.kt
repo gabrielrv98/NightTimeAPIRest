@@ -1,7 +1,9 @@
 package com.esei.grvidal.nightTimeApi
 
+import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
 import com.esei.grvidal.nightTimeApi.repository.*
 import com.esei.grvidal.nightTimeApi.model.*
+import com.esei.grvidal.nightTimeApi.services.UserService
 import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -32,6 +34,9 @@ class NightTimeApiApplication : CommandLineRunner {
 
     @Autowired
     lateinit var userRepositories: UserRepository
+
+    @Autowired
+    lateinit var userService: UserService
 
     @Autowired
     lateinit var friendshipRepositories: FriendshipRepository
@@ -171,7 +176,7 @@ class NightTimeApiApplication : CommandLineRunner {
 
 
 
-        val user1 = User(
+        var user = UserDTOInsert(
                 "Gabriel Rguez",
                 "grvidal",
                 "passwordUser1",
@@ -181,10 +186,11 @@ class NightTimeApiApplication : CommandLineRunner {
 
         )
 
-        userRepositories.save(user1)
+        userService.save(user)
+        val user1 = userRepositories.findByNickname(user.nickname).get()
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user1))
 
-        val user2 = User(
+        user = UserDTOInsert(
                 "Nuria Sotelo",
                 "pinkxnut",
                 "passwordUser2",
@@ -194,11 +200,13 @@ class NightTimeApiApplication : CommandLineRunner {
 
 
         )
-        userRepositories.save(user2)
+
+        userService.save(user)
+        val user2 = userRepositories.findByNickname(user.nickname).get()
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user2))
 
 
-        val user3 = User(
+        user = UserDTOInsert(
                 "Irene Monterey",
                 "monteRey",
                 "passwordUser3",
@@ -206,11 +214,13 @@ class NightTimeApiApplication : CommandLineRunner {
                 email = "ireneReina@hotmail.com",
                 birthdate = LocalDate.of(1998, 4, 12)
         )
-        userRepositories.save(user3)
+
+        userService.save(user)
+        val user3 = userRepositories.findByNickname(user.nickname).get()
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user3))
 
 
-        val user4 = User(
+        user = UserDTOInsert(
                 "Jose Negro",
                 "joseju",
                 "passwordUser4",
@@ -218,7 +228,9 @@ class NightTimeApiApplication : CommandLineRunner {
                 "joseNegro@gmail.com",
                 birthdate = LocalDate.of(1990, 4, 25)
         )
-        userRepositories.save(user4)
+
+        userService.save(user)
+        val user4 = userRepositories.findByNickname(user.nickname).get()
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityVigo, user = user4))
 
         val friend1_2 =  Friendship(user1,user2)
