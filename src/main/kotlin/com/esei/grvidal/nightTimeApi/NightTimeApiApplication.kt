@@ -179,7 +179,7 @@ class NightTimeApiApplication : CommandLineRunner {
         var user = UserDTOInsert(
                 "Gabriel Rguez",
                 "grvidal",
-                "passwordUser1",
+                "1234",
                 "Hey there i'm using NightTime",
                 email = "grvidal@esei.uvigo.es",
                 birthdate = LocalDate.of(1998, 3, 14),

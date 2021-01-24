@@ -100,10 +100,11 @@ class FriendshipService : IFriendshipService {
     }
 
     override fun update(friendshipParam: FriendshipUpdateDTO) {
-        val friendship = friendshipRepository.findById(friendshipParam.id)
+        val friendshipDB = friendshipRepository.findById(friendshipParam.id)
             .orElseThrow { NotFoundException("No friendship with id ${friendshipParam.id} were found") }
-        friendship.answer = friendshipParam.answer
-        friendshipRepository.save(friendship)
+
+        friendshipDB.answer = friendshipParam.answer
+        friendshipRepository.save(friendshipDB)
     }
 
     /**

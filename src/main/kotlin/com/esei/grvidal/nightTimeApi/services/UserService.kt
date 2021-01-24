@@ -92,14 +92,8 @@ class UserService : IUserService {
             return userRepository.save(user.toUser()).id
 
         }catch (e: DataIntegrityViolationException){//todo improve this
-            throw ServiceException("User with nickname ${user.nickname} already exists \n" +
-                    e.message.toString())
+            throw ServiceException("User with nickname ${user.nickname} already exists" )
         }
-/*
-
-        */
-
-
     }
 
     override fun update(idUser: Long, user: UserDTOEdit) {
@@ -109,13 +103,14 @@ class UserService : IUserService {
 
 
     /**
-     * This will remove a bars through its id, if not, will throw an Exception, or if it cant find it, it will throw a NotFoundException
+     * This will remove an user through its id
+     * if [idUser] doesn't exist NotFoundException will be thrown
      */
 
     override fun remove(idUser: Long) {
 
-        val user = loadProjection(idUser)
-        userRepository.deleteById(user.getId())
+        if (!exists(idUser)) throw NotFoundException("Couldn't find the user with id $idUser")
+        userRepository.deleteById(idUser)
 
     }
 

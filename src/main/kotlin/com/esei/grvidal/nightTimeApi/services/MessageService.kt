@@ -1,12 +1,12 @@
 package com.esei.grvidal.nightTimeApi.services
 
 import com.esei.grvidal.nightTimeApi.dto.MessageForm
+import com.esei.grvidal.nightTimeApi.exception.NoAuthorizationException
 import com.esei.grvidal.nightTimeApi.repository.FriendshipRepository
 import com.esei.grvidal.nightTimeApi.repository.MessageRepository
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Message
 import com.esei.grvidal.nightTimeApi.projections.ChatView
-import com.esei.grvidal.nightTimeApi.repository.UserRepository
 import com.esei.grvidal.nightTimeApi.serviceInterface.IMessageService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -57,6 +57,9 @@ class MessageService : IMessageService {
         //Get the friendship
         val friendship = friendshipRepository.findById(idFriendship)
             .orElseThrow { NotFoundException("Relationship with id $idFriendship.friendshipId not found") }
+
+        if(friendship.userAnswer.id == idUser )
+            throw NoAuthorizationException( "$idUser is not in the friendship and cannot see the messages")
 
         return ChatView(friendship, idUser)
     }
