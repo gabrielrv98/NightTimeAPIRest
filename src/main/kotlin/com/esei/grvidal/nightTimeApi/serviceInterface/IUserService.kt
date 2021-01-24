@@ -4,6 +4,7 @@ import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
 import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
+import com.esei.grvidal.nightTimeApi.exception.NoAuthorizationException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.projections.UserProjection
@@ -37,7 +38,7 @@ interface IUserService {
     @Throws(NotFoundException::class, ServiceException::class)
     fun login(nickname: String, password: String): Long
 
-    @Throws(NotFoundException::class)
+    @Throws(NotFoundException::class, NoAuthorizationException::class)
     fun deleteDate(idUser: Long, idDate: Long)
 
     fun exists(idUser: Long): Boolean
