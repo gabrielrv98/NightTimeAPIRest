@@ -204,6 +204,8 @@ class NightTimeApiApplication : CommandLineRunner {
         userService.save(user)
         val user2 = userRepositories.findByNickname(user.nickname).get()
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user2))
+        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(1), nextCity = cityOu, user = user2))
+        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(3), nextCity = cityOu, user = user2))
 
 
         user = UserDTOInsert(
@@ -218,6 +220,8 @@ class NightTimeApiApplication : CommandLineRunner {
         userService.save(user)
         val user3 = userRepositories.findByNickname(user.nickname).get()
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user3))
+        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(2), nextCity = cityOu, user = user3))
+        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(3), nextCity = cityOu, user = user3))
 
 
         user = UserDTOInsert(
@@ -231,7 +235,9 @@ class NightTimeApiApplication : CommandLineRunner {
 
         userService.save(user)
         val user4 = userRepositories.findByNickname(user.nickname).get()
-        dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityVigo, user = user4))
+        dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user4))
+        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(1), nextCity = cityVigo, user = user4))
+        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(2), nextCity = cityVigo, user = user4))
 
         val friend1_2 =  Friendship(user1,user2)
         friend1_2.answer = AnswerOptions.YES
@@ -239,7 +245,9 @@ class NightTimeApiApplication : CommandLineRunner {
 
         friendshipRepositories.save(Friendship(user3,user2))
 
-        friendshipRepositories.save(Friendship(user4,user1))
+        val friend4_1 =  Friendship(user4,user1)
+        friend4_1.answer = AnswerOptions.YES
+        friendshipRepositories.save(friend4_1)
 
         var friendship = friendshipRepositories.findFriendsByUserAsk_IdOrUserAnswer_Id(user1.id,user1.id)[0]
         var msg = Message("Hola nuria", LocalDate.now(), LocalTime.now(), friendship, friendship.userAsk)

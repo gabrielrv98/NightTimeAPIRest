@@ -4,11 +4,9 @@ package com.esei.grvidal.nightTimeApi.projections
 /**
  * Interface to show a list of chats
  */
-class UserFriendView(
-    var friendshipId: Long,
+class UserSnapProjection(
     var userId: Long,
-    var userNickname: String,
-    var state: String
+    var userNickname: String
 ) : java.io.Serializable {
 
 
@@ -20,7 +18,6 @@ class UserFriendView(
         friendship: FriendshipProjection,
         userId: Long
     ) : this(
-        friendshipId = friendship.getId(),
         user = if (friendship.getUserAsk().getId() == userId) friendship.getUserAnswer()
         else friendship.getUserAsk()
     )
@@ -30,13 +27,10 @@ class UserFriendView(
      *
      */
     private constructor(
-        friendshipId: Long,
         user: UserProjection
     ) : this(
-        friendshipId = friendshipId,
         userId = user.getId(),
-        userNickname = user.getNickname(),
-        state = user.getState()
+        userNickname = user.getNickname()
     )
 
 

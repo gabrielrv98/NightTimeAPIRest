@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDate
 import kotlin.collections.HashMap
 import kotlin.jvm.Throws
 
@@ -491,8 +492,11 @@ class UserRestController {
                 //Only the userAnswer can update the request
                 if (idUser != friendRequestDB.getUserAnswer().getId())
                     return ResponseEntity("Error: Only userAnswer can update the request", HttpStatus.FORBIDDEN)
-                else {   //Answer yes
+
+
+                else {
                     return when (friendRequest.answer) {
+                        //Answer yes
                         AnswerOptions.YES -> {
 
                             friendshipService.update(friendRequest)
@@ -509,6 +513,7 @@ class UserRestController {
                             ResponseEntity(responseHeader, HttpStatus.OK)
 
                         }
+                        //any other answer
                         else -> {
                             ResponseEntity(HttpStatus.NO_CONTENT)
                         }
@@ -688,34 +693,97 @@ class UserRestController {
      *
      * @exception NotLoggedException if the [idUser] is not in the hashMap [tokenSimple]
      */
-    @GetMapping("/{idUser}/date")
+    @GetMapping("/{idUser}/{day}-{month}-{year}/{idCity}")
     fun getPeopleAndFriends(
         @PathVariable("idUser") idUser: Long,
         @RequestHeader("auth") auth: String,
-        @RequestBody dateCity: DateCityDTO,
+        @PathVariable("day") day: Int,
+        @PathVariable("month") month: Int,
+        @PathVariable("year") year: Int,
+        @PathVariable("idCity") cityId: Long
+        //@RequestBody dateCity: DateCityDTO
     ): ResponseEntity<Any> {
         return try {
 
-            if(!securityCheck(idUser,auth))//if security fails
+            val st = StringBuilder()
+            val dateString = st.append(day)
+                .append("-")
+                .append(month)
+                .append("-")
+                .append(year)
+
+            val datePatter = Regex("\\d{1,2}-\\d{1,2}-\\d{4}")
+
+            if(!dateString.matches(datePatter))
+                ResponseEntity("Date error, plase use date as  day-month-year",HttpStatus.UNAUTHORIZED)
+
+            else{
+                val date = LocalDate.of(year,month,day)
+
+                if(!securityCheck(idUser,auth))//if security fails
                     ResponseEntity("Security error, credentials don't match",HttpStatus.UNAUTHORIZED)
 
-            val responseHeader = HttpHeaders()
+                else {
+                    val responseHeader = HttpHeaders()
+                    val dateCity = DateCityDTO(date,cityId)
 
-            if (userService.exists(idUser)) {
+                    responseHeader.set("total", userService.getTotal(dateCity).toString())
+                    responseHeader.set("friends", friendshipService.getCountFriendsOnDate(idUser, dateCity).toString())
 
-                responseHeader.set("total", userService.getTotal(dateCity).toString())
-                responseHeader.set("friends", friendshipService.getFriendsOnDate(idUser, dateCity).toString())
-
-
-
-                ResponseEntity(null, responseHeader, HttpStatus.OK)
-
-            } else ResponseEntity("No user with id $idUser were found", HttpStatus.NOT_FOUND)
+                    ResponseEntity(null, responseHeader, HttpStatus.OK)
+                }
+            }
 
 
         } catch (e: NotLoggedException) {
             ResponseEntity(e.message, HttpStatus.FORBIDDEN)
         }
+    }
+
+    @GetMapping("/{idUser}/{day}-{month}-{year}/{idCity}/users")
+    fun getFriendsOnDate(
+        @PathVariable("idUser") idUser: Long,
+        @RequestHeader("auth") auth: String,
+        @PathVariable("day") day: Int,
+        @PathVariable("month") month: Int,
+        @PathVariable("year") year: Int,
+        @PathVariable("idCity") cityId: Long
+    ): ResponseEntity<Any>{
+
+        return try {
+
+            val st = StringBuilder()
+            val dateString = st.append(day)
+                .append("-")
+                .append(month)
+                .append("-")
+                .append(year)
+
+            val datePatter = Regex("\\d{1,2}-\\d{1,2}-\\d{4}")
+
+            if(!dateString.matches(datePatter))
+                ResponseEntity("Date error, plase use date as  day-month-year",HttpStatus.UNAUTHORIZED)
+
+            else{
+                if (!securityCheck(idUser, auth))//if security fails
+                    ResponseEntity("Security error, credentials don't match", HttpStatus.UNAUTHORIZED)
+
+                else{
+                    val dateCity = DateCityDTO(LocalDate.of(year,month,day),cityId)
+
+                    val users = friendshipService.getFriendsOnDate(idUser, dateCity)
+
+                    ResponseEntity(users, HttpStatus.FORBIDDEN)
+                }
+            }
+
+
+        } catch (e: NotLoggedException) {
+            ResponseEntity(e.message, HttpStatus.FORBIDDEN)
+        }
+
+
+
     }
 
 

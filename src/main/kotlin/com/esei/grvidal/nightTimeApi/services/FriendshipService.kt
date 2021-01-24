@@ -13,6 +13,7 @@ import com.esei.grvidal.nightTimeApi.model.Message
 import com.esei.grvidal.nightTimeApi.projections.ChatView
 import com.esei.grvidal.nightTimeApi.projections.FriendshipProjection
 import com.esei.grvidal.nightTimeApi.projections.UserFriendView
+import com.esei.grvidal.nightTimeApi.projections.UserSnapProjection
 import com.esei.grvidal.nightTimeApi.repository.UserRepository
 import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendshipService
 import org.springframework.beans.factory.annotation.Autowired
@@ -131,17 +132,27 @@ class FriendshipService : IFriendshipService {
         }
     }
 
-
-    override fun getFriendsOnDate(idUser: Long, dateCityDTO: DateCityDTO): Int {
-
-        var numberFriends = friendshipRepository.getFriendsFromUserAskOnDate(idUser,dateCityDTO.nextCityId,dateCityDTO.nextDate)
-        numberFriends += friendshipRepository.getFriendsFromAnswerOnDate(idUser,dateCityDTO.nextCityId,dateCityDTO.nextDate)
-        return numberFriends
-    }
-
     override fun getFriendsRequest(idUser: Long): List<UserFriendView> {
         return friendshipRepository.getFriendshipsRequest(idUser).map{ UserFriendView(it,idUser) }
     }
+
+    override fun getCountFriendsOnDate(idUser: Long, dateCityDTO: DateCityDTO): Int {
+
+        var numberFriends = friendshipRepository.getCountFriendsFromUserAskOnDate(idUser,dateCityDTO.nextCityId,dateCityDTO.nextDate)
+        numberFriends += friendshipRepository.getCountFriendsFromAnswerOnDate(idUser,dateCityDTO.nextCityId,dateCityDTO.nextDate)
+        return numberFriends
+    }
+
+    override fun getFriendsOnDate(idUser: Long, dateCityDTO: DateCityDTO): List<UserSnapProjection> {
+
+        val friendList =
+            friendshipRepository.getFriendsFromUserAskOnDate(idUser,dateCityDTO.nextCityId,dateCityDTO.nextDate).toMutableList()
+        friendList += friendshipRepository.getFriendsFromUserAnswerOnDate(idUser,dateCityDTO.nextCityId,dateCityDTO.nextDate)
+
+        return friendList.map{ UserSnapProjection(it,idUser) }
+
+    }
+
 }
 
 
