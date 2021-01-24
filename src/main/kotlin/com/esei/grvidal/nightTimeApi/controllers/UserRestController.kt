@@ -1,6 +1,5 @@
 package com.esei.grvidal.nightTimeApi.controllers
 
-import com.esei.grvidal.nightTimeApi.NightTimeApiApplication
 import com.esei.grvidal.nightTimeApi.dto.*
 import com.esei.grvidal.nightTimeApi.exception.*
 import com.esei.grvidal.nightTimeApi.model.*
@@ -9,7 +8,6 @@ import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import com.esei.grvidal.nightTimeApi.serviceInterface.*
 import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
 import com.esei.grvidal.nightTimeApi.utlis.Constants
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -473,11 +471,16 @@ class UserRestController {
     ): ResponseEntity<Any> {
         val responseHeader = HttpHeaders()
 
-        try {
-
+        try{
             if (!securityCheck(idUser, auth))//if security fails
                 return ResponseEntity("Security error, credentials don't match", HttpStatus.UNAUTHORIZED)
-            else {
+
+        }catch (e: NotLoggedException) {
+            return ResponseEntity(e.message.toString(), HttpStatus.FORBIDDEN)
+        }
+
+
+        try {
                 val friendRequestDB = friendshipService.load(friendRequest.id)
 
                 //only non accepted requests can be updated
@@ -513,13 +516,11 @@ class UserRestController {
 
                 }
 
-            }
+
 
         } catch (e: NotFoundException) {
-            return ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+            return ResponseEntity(e.message.toString(), HttpStatus.NOT_FOUND)
 
-        } catch (e: NotLoggedException) {
-            return ResponseEntity(e.message, HttpStatus.FORBIDDEN)
         }
 
     }
