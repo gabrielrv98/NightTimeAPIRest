@@ -91,7 +91,7 @@ class UserService : IUserService {
         try{
             return userRepository.save(user.toUser()).id
 
-        }catch (e: DataIntegrityViolationException){//todo improve this
+        }catch (e: DataIntegrityViolationException){
             throw ServiceException("User with nickname ${user.nickname} already exists" )
         }
     }

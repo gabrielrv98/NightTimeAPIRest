@@ -12,7 +12,7 @@ import java.time.LocalDate
  *
  */
 
-@Repository//todo investigar esto
+@Repository
 interface EventRepository : JpaRepository<Event, Long> {
     fun findAllBy(): List<EventProjection>
 

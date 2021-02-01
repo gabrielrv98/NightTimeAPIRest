@@ -36,7 +36,6 @@ class BarRestController {
      *
      * @param cityId Id from the city to show
      * @return all Bars in that city with id [cityId]
-     * TODO ADD PAGEABLE
      */
     @GetMapping("/byCity/{idCity}")
     fun listByCity(@PathVariable("idCity") cityId: Long,
