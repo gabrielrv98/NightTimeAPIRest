@@ -21,7 +21,7 @@ class CityService : ICityService {
      *Dependency injection with autowired
      */
     @Autowired
-    val cityRepository: CityRepository? = null
+    lateinit var cityRepository: CityRepository
 
 
     /**
@@ -29,12 +29,8 @@ class CityService : ICityService {
      */
     @Throws(ServiceException::class)
     override fun list(): List<City> {
+        return cityRepository.findAll()
 
-        try {
-            return cityRepository!!.findAll()
-        } catch (e: Exception) {
-            throw ServiceException(e.message)
-        }
     }
 
 
@@ -45,7 +41,7 @@ class CityService : ICityService {
     @Throws(NotFoundException::class)
     override fun load(idCity: Long): City {
 
-        return cityRepository!!.findById(idCity)
+        return cityRepository.findById(idCity)
                 .orElseThrow { NotFoundException("No se encontro la ciudad con el id $idCity") }
     }
 
@@ -54,42 +50,20 @@ class CityService : ICityService {
      */
     @Throws(ServiceException::class)
     override fun save(City: City): City {
-
-        try {
-            return cityRepository!!.save(City)
-        } catch (e: Exception) {
-            throw ServiceException(e.message)
-        }
+        return cityRepository.save(City)
     }
 
     /**
      * This will remove a bars through its id, if not, will throw an Exception, or if it cant find it, it will throw a NotFoundException
      */
-    @Throws(ServiceException::class, NotFoundException::class)
+    @Throws(NotFoundException::class)
     override fun remove(idCity: Long) {
-        val op: Optional<City>
-
-        try {
-            op = cityRepository!!.findById(idCity)
-        } catch (e: Exception) {
-            throw ServiceException(e.message)
-        }
-
-        if (!op.isPresent) {
-            throw NotFoundException("No se encontro al bar con el id $idCity")
-        } else {
-
-            try {
-                cityRepository!!.deleteById(idCity)
-            } catch (e: Exception) {
-                throw ServiceException(e.message)
-            }
-        }
-
+        val bar = load(idCity)
+        cityRepository.delete(bar)
     }
 
     override fun exists(idCity: Long): Boolean {
-        return cityRepository!!.findById(idCity).isPresent
+        return cityRepository.findById(idCity).isPresent
     }
 }
 
