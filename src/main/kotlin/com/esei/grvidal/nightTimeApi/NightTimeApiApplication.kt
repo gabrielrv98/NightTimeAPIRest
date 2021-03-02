@@ -55,6 +55,24 @@ class NightTimeApiApplication : CommandLineRunner {
         cityRepositories.save(cityOu)
         cityRepositories.save(cityVigo)
 
+        var genericCity = City("Pontevedra","Spain")
+        cityRepositories.save(genericCity)
+
+        genericCity = City("Coruña","Spain")
+        cityRepositories.save(genericCity)
+
+        genericCity = City("Allariz","Spain")
+        cityRepositories.save(genericCity)
+
+        genericCity = City("Lugo","Spain")
+        cityRepositories.save(genericCity)
+
+        genericCity = City("Rivadavia","Spain")
+        cityRepositories.save(genericCity)
+
+
+
+
         val bar1 = Bar(
                 "Luxus",
                 "Algun pijo",
@@ -131,8 +149,12 @@ class NightTimeApiApplication : CommandLineRunner {
         barRepository.save(bar)
 
 
-        var event = Event( "2 x 1",date = LocalDate.now().plusDays(1), bar = bar)
+        var event = Event( "Oferta 2 x 1",date = LocalDate.now(), bar = bar)
         eventRepositories.save(event)
+
+        Event( "Musica de los 90",date = LocalDate.now().plusDays(1), bar = bar)
+        eventRepositories.save(event)
+
 
 
         bar = Bar(
@@ -151,9 +173,14 @@ class NightTimeApiApplication : CommandLineRunner {
         barRepository.save(bar)
 
 
-        event = Event( "2 x 1",date = LocalDate.now().plusDays(1), bar = bar)
+        event = Event( "Oferta 2 x 1",date = LocalDate.now().plusDays(1), bar = bar)
         eventRepositories.save(event)
 
+        Event( "Fiesta de la espuma",date = LocalDate.now().plusDays(2), bar = bar)
+        eventRepositories.save(event)
+
+        Event( "Hoy cerrado por fiesta infantil, nos vemos gente",date = LocalDate.now().plusDays(2), bar = bar)
+        eventRepositories.save(event)
 
         bar = Bar(
             "Studio 34",
@@ -171,7 +198,11 @@ class NightTimeApiApplication : CommandLineRunner {
         barRepository.save(bar)
 
 
-        event = Event( "Musica en vivo",date = LocalDate.now().plusDays(3), bar = bar)
+        event = Event( "Musica en vivo",date = LocalDate.now().plusDays(1), bar = bar)
+        eventRepositories.save(event)
+        event = Event( "Hoy cerrado por defuncion, esperemos que todos se pongan mejor, gracias por su atencion",date = LocalDate.now().plusDays(3), bar = bar)
+        eventRepositories.save(event)
+        event = Event( "Copas a 3 euros",date = LocalDate.now().plusDays(3), bar = bar)
         eventRepositories.save(event)
 
 
@@ -189,6 +220,8 @@ class NightTimeApiApplication : CommandLineRunner {
         userService.save(user)
         val user1 = userRepositories.findByNickname(user.nickname).get()
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user1))
+        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(1), nextCity = cityOu, user = user1))
+        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusWeeks(1).plusDays(3), nextCity = cityOu, user = user1))
 
         user = UserDTOInsert(
                 "Nuria Sotelo",

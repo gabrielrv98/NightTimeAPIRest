@@ -21,7 +21,7 @@ interface IEventService {
     fun listEventByBar(idBar: Long): List<EventProjection>
 
     //List all the events of an event
-    fun listEventByDay(date: LocalDate): List<EventProjection>
+    fun listEventByDayAndCity(date: LocalDate, idCity:Long): List<EventProjection>
 
     //Save a new event
     fun save(event: Event): Long

@@ -7,3 +7,7 @@ interface DateCityProjection {
     fun getNextDate(): LocalDate
     fun getNextCity(): CityProjection
 }
+
+interface DateCityReducedProjection {
+    fun getNextDate(): LocalDate
+}

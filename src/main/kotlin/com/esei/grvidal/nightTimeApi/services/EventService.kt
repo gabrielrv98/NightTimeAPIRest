@@ -38,8 +38,8 @@ class EventService : IEventService {
         return eventRepository.findAllByBar_Id(idBar)
     }
 
-    override fun listEventByDay(date: LocalDate): List<EventProjection> {
-        return eventRepository.findAllByDate(date)
+    override fun listEventByDayAndCity(date: LocalDate, idCity: Long): List<EventProjection> {
+        return eventRepository.findAllByDateAndBar_City_Id(date,idCity)
     }
 
 

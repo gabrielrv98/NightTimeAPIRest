@@ -27,16 +27,6 @@ class EventRestController {
     @Autowired
     lateinit var barService: IBarService
 
-
-    /**
-     * Listen to a Get with the [Constants.URL_BASE_EVENT] and an Id as a parameter to show one Event
-     */
-    @GetMapping("/byDay")
-    fun listByDay(@RequestBody date: LocalDate): ResponseEntity<Any> {
-
-        return ResponseEntity(eventService.listEventByDay(date), HttpStatus.OK)
-    }
-
     /**
      * Listen to a Post with the [Constants.URL_BASE_EVENT] and a requestBody with a Event to create a Event
      */

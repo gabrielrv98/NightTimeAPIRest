@@ -11,6 +11,7 @@ import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.User
 import com.esei.grvidal.nightTimeApi.model.nicknameLenght
+import com.esei.grvidal.nightTimeApi.projections.DateCityReducedProjection
 import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import com.esei.grvidal.nightTimeApi.repository.DateCityRepository
 import com.esei.grvidal.nightTimeApi.serviceInterface.IUserService
@@ -61,7 +62,20 @@ class UserService : IUserService {
     }
 
     /**
-     * This will show one user, if not, will throw a BusinessException or
+     * Gets a city id and a date [dateCityDTO] and returns the list of the dates selected by
+     * the user in that city after the date
+     *
+     * @param idUser Id of the user in the database
+     * @param dateCityDTO date and city id
+     *
+     */
+    override fun loadUserDatesList(idUser: Long, dateCityDTO: DateCityDTO): List<DateCityReducedProjection> {
+
+        return dateCityRepository.findAllByUser_IdAndNextCity_IdAndNextDateAfter(idUser,dateCityDTO.nextCityId,dateCityDTO.nextDate)
+    }
+
+    /**
+     * Try to load an user by its ID, if there is no user with that id it will throw a BusinessException or
      * if the object cant be found, it will throw a NotFoundException
      */
     @Throws(NotFoundException::class)
@@ -135,15 +149,15 @@ class UserService : IUserService {
     }
 
 
-    override fun deleteDate(idUser: Long, idDate: Long) {
+    override fun deleteDate(idUser: Long, dateCity: DateCityDTO): Long {
 
-        val date = dateCityRepository.findById(idDate)
-            .orElseThrow { NotFoundException("No date selected with id $idDate") }
+        val date = dateCityRepository.findByUser_IdAndNextCity_IdAndNextDate(idUser,dateCity.nextCityId,dateCity.nextDate)
+            .orElseThrow { NotFoundException("No date selected with user id $idUser, cityId ${dateCity.nextCityId} and date ${dateCity.nextDate}") }
 
-        if (date.user.id == idUser)
-            dateCityRepository.deleteById(idDate)
-        else throw NoAuthorizationException("User ID doesn't match")
+        val id = date.getId()
+        dateCityRepository.deleteById(id)
 
+        return id
     }
 
     override fun exists(idUser: Long): Boolean {

@@ -36,6 +36,6 @@ interface IBarService {
     fun update(idBar: Long, barEdit: BarDTOEdit)
 
     //Removes a bar
-    @Throws(ServiceException::class, NotFoundException::class)
+    @Throws( NotFoundException::class)
     fun remove(idBar: Long)
 }

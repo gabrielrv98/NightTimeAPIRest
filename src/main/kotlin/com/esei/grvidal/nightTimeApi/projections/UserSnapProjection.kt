@@ -6,7 +6,8 @@ package com.esei.grvidal.nightTimeApi.projections
  */
 class UserSnapProjection(
     var userId: Long,
-    var userNickname: String
+    var username: String,
+    val realname: String
 ) : java.io.Serializable {
 
 
@@ -30,7 +31,8 @@ class UserSnapProjection(
         user: UserProjection
     ) : this(
         userId = user.getId(),
-        userNickname = user.getNickname()
+        username = user.getNickname(),
+        realname = user.getName()
     )
 
 
