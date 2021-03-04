@@ -8,6 +8,7 @@ interface BarProjection{
     fun getName() : String
     fun getOwner() : String
     fun getAddress() : String
+    fun getDescription() : String?
 
     fun getMondaySchedule() : String?
     fun getTuesdaySchedule() : String?
@@ -16,10 +17,5 @@ interface BarProjection{
     fun getFridaySchedule() : String?
     fun getSaturdaySchedule() : String?
     fun getSundaySchedule() : String?
-
-    fun getCity(): CityProjection
-    //@Value("#{(target.getEvents().get(0))}")
-    //fun getEvents() : Event?
-
 }
 

@@ -80,11 +80,11 @@ class BarService : IBarService {
         //getting the old Bar
         val barOriginal = load(idBar)
 
-        val cityEdit = barEdit.cityId?.let {
-            cityRepository.findById(it)
-                .orElse(barOriginal.city)
+        val cityEdit = barEdit.cityId?.let {newCity -> // if city has been updated
+            cityRepository.findById(newCity)//get from DB
+                .orElse(barOriginal.city)// If city Id doesn't exit old city is used instead
         }
-            ?: barOriginal.city
+            ?: barOriginal.city // if city hasn't been update
 
 
         //updating the bar
@@ -93,6 +93,7 @@ class BarService : IBarService {
             name = barEdit.name ?: this.name
             owner = barEdit.owner ?: this.owner
             address = barEdit.address ?: this.address
+            description = barEdit.description ?: this.description
             city = cityEdit
 
             // if the parameter [mondaySchedule] is null, it won't update
@@ -108,43 +109,43 @@ class BarService : IBarService {
             this.tuesdaySchedule = if (barEdit.tuesdaySchedule == null)
                 this.tuesdaySchedule
             else {
-                if (barEdit.tuesdaySchedule != "null") barEdit.tuesdaySchedule
-                else null
+                if (barEdit.tuesdaySchedule == "null") null
+                else barEdit.tuesdaySchedule
             }
 
             this.wednesdaySchedule = if (barEdit.wednesdaySchedule == null)
                 this.wednesdaySchedule
             else {
-                if (barEdit.wednesdaySchedule != "null") barEdit.wednesdaySchedule
-                else null
+                if (barEdit.wednesdaySchedule == "null") null
+                else barEdit.wednesdaySchedule
             }
 
             this.thursdaySchedule = if (barEdit.thursdaySchedule == null)
                 this.thursdaySchedule
             else {
-                if (barEdit.thursdaySchedule != "null") barEdit.thursdaySchedule
-                else null
+                if (barEdit.thursdaySchedule == "null") null
+                else barEdit.thursdaySchedule
             }
 
             this.fridaySchedule = if (barEdit.fridaySchedule == null)
                 this.fridaySchedule
             else {
-                if (barEdit.fridaySchedule != "null") barEdit.fridaySchedule
-                else null
+                if (barEdit.fridaySchedule == "null") null
+                else  barEdit.fridaySchedule
             }
 
             this.saturdaySchedule = if (barEdit.saturdaySchedule == null)
                 this.saturdaySchedule
             else {
-                if (barEdit.saturdaySchedule != "null") barEdit.saturdaySchedule
-                else null
+                if (barEdit.saturdaySchedule == "null") null
+                else  barEdit.saturdaySchedule
             }
 
             this.sundaySchedule = if (barEdit.sundaySchedule == null)
                 this.sundaySchedule
             else {
-                if (barEdit.sundaySchedule != "null") barEdit.sundaySchedule
-                else null
+                if (barEdit.sundaySchedule == "null") null
+                else  barEdit.sundaySchedule
             }
         }
 

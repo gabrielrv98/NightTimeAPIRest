@@ -24,6 +24,7 @@ class Bar(
         var name: String,
         var owner: String,
         var address: String,
+        var description: String?,
 
         var mondaySchedule : String? = null,
         var tuesdaySchedule : String? = null,

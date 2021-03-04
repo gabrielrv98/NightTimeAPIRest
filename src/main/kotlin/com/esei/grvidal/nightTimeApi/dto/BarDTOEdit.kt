@@ -4,6 +4,7 @@ data class BarDTOEdit(
         val name: String?,
         val owner: String?,
         val address: String?,
+        val description: String?,
         val mondaySchedule: String? = null,
         val tuesdaySchedule: String? = null,
         val wednesdaySchedule: String? = null,
