@@ -39,9 +39,11 @@ class BarRestController {
      */
     @GetMapping("/byCity/{idCity}")
     fun listByCity(@PathVariable("idCity") cityId: Long,
-                   @RequestParam(defaultValue = "1") page: Int): ResponseEntity<List<BarProjection>> {
+                   @RequestParam(defaultValue = "0") page: Int,
+                    @RequestParam(defaultValue = "10")size: Int
+    ): ResponseEntity<List<BarProjection>> {
 
-        return ResponseEntity(barService.listByCity(cityId,page), HttpStatus.OK)
+        return ResponseEntity(barService.listByCity(cityId,page,size), HttpStatus.OK)
 
     }
 
@@ -53,7 +55,6 @@ class BarRestController {
      */
     @GetMapping("/{id}/details")
     fun getDetails(@PathVariable("id") idBar: Long): ResponseEntity<Any> {
-
 
         return try {
             ResponseEntity(barService.getDetails(idBar), HttpStatus.OK)

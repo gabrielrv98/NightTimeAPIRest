@@ -15,7 +15,7 @@ import kotlin.jvm.Throws
 interface IBarService {
 
     //list all the bars on a city
-    fun listByCity(cityId: Long, page: Int = 0, size: Int = 5): List<BarProjection>
+    fun listByCity(cityId: Long, page: Int = 0, size: Int = 10): List<BarProjection>
 
     //Returns a Bar Entity
     @Throws(NotFoundException::class)
