@@ -43,6 +43,9 @@ class Bar(
     @OneToMany(mappedBy = "bar",cascade = [CascadeType.REMOVE])
     var events : List<Event>? = null
 
+    @OneToMany(mappedBy = "bar",cascade = [CascadeType.ALL])
+    var photos : List<PhotoURL>? = null
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     var id: Long = 0

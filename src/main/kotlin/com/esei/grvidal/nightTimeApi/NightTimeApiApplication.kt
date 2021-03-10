@@ -71,7 +71,7 @@ class NightTimeApiApplication : CommandLineRunner {
         cityRepositories.save(genericCity)
 
 
-        val bar1 = Bar(
+        var bar = Bar(
 
 
             name = "Luxus",
@@ -87,9 +87,42 @@ class NightTimeApiApplication : CommandLineRunner {
             saturdaySchedule = "14:40-21:20"
         )
 
-        barRepository.save(bar1)
+        bar = barRepository.save(bar)
+        bar.photos = listOf(
+            PhotoURL("/barpics/bar${bar.id}_0.jpg", bar),
+            PhotoURL("/barpics/bar${bar.id}_1.jpg", bar),
+            PhotoURL("/barpics/bar${bar.id}_2.jpg", bar),
+            PhotoURL("/barpics/bar${bar.id}_3.jpg", bar),
+            PhotoURL("/barpics/bar${bar.id}_4.jpg", bar),
+            PhotoURL("/barpics/bar${bar.id}_5.jpg", bar),
+            PhotoURL("/barpics/bar${bar.id}_6.jpg", bar),
+            PhotoURL("/barpics/bar${bar.id}_7.jpg", bar),
+            PhotoURL("/barpics/bar${bar.id}_8.jpg", bar),
+            PhotoURL("/barpics/bar${bar.id}_9.jpg", bar)
+        )
 
-        val bar2 = Bar(
+        barRepository.save(bar)
+
+        var event = Event("copas a menos de 1 euro", date = LocalDate.now(), bar = bar)
+        eventRepositories.save(event)
+
+        event = Event("Fardos gratis", date = LocalDate.now(), bar = bar)
+        eventRepositories.save(event)
+
+        event = Event("Musica en vivo", date = LocalDate.now().plusDays(1), bar = bar)
+        eventRepositories.save(event)
+
+        event = Event(
+            "Hoy cerrado por defuncion, esperemos que todos se pongan mejor, gracias por su atencion",
+            date = LocalDate.now().plusDays(3),
+            bar = bar
+        )
+        eventRepositories.save(event)
+
+        event = Event("Copas a 3 euros", date = LocalDate.now().plusDays(3), bar = bar)
+        eventRepositories.save(event)
+
+        bar = Bar(
             name = "Patio andaluz",
             owner = "Aida Miguez",
             address = "Calle turbia",
@@ -102,20 +135,35 @@ class NightTimeApiApplication : CommandLineRunner {
             fridaySchedule = null,
             saturdaySchedule = "14:40-21:20"
         )
-        barRepository.save(bar2)
+        bar = barRepository.save(bar)
+        bar.photos = listOf(
+            PhotoURL("/barpics/bar${bar.id}_0.jpg", bar),
+            PhotoURL("/barpics/bar${bar.id}_1.jpg", bar),
+            PhotoURL("/barpics/bar${bar.id}_2.jpg", bar),
+            PhotoURL("/barpics/bar${bar.id}_3.jpg", bar),
+            PhotoURL("/barpics/bar${bar.id}_4.jpg", bar),
+            PhotoURL("/barpics/bar${bar.id}_5.jpg", bar),
+            PhotoURL("/barpics/bar${bar.id}_6.jpg", bar)
+        )
+        barRepository.save(bar)
 
 
-        val event1 = Event("copas a menos de 1 euro", date = LocalDate.now(), bar = bar1)
-        val event2 = Event("Fardos gratis", date = LocalDate.now(), bar = bar1)
-        val event3 = Event("No lo tenemos muy claro", date = LocalDate.now(), bar = bar2)
+
+        event = Event(
+            "Hoy cerrado por defuncion, esperemos que todos se pongan mejor, gracias por su atencion",
+            date = LocalDate.now().plusDays(3),
+            bar = bar
+        )
+        eventRepositories.save(event)
+
+        event = Event("Copas a 3 euros", date = LocalDate.now().plusDays(3), bar = bar)
+        eventRepositories.save(event)
+
+        event = Event("No lo tenemos muy claro", date = LocalDate.now(), bar = bar)
+        eventRepositories.save(event)
 
 
-
-        eventRepositories.save(event1)
-        eventRepositories.save(event2)
-        eventRepositories.save(event3)
-
-        val bar3 = Bar(
+        bar = Bar(
             name = "Faro de Vigo",
             owner = "Juan Miranda",
             address = "Calle Principe",
@@ -128,14 +176,14 @@ class NightTimeApiApplication : CommandLineRunner {
             fridaySchedule = null,
             saturdaySchedule = "14:40-21:20"
         )
-        barRepository.save(bar3)
+        barRepository.save(bar)
 
 
-        val event4 = Event("Todo barato", date = LocalDate.now(), bar = bar3)
-        eventRepositories.save(event4)
+        event = Event("Todo barato", date = LocalDate.now(), bar = bar)
+        eventRepositories.save(event)
 
 
-        var bar = Bar(
+        bar = Bar(
             name = "Night",
             owner = "NightOwner",
             address = "Rua cabeza de manzaneda",
@@ -152,7 +200,7 @@ class NightTimeApiApplication : CommandLineRunner {
         barRepository.save(bar)
 
 
-        var event = Event("Oferta 2 x 1", date = LocalDate.now(), bar = bar)
+         event = Event("Oferta 2 x 1", date = LocalDate.now(), bar = bar)
         eventRepositories.save(event)
 
         Event("Musica de los 90", date = LocalDate.now().plusDays(1), bar = bar)
@@ -232,7 +280,7 @@ class NightTimeApiApplication : CommandLineRunner {
         )
         barRepository.save(bar)
 
-        for( i in 0.. 15){
+        for (i in 0..15) {
             bar = Bar(
                 name = "Bar$i",
                 owner = "Nuria Sotelo",
@@ -249,7 +297,6 @@ class NightTimeApiApplication : CommandLineRunner {
             )
             barRepository.save(bar)
         }
-
 
 
         var user = UserDTOInsert(
