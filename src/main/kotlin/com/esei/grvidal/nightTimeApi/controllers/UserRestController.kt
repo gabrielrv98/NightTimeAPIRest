@@ -355,8 +355,9 @@ class UserRestController {
      * @exception NoAuthorizationException when the [idUser] who sent the request is not the owner of the [idDate]
      * @exception NotLoggedException if the [idUser] is not in the hashMap [tokenSimple]
      *
-     * Try to delete it, if there is no problem it will return [HttpStatus.NO_CONTENT] or if the [idDate] doesn't exist
-     * it will return [HttpStatus.NOT_FOUND] or if the [idUser] doesn't match with the owner of the [idDate]
+     * Try to delete it, if there is no problem it will return true, id, [HttpStatus.ACCEPTED],
+     * if the [dateCity] doesn't exist it will return [HttpStatus.NOT_FOUND]
+     * or if the [idUser] doesn't match with the owner of the [dateCity]
      * it will return [HttpStatus.FORBIDDEN]
      */
     @DeleteMapping("/{id}/date")

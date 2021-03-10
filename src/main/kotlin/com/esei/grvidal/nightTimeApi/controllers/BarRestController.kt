@@ -1,5 +1,6 @@
 package com.esei.grvidal.nightTimeApi.controllers
 
+import com.esei.grvidal.nightTimeApi.NightTimeApiApplication
 import com.esei.grvidal.nightTimeApi.dto.BarDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.BarDTOInsert
 import com.esei.grvidal.nightTimeApi.dto.toBar
@@ -8,12 +9,16 @@ import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.projections.BarDetailsProjection
 import com.esei.grvidal.nightTimeApi.projections.BarProjection
 import com.esei.grvidal.nightTimeApi.serviceInterface.ICityService
+import com.esei.grvidal.nightTimeApi.serviceInterface.IPhotoService
 import com.esei.grvidal.nightTimeApi.utlis.Constants
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.io.InputStream
 
 /**
  * This is Bar Controller
@@ -28,6 +33,10 @@ class BarRestController {
 
     //City Service with the logic of city
     @Autowired
+    lateinit var photoService: IPhotoService
+
+    //City Service with the logic of city
+    @Autowired
     lateinit var cityService: ICityService
 
 
@@ -38,12 +47,13 @@ class BarRestController {
      * @return all Bars in that city with id [cityId]
      */
     @GetMapping("/byCity/{idCity}")
-    fun listByCity(@PathVariable("idCity") cityId: Long,
-                   @RequestParam(defaultValue = "0") page: Int,
-                    @RequestParam(defaultValue = "10")size: Int
+    fun listByCity(
+        @PathVariable("idCity") cityId: Long,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "10") size: Int
     ): ResponseEntity<List<BarProjection>> {
 
-        return ResponseEntity(barService.listByCity(cityId,page,size), HttpStatus.OK)
+        return ResponseEntity(barService.listByCity(cityId, page, size), HttpStatus.OK)
 
     }
 
@@ -61,10 +71,44 @@ class BarRestController {
         } catch (e: NotFoundException) {
             ResponseEntity(e.message, HttpStatus.NOT_FOUND)
         }
-
-
     }
 
+
+    val logger = LoggerFactory.getLogger(NightTimeApiApplication::class.java)!!
+    @GetMapping(
+        value = ["/{idBar}/photo/{idPhoto}"],
+        produces = [MediaType.IMAGE_JPEG_VALUE]
+    )
+    fun getPicture(
+        @PathVariable("idBar") idBar: Long,
+        @PathVariable("idPhoto") idPhoto: Int
+    ): ResponseEntity<Any> {
+        val responseHeader = HttpHeaders()
+
+
+        val photoProjection = photoService.getPhotoDir(idBar, idPhoto)
+
+        logger.info("photoProjection = ${photoProjection?.getId()} ${photoProjection?.getDir()}")
+        return if (photoProjection != null) {
+
+            responseHeader.set("id_photo", photoProjection.getId().toString())
+
+            return try {
+                val photo: InputStream = javaClass
+                    .getResourceAsStream(photoProjection.getDir())
+
+                ResponseEntity(photo.readBytes(), responseHeader, HttpStatus.OK)
+
+            }catch (e: NullPointerException){
+                ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+            }
+
+        }else {
+            responseHeader.set("error", "no photo with id $idPhoto")
+            logger.info("photoProjection = it was null")
+            ResponseEntity( responseHeader, HttpStatus.NOT_FOUND)
+        }
+    }
 
     /**
      * Listen to a Get with the [idBar] to show all the information of a bar
@@ -116,7 +160,7 @@ class BarRestController {
 
         return try {
             barService.update(idBar, barEdit)
-            ResponseEntity( HttpStatus.OK)
+            ResponseEntity(HttpStatus.OK)
 
         } catch (e: NotFoundException) {
             ResponseEntity(e.message, HttpStatus.NOT_FOUND)

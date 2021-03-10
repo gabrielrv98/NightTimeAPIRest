@@ -12,8 +12,6 @@ import com.esei.grvidal.nightTimeApi.serviceInterface.IBarService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Pageable
-import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import kotlin.jvm.Throws
 
