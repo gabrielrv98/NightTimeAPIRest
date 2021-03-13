@@ -46,6 +46,14 @@ interface IUserService {
     //Get the total of users on a date in a specific city
     fun getTotal(dateCityDTO: DateCityDTO): Int
 
+    @Throws(NotFoundException::class)
+    fun setUserPicture(id: Long, src: String?)
+
+    @Throws(NotFoundException::class)
+    fun setNewPicture(idUser: Long)
+
+    @Throws(NotFoundException::class)
+    fun getPicture(id: Long): String?
 
 
 }

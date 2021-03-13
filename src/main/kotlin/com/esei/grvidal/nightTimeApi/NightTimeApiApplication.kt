@@ -49,6 +49,8 @@ class NightTimeApiApplication : CommandLineRunner {
 
     override fun run(vararg args: String?) {
 
+        // Cities -----------------------------
+
         val cityOu = City("Ourense", "Spain")
         val cityVigo = City("Vigo", "Spain")
 
@@ -71,9 +73,9 @@ class NightTimeApiApplication : CommandLineRunner {
         cityRepositories.save(genericCity)
 
 
+        // Bar with events ---------------------
+
         var bar = Bar(
-
-
             name = "Luxus",
             owner = "Lara Santas",
             address = "Mercedes 2º",
@@ -96,9 +98,7 @@ class NightTimeApiApplication : CommandLineRunner {
             PhotoURL("/barpics/bar${bar.id}_4.jpg", bar),
             PhotoURL("/barpics/bar${bar.id}_5.jpg", bar),
             PhotoURL("/barpics/bar${bar.id}_6.jpg", bar),
-            PhotoURL("/barpics/bar${bar.id}_7.jpg", bar),
-            PhotoURL("/barpics/bar${bar.id}_8.jpg", bar),
-            PhotoURL("/barpics/bar${bar.id}_9.jpg", bar)
+            PhotoURL("/barpics/bar${bar.id}_7.jpg", bar)
         )
 
         barRepository.save(bar)
@@ -189,7 +189,7 @@ class NightTimeApiApplication : CommandLineRunner {
             address = "Rua cabeza de manzaneda",
             description = "Ven y pasatelo como si volvieses a tener 15",
             city = cityOu,
-            mondaySchedule = null,
+            mondaySchedule = "12:00-22:00",
             tuesdaySchedule = "11:00-20:30",
             wednesdaySchedule = "12:00-22:00",
             thursdaySchedule = null,
@@ -200,7 +200,7 @@ class NightTimeApiApplication : CommandLineRunner {
         barRepository.save(bar)
 
 
-         event = Event("Oferta 2 x 1", date = LocalDate.now(), bar = bar)
+        event = Event("Oferta 2 x 1", date = LocalDate.now(), bar = bar)
         eventRepositories.save(event)
 
         Event("Musica de los 90", date = LocalDate.now().plusDays(1), bar = bar)
@@ -240,7 +240,7 @@ class NightTimeApiApplication : CommandLineRunner {
             address = "Rua Concordia",
             description = "Un lugar libre para gente libre",
             city = cityOu,
-            mondaySchedule = "12:00-22:00",
+            mondaySchedule = null,
             tuesdaySchedule = "11:00-20:30",
             wednesdaySchedule = null,
             thursdaySchedule = "14:40-21:20",
@@ -298,19 +298,22 @@ class NightTimeApiApplication : CommandLineRunner {
             barRepository.save(bar)
         }
 
+        // Users --------------------------
 
         var user = UserDTOInsert(
+            // user grvidal
             "Gabriel Rguez",
             "grvidal",
             "1234",
             "Hey there i'm using NightTime",
             email = "grvidal@esei.uvigo.es",
-            birthdate = LocalDate.of(1998, 3, 14),
+            birthdate = LocalDate.of(1998, 3, 14)
 
-            )
-
+        )
         userService.save(user)
         val user1 = userRepositories.findByNickname(user.nickname).get()
+        userService.setUserPicture(user1.id, "/userpics/user_grvidal.jpg")
+
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user1))
         dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(1), nextCity = cityOu, user = user1))
         dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(2), nextCity = cityVigo, user = user1))
@@ -322,38 +325,57 @@ class NightTimeApiApplication : CommandLineRunner {
             )
         )
 
-        user = UserDTOInsert(
+        user = UserDTOInsert( // user pinkxnut
             "Nuria Sotelo",
             "pinkxnut",
             "passwordUser2",
             ".",
             "nuasotelo@gmail.com",
-            birthdate = LocalDate.of(2001, 9, 17),
-
-
-            )
+            birthdate = LocalDate.of(2001, 9, 17)
+        )
 
         userService.save(user)
         val user2 = userRepositories.findByNickname(user.nickname).get()
+
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user2))
         dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(1), nextCity = cityOu, user = user2))
         dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(3), nextCity = cityOu, user = user2))
 
 
         user = UserDTOInsert(
-            "Irene Monterey",
-            "monteRey",
-            "passwordUser3",
-            "Pues soy mas de playa",
-            email = "ireneReina@hotmail.com",
-            birthdate = LocalDate.of(1998, 4, 12)
+            // user santii810
+            "Santi Gómez",
+            "santii810",
+            "santiSuperSecret",
+            "Programando y coodirigiendo TFGs",
+            "santii810@gmail.com",
+            birthdate = LocalDate.of(2001, 9, 17),
         )
 
         userService.save(user)
         val user3 = userRepositories.findByNickname(user.nickname).get()
+        userService.setUserPicture(user3.id, "/userpics/user_santii810.jpg")
+
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user3))
-        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(2), nextCity = cityOu, user = user3))
+        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(1), nextCity = cityOu, user = user3))
         dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(3), nextCity = cityOu, user = user3))
+
+
+        user = UserDTOInsert( // user monteRey
+            "Maria Vidal",
+            "mvittae",
+            "Gabriel<3",
+            "Que es \"Luxus\"",
+            email = "mjvidal@hotmail.com",
+            birthdate = LocalDate.of(1988, 3, 4)
+        )
+
+        userService.save(user)
+        val user4 = userRepositories.findByNickname(user.nickname).get()
+
+        dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user4))
+        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(2), nextCity = cityOu, user = user4))
+        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(3), nextCity = cityOu, user = user4))
 
 
         user = UserDTOInsert(
@@ -366,20 +388,31 @@ class NightTimeApiApplication : CommandLineRunner {
         )
 
         userService.save(user)
-        val user4 = userRepositories.findByNickname(user.nickname).get()
-        dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user4))
-        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(1), nextCity = cityVigo, user = user4))
-        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(2), nextCity = cityVigo, user = user4))
+        val user5 = userRepositories.findByNickname(user.nickname).get()
+
+        dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user5))
+        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(1), nextCity = cityVigo, user = user5))
+        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(2), nextCity = cityVigo, user = user5))
+
+
+        // Friends -----------------------
 
         val friend1_2 = Friendship(user1, user2)
         friend1_2.answer = AnswerOptions.YES
-        friendshipRepositories.save(friend1_2)
+        friendshipRepositories.save(friend1_2)// accepted friendship
 
-        friendshipRepositories.save(Friendship(user3, user2))
+        val friend1_3 = Friendship(user3, user1 )
+        friend1_3.answer = AnswerOptions.YES
+        friendshipRepositories.save(friend1_3)// accepted friendship
+
+        friendshipRepositories.save(Friendship(user3, user2)) // offered friendship
+        friendshipRepositories.save(Friendship(user4, user1)) // offered friendship
 
         val friend4_1 = Friendship(user4, user1)
         friend4_1.answer = AnswerOptions.YES
-        friendshipRepositories.save(friend4_1)
+        friendshipRepositories.save(friend4_1)// accepted friendship
+
+        // Chats -----------------------
 
         var friendship = friendshipRepositories.findFriendsByUserAsk_IdOrUserAnswer_Id(user1.id, user1.id)[0]
         var msg = Message("Hola nuria", LocalDate.now(), LocalTime.now(), friendship, friendship.userAsk)
@@ -394,7 +427,7 @@ class NightTimeApiApplication : CommandLineRunner {
         messageRepositories.save(msg)
 
         friendship = friendshipRepositories.findFriendsByUserAsk_IdOrUserAnswer_Id(user1.id, user1.id)[1]
-        msg = Message("Hola Josune", LocalDate.now(), LocalTime.now(), friendship, friendship.userAnswer)
+        msg = Message("Hola Santii", LocalDate.now(), LocalTime.now(), friendship, friendship.userAnswer)
         messageRepositories.save(msg)
 
 

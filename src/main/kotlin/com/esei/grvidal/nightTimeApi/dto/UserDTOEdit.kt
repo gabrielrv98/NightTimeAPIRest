@@ -12,11 +12,11 @@ data class UserDTOEdit(
 
 fun UserDTOEdit.toUser(user: User): User {
         return User(
-                name ?: user.name,
+                name = name ?: user.name,
                 nickname = user.nickname,
                 password ?: user.password,
-                state,
-                email ?: user.email,
+                state = state,
+                email = email ?: user.email,
                 birthdate = user.birthdate
         ).apply { id = user.id }
 }

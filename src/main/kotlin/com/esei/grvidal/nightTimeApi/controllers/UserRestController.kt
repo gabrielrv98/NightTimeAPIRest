@@ -12,6 +12,8 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
+import java.io.InputStream
 import java.time.LocalDate
 import kotlin.collections.HashMap
 import kotlin.jvm.Throws
@@ -165,6 +167,10 @@ class UserRestController {
 
     }
 
+    data class UserProjectionPicture(
+        val userData: UserProjection,
+        val picture: ByteArray
+    )
 
     /**
      * Receives an [idUser] and returns a UserProjection //TODO IS THIS PUBLIC?
@@ -175,9 +181,31 @@ class UserRestController {
     fun loadProjection(@PathVariable("id") idUser: Long): ResponseEntity<Any> {
 
         return try {
-            ResponseEntity(userService.loadProjection(idUser), HttpStatus.OK)
+            ResponseEntity( userService.loadProjection(idUser)  , HttpStatus.OK)
         } catch (e: NotFoundException) {
             ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+        }
+    }
+
+    @GetMapping("/{id}/photo")
+    fun getPicture(
+        @PathVariable("id") id: Long
+    ): ResponseEntity<Any>{
+
+        return try{
+
+
+            userService.getPicture(id)?.let{ dir ->
+                val photo: InputStream = javaClass
+                    .getResourceAsStream(dir)
+
+                ResponseEntity( photo.readBytes() , HttpStatus.OK)
+
+            } ?: ResponseEntity( false , HttpStatus.NOT_FOUND)
+
+
+        }catch (e: NotFoundException){
+            ResponseEntity(e.message,HttpStatus.NOT_FOUND)
         }
     }
 
@@ -189,7 +217,7 @@ class UserRestController {
         @RequestHeader("auth") auth: String,
         @PathVariable("id") idUser: Long,
         @PathVariable("idCity") idCity: Long
-    ): ResponseEntity<Any>{
+    ): ResponseEntity<Any> {
 
         return try {
             if (!securityCheck(idUser, auth))//if security fails
@@ -197,13 +225,13 @@ class UserRestController {
             else {
                 val responseHeader = HttpHeaders()
 
-                val userList = userService.loadUserDatesList(idUser,DateCityDTO(LocalDate.now().minusDays(1), idCity) )
+                val userList = userService.loadUserDatesList(idUser, DateCityDTO(LocalDate.now().minusDays(1), idCity))
 
                 responseHeader.set("total", userList.size.toString())
                 ResponseEntity(userList, responseHeader, HttpStatus.OK)
             }
 
-        }  catch (e: NotLoggedException) {
+        } catch (e: NotLoggedException) {
             ResponseEntity(e.message, HttpStatus.FORBIDDEN)
         }
 
@@ -235,6 +263,29 @@ class UserRestController {
 
         } catch (e: AlreadyExistsException) {
             ResponseEntity(e.message, HttpStatus.ALREADY_REPORTED)
+        }
+    }
+
+    @PostMapping("/{idUser}/picture")
+    fun setPicture(
+        @PathVariable("idUser") idUser: Long,
+        @RequestHeader("auth") auth: String,
+        @RequestParam("file") file: MultipartFile
+    ): ResponseEntity<Any> {
+        return try {
+
+            if (!securityCheck(idUser, auth))//if security fails
+                ResponseEntity("Security error, credentials don't match", HttpStatus.UNAUTHORIZED)
+            else {
+                userService.setNewPicture(idUser)
+                ResponseEntity(HttpStatus.OK)
+            }
+
+        } catch (e: NotFoundException) {
+            ResponseEntity(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
+
+        } catch (e: NotLoggedException) {
+            ResponseEntity(e.message, HttpStatus.FORBIDDEN)
         }
     }
 
@@ -346,13 +397,12 @@ class UserRestController {
     }
 
     /**
-     * Listen to a DELETE with a [idDate] and an User ID, then deletes the DateCity from the db
+     * Listen to a DELETE with a [DateCityDTO] and an User ID, then deletes the DateCity from the db
      *
      * @param idUser id of the user that will be updated
      * @param dateCity data of the date
      *
-     * @exception NotFoundException when the [idDate] doesn't match any db entry
-     * @exception NoAuthorizationException when the [idUser] who sent the request is not the owner of the [idDate]
+     * @exception NotFoundException when the [DateCityDTO] doesn't match any db entry
      * @exception NotLoggedException if the [idUser] is not in the hashMap [tokenSimple]
      *
      * Try to delete it, if there is no problem it will return true, id, [HttpStatus.ACCEPTED],
@@ -373,9 +423,9 @@ class UserRestController {
                 val responseHeader = HttpHeaders()
 
                 val id = userService.deleteDate(idUser, dateCity)
-                responseHeader.set("deleted",id.toString())
+                responseHeader.set("deleted", id.toString())
 
-                ResponseEntity(true,  responseHeader ,HttpStatus.ACCEPTED)
+                ResponseEntity(true, responseHeader, HttpStatus.ACCEPTED)
             }
 
         } catch (e: NotFoundException) {
@@ -722,7 +772,7 @@ class UserRestController {
      * Listen to a Get with a [idUser] as id of the asking user,
      * [auth] as Header for authentication,
      * a formated date as [day]-[month]-[year],
-     * and [idCity] to return the total number of people and number of friends
+     * and [cityId] to return the total number of people and number of friends
      * who checked that day in the same city
      *
      * @return a Response with two headers, "total" for total people, and "friends" for user's friends. Also a body with the events on that date
@@ -772,7 +822,11 @@ class UserRestController {
 
 
 
-                        ResponseEntity(eventService.listEventByDayAndCity(date = date, idCity = cityId), responseHeader, HttpStatus.OK)
+                        ResponseEntity(
+                            eventService.listEventByDayAndCity(date = date, idCity = cityId),
+                            responseHeader,
+                            HttpStatus.OK
+                        )
                     }
                 }
             }
@@ -787,7 +841,7 @@ class UserRestController {
      * Listen to a Get with a [idUser] as id of the asking user,
      * [auth] as Header for authentication,
      * a formated date as [day]-[month]-[year],
-     * and [idCity] to return a list of [UserSnapProjection] with the friends of the user on the specified date and city
+     * and [cityId] to return a list of [UserSnapProjection] with the friends of the user on the specified date and city
      *
      * @return a Response with a body with the a list of [UserSnapProjection]
      *
@@ -808,27 +862,27 @@ class UserRestController {
             if (!securityCheck(idUser, auth))//if security fails
                 ResponseEntity("Security error, credentials don't match", HttpStatus.UNAUTHORIZED)
             else {
-                    val st = StringBuilder()
-                    val dateString = st.append(day)
-                        .append("-")
-                        .append(month)
-                        .append("-")
-                        .append(year)
+                val st = StringBuilder()
+                val dateString = st.append(day)
+                    .append("-")
+                    .append(month)
+                    .append("-")
+                    .append(year)
 
-                    val datePatter = Regex("\\d{1,2}-\\d{1,2}-\\d{4}")
+                val datePatter = Regex("\\d{1,2}-\\d{1,2}-\\d{4}")
 
-                    if (!dateString.matches(datePatter))
-                        ResponseEntity("Date error, plase use date as  day-month-year", HttpStatus.UNAUTHORIZED)
-                    else {
+                if (!dateString.matches(datePatter))
+                    ResponseEntity("Date error, plase use date as  day-month-year", HttpStatus.UNAUTHORIZED)
+                else {
 
-                        val dateCity = DateCityDTO(LocalDate.of(year, month, day), cityId)
+                    val dateCity = DateCityDTO(LocalDate.of(year, month, day), cityId)
 
-                        val users = friendshipService.getFriendsOnDate(idUser, dateCity)
+                    val users = friendshipService.getFriendsOnDate(idUser, dateCity)
 
-                        ResponseEntity(users, HttpStatus.OK)
+                    ResponseEntity(users, HttpStatus.OK)
 
-                    }
                 }
+            }
 
 
         } catch (e: NotLoggedException) {

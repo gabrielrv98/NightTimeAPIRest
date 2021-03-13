@@ -1,6 +1,7 @@
 package com.esei.grvidal.nightTimeApi.projections
 
-import java.time.LocalDate
+import org.springframework.beans.factory.annotation.Value
+
 
 interface UserProjection{
 
@@ -8,10 +9,9 @@ interface UserProjection{
     fun getName() : String
     fun getNickname() : String
     fun getState() : String
-    fun getEmail(): String
-    fun getBirthdate() : LocalDate
-    fun getNextDates() : List<DateCityProjection>?
-
+    @Value("#{(target.nextDates.size > 0 ? target.nextDates[0] : null) }")
+    fun getNextDate() :  DateCityProjection?
+    fun getPicture() : String?
 
 }
 

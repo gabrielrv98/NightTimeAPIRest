@@ -5,12 +5,11 @@ import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
 import com.esei.grvidal.nightTimeApi.dto.toUser
 import com.esei.grvidal.nightTimeApi.encryptation.Encoding
-import com.esei.grvidal.nightTimeApi.exception.NoAuthorizationException
 import com.esei.grvidal.nightTimeApi.repository.UserRepository
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.User
-import com.esei.grvidal.nightTimeApi.model.nicknameLenght
+import com.esei.grvidal.nightTimeApi.model.nicknameLength
 import com.esei.grvidal.nightTimeApi.projections.DateCityReducedProjection
 import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import com.esei.grvidal.nightTimeApi.repository.DateCityRepository
@@ -93,7 +92,7 @@ class UserService : IUserService {
     override fun save(user: UserDTOInsert): Long {
 
         //checking user constraints
-        if (user.nickname.length > nicknameLenght)
+        if (user.nickname.length > nicknameLength)
             throw ServiceException("User's nickname is too long")
 
         //Encrypting password
@@ -171,6 +170,30 @@ class UserService : IUserService {
         )
 
     }
+
+    override fun setUserPicture(id: Long, src: String?) {
+        val user = load(id)
+        user.picture = src
+        userRepository.save(user)
+    }
+
+    /**
+     * Checks if the user has any URL file associated, and if it was null rewrites it
+     * if it wasn't null there is no need to rewrite since new picture has the same name as the old one
+     */
+    override fun setNewPicture(idUser: Long) {
+        val user = load(idUser)
+        if(user.picture == null) {
+            user.picture = "/userpics/user_${user.nickname}"
+            userRepository.save(user)
+        }
+    }
+
+
+    override fun getPicture(id: Long): String? {
+        return load(id).picture
+    }
+
 }
 
 
