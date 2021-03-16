@@ -312,7 +312,7 @@ class NightTimeApiApplication : CommandLineRunner {
         )
         userService.save(user)
         val user1 = userRepositories.findByNickname(user.nickname).get()
-        userService.setUserPicture(user1.id, "/userpics/user_grvidal.jpg")
+        //userService.setUserPicture(user1.id, "/userpics/user_grvidal.jpg")
 
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user1))
         dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(1), nextCity = cityOu, user = user1))
@@ -336,6 +336,7 @@ class NightTimeApiApplication : CommandLineRunner {
 
         userService.save(user)
         val user2 = userRepositories.findByNickname(user.nickname).get()
+        userService.setUserPicture(user2.id, "/userpics/user_pinkxnut_2021-03-16_18-31-14-988.jpg")
 
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user2))
         dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(1), nextCity = cityOu, user = user2))

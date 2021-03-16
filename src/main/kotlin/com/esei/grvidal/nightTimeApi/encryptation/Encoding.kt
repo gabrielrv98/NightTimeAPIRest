@@ -1,11 +1,8 @@
 package com.esei.grvidal.nightTimeApi.encryptation
 
-import com.esei.grvidal.nightTimeApi.NightTimeApiApplication
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
-import jdk.internal.dynalink.support.NameCodec.encode
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.util.encoders.Base64
-import org.slf4j.LoggerFactory
 import java.io.UnsupportedEncodingException
 import java.security.InvalidKeyException
 import java.security.NoSuchAlgorithmException
@@ -85,11 +82,11 @@ class Encoding {
 
         }
 
-        fun decrypt(key: String, strToDecrypt: String?): String {
+        fun decrypt(strToDecrypt: String, secret_key: String): String {
             Security.addProvider(BouncyCastleProvider())
             val keyBytes: ByteArray
 
-            val sub_secret_key = to16Chars(key)
+            val sub_secret_key = to16Chars(secret_key)
 
             try {
                 keyBytes = sub_secret_key.toByteArray(charset("UTF8"))
