@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 
 /**
- * This is the Event Controller
+ * This is the Event Controller todo delete
  */
 @RestController
 @RequestMapping(Constants.URL_BASE_EVENT)

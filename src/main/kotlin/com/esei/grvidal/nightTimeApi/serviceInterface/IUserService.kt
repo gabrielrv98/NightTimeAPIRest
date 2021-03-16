@@ -7,6 +7,7 @@ import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.projections.DateCityReducedProjection
+import com.esei.grvidal.nightTimeApi.projections.UserEditProjection
 import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import kotlin.jvm.Throws
 
@@ -18,9 +19,13 @@ interface IUserService {
     //List all the user
     fun list(): List<UserProjection>
 
-    //Show one user
+    //Show one user ( public attributes )
     @Throws(NotFoundException::class)
     fun loadProjection(idUser: Long): UserProjection
+
+    //Show one user ( private attributes )
+    @Throws(NotFoundException::class)
+    fun loadEditProjection(idUser: Long): UserDTOEdit
 
     fun loadUserDatesList(idUser: Long, dateCityDTO: DateCityDTO): List<DateCityReducedProjection>
 
@@ -48,9 +53,6 @@ interface IUserService {
 
     @Throws(NotFoundException::class)
     fun setUserPicture(id: Long, src: String?)
-
-    @Throws(NotFoundException::class)
-    fun setNewPicture(idUser: Long)
 
     @Throws(NotFoundException::class)
     fun getPicture(id: Long): String?

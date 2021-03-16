@@ -5,6 +5,7 @@ import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
 import com.esei.grvidal.nightTimeApi.dto.toUser
 import com.esei.grvidal.nightTimeApi.encryptation.Encoding
+import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.repository.UserRepository
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
@@ -12,6 +13,7 @@ import com.esei.grvidal.nightTimeApi.model.User
 import com.esei.grvidal.nightTimeApi.model.nicknameLength
 import com.esei.grvidal.nightTimeApi.projections.DateCityReducedProjection
 import com.esei.grvidal.nightTimeApi.projections.UserProjection
+import com.esei.grvidal.nightTimeApi.projections.toUserDTOEdit
 import com.esei.grvidal.nightTimeApi.repository.DateCityRepository
 import com.esei.grvidal.nightTimeApi.serviceInterface.IUserService
 import org.springframework.beans.factory.annotation.Autowired
@@ -49,8 +51,9 @@ class UserService : IUserService {
 
 
     /**
-     * This will show one user, if not, will throw a BusinessException or
-     * if the object cant be found, it will throw a NotFoundException
+     * This will show one user, if the object cant be found it will throw a NotFoundException
+     *
+     * @param idUser id of the user
      */
     @Throws(NotFoundException::class)
     override fun loadProjection(idUser: Long): UserProjection {
@@ -59,6 +62,28 @@ class UserService : IUserService {
             .orElseThrow { NotFoundException("Couldn't find the user with id $idUser") }
 
     }
+
+    /**
+     * This will show one user with the private attributes like password and email,
+     * if the object cant be found it will throw a NotFoundException
+     *
+     * @param idUser id of the user
+     */
+    override fun loadEditProjection(idUser: Long): UserDTOEdit {
+        val user = userRepository.findUserById(idUser)
+
+        if (!user.isPresent)
+            throw  NotFoundException("Couldn't find the user with id $idUser")
+        else{
+            return user.get().toUserDTOEdit().also{ userDTOEdit ->
+                userDTOEdit.password = Encoding.decrypt(
+                    strToDecrypt = userDTOEdit.password!!,//Should always have password
+                    secret_key = user.get().getNickname()
+                )
+            }
+        }
+    }
+
 
     /**
      * Gets a city id and a date [dateCityDTO] and returns the list of the dates selected by
@@ -70,7 +95,11 @@ class UserService : IUserService {
      */
     override fun loadUserDatesList(idUser: Long, dateCityDTO: DateCityDTO): List<DateCityReducedProjection> {
 
-        return dateCityRepository.findAllByUser_IdAndNextCity_IdAndNextDateAfter(idUser,dateCityDTO.nextCityId,dateCityDTO.nextDate)
+        return dateCityRepository.findAllByUser_IdAndNextCity_IdAndNextDateAfter(
+            idUser,
+            dateCityDTO.nextCityId,
+            dateCityDTO.nextDate
+        )
     }
 
     /**
@@ -101,17 +130,25 @@ class UserService : IUserService {
             secret_key = user.nickname
         )
 
-        try{
+        try {
             return userRepository.save(user.toUser()).id
 
-        }catch (e: DataIntegrityViolationException){
-            throw ServiceException("User with nickname ${user.nickname} already exists" )
+        } catch (e: DataIntegrityViolationException) {
+            throw AlreadyExistsException("User with nickname ${user.nickname} already exists")
         }
     }
 
-    override fun update(idUser: Long, user: UserDTOEdit) {
+    override fun update(idUser: Long, userEdit: UserDTOEdit) {
         val userOriginal = load(idUser)
-        userRepository.save(user.toUser(userOriginal))
+
+        userEdit.password?.let{ passRaw ->
+            userEdit.password = Encoding.encrypt(
+                strToEncrypt = passRaw,
+                secret_key = userOriginal.nickname
+            )
+        }
+
+        userRepository.save( userEdit.toUser(userOriginal) )
     }
 
 
@@ -139,19 +176,20 @@ class UserService : IUserService {
         val user = loadByNickname(nickname)
 
         val decodedPassword = Encoding.decrypt(
-            key = user.nickname,
+            secret_key = user.nickname,
             strToDecrypt = user.password
         )
 
         return if (decodedPassword == password) user.id
-                else (-1)
+        else (-1)
     }
 
 
     override fun deleteDate(idUser: Long, dateCity: DateCityDTO): Long {
 
-        val date = dateCityRepository.findByUser_IdAndNextCity_IdAndNextDate(idUser,dateCity.nextCityId,dateCity.nextDate)
-            .orElseThrow { NotFoundException("No date selected with user id $idUser, cityId ${dateCity.nextCityId} and date ${dateCity.nextDate}") }
+        val date =
+            dateCityRepository.findByUser_IdAndNextCity_IdAndNextDate(idUser, dateCity.nextCityId, dateCity.nextDate)
+                .orElseThrow { NotFoundException("No date selected with user id $idUser, cityId ${dateCity.nextCityId} and date ${dateCity.nextDate}") }
 
         val id = date.getId()
         dateCityRepository.deleteById(id)
@@ -175,18 +213,6 @@ class UserService : IUserService {
         val user = load(id)
         user.picture = src
         userRepository.save(user)
-    }
-
-    /**
-     * Checks if the user has any URL file associated, and if it was null rewrites it
-     * if it wasn't null there is no need to rewrite since new picture has the same name as the old one
-     */
-    override fun setNewPicture(idUser: Long) {
-        val user = load(idUser)
-        if(user.picture == null) {
-            user.picture = "/userpics/user_${user.nickname}"
-            userRepository.save(user)
-        }
     }
 
 
