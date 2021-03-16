@@ -60,6 +60,10 @@ class DateCityService : IDateCityService {
     override fun addDate(idUser: Long, dateCity: DateCityDTO): Long {
         if (!cityRepository.existsById(dateCity.nextCityId))
             throw NotFoundException("No city with id ${dateCity.nextCityId} found")
+
+        if( dateCity.nextDate.isBefore(LocalDate.now()))
+            throw ServiceException("Only dates after today ( ${LocalDate.now()} can be added")
+
         return dateCityRepository.save(dateCity.toDateCity(idUser)).id
     }
 
