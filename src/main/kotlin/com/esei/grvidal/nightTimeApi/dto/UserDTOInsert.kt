@@ -8,8 +8,7 @@ data class UserDTOInsert(
         val nickname: String,
         var password: String,
         val state: String? = null,
-        val email: String,
-        var birthdate: LocalDate,
+        val email: String
 )
 
 fun UserDTOInsert.toUser(): User {
@@ -18,7 +17,6 @@ fun UserDTOInsert.toUser(): User {
             nickname,
             password,
             state,
-            email,
-            birthdate
+            email
     )
 }

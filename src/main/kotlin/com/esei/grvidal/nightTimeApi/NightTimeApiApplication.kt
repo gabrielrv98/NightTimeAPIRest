@@ -306,8 +306,7 @@ class NightTimeApiApplication : CommandLineRunner {
             "grvidal",
             "1234",
             "Hey there i'm using NightTime",
-            email = "grvidal@esei.uvigo.es",
-            birthdate = LocalDate.of(1998, 3, 14)
+            email = "grvidal@esei.uvigo.es"
 
         )
         userService.save(user)
@@ -330,8 +329,7 @@ class NightTimeApiApplication : CommandLineRunner {
             "pinkxnut",
             "passwordUser2",
             ".",
-            "nuasotelo@gmail.com",
-            birthdate = LocalDate.of(2001, 9, 17)
+            "nuasotelo@gmail.com"
         )
 
         userService.save(user)
@@ -349,8 +347,7 @@ class NightTimeApiApplication : CommandLineRunner {
             "santii810",
             "santiSuperSecret",
             "Programando y coodirigiendo TFGs",
-            "santii810@gmail.com",
-            birthdate = LocalDate.of(2001, 9, 17),
+            "santii810@gmail.com"
         )
 
         userService.save(user)
@@ -367,8 +364,7 @@ class NightTimeApiApplication : CommandLineRunner {
             "mvittae",
             "Gabriel<3",
             "Que es \"Luxus\"",
-            email = "mjvidal@hotmail.com",
-            birthdate = LocalDate.of(1988, 3, 4)
+            email = "mjvidal@hotmail.com"
         )
 
         userService.save(user)
@@ -384,8 +380,7 @@ class NightTimeApiApplication : CommandLineRunner {
             "joseju",
             "passwordUser4",
             "Todo lo que se pueda decir es irrelevante",
-            "joseNegro@gmail.com",
-            birthdate = LocalDate.of(1990, 4, 25)
+            "joseNegro@gmail.com"
         )
 
         userService.save(user)
@@ -430,11 +425,6 @@ class NightTimeApiApplication : CommandLineRunner {
         friendship = friendshipRepositories.findFriendsByUserAsk_IdOrUserAnswer_Id(user1.id, user1.id)[1]
         msg = Message("Hola Santii", LocalDate.now(), LocalTime.now(), friendship, friendship.userAnswer)
         messageRepositories.save(msg)
-
-
-        //val friends1w3 = Friendship(user1,user3)
-
-        //friendshipRepositories!!.save(friends1w3)
 
         logger.info("Application ready to use")
     }

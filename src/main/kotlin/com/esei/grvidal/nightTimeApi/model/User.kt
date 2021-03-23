@@ -19,14 +19,11 @@ class User(
     var nickname: String,
     var password: String,
     var state: String? = null,
-    var email: String,
-    @Column(name = "birth_date")
-    var birthdate: LocalDate,
-
+    var email: String
 
     ) {
 
-    constructor(idUser: Long) : this("", "", "", "", "", LocalDate.now()) {
+    constructor(idUser: Long) : this("", "", "", "", "") {
         id = idUser
     }
 

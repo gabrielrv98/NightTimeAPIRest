@@ -16,7 +16,9 @@ import com.esei.grvidal.nightTimeApi.projections.UserProjection
 import com.esei.grvidal.nightTimeApi.projections.toUserDTOEdit
 import com.esei.grvidal.nightTimeApi.repository.DateCityRepository
 import com.esei.grvidal.nightTimeApi.serviceInterface.IUserService
+import org.hibernate.engine.jdbc.spi.SqlExceptionHelper
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import kotlin.jvm.Throws
@@ -133,22 +135,28 @@ class UserService : IUserService {
         try {
             return userRepository.save(user.toUser()).id
 
-        } catch (e: DataIntegrityViolationException) {
-            throw AlreadyExistsException("User with nickname ${user.nickname} already exists")
+        } catch(e : Exception){
+            when(e){
+                is DataIntegrityViolationException,
+                is DataAccessException ->{
+                    throw AlreadyExistsException("User with nickname ${user.nickname} already exists")
+                }
+                else ->  throw ServiceException("Error adding ${user.nickname}, ${e.toString()} ")
+            }
         }
     }
 
-    override fun update(idUser: Long, userEdit: UserDTOEdit) {
+    override fun update(idUser: Long, user: UserDTOEdit) {
         val userOriginal = load(idUser)
 
-        userEdit.password?.let{ passRaw ->
-            userEdit.password = Encoding.encrypt(
+        user.password?.let{ passRaw ->
+            user.password = Encoding.encrypt(
                 strToEncrypt = passRaw,
                 secret_key = userOriginal.nickname
             )
         }
 
-        userRepository.save( userEdit.toUser(userOriginal) )
+        userRepository.save( user.toUser(userOriginal) )
     }
 
 

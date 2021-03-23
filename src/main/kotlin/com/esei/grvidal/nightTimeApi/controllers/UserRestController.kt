@@ -10,7 +10,7 @@ import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
 import com.esei.grvidal.nightTimeApi.utlis.Constants
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.core.io.Resource
+
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -22,11 +22,6 @@ import java.time.LocalDate
 import java.time.LocalTime
 import kotlin.collections.HashMap
 import kotlin.jvm.Throws
-import java.net.MalformedURLException
-
-import org.springframework.core.io.UrlResource
-import java.nio.file.Path
-import java.nio.file.Paths
 
 
 /**
@@ -122,7 +117,7 @@ class UserRestController {
                 tokenSimple[idUser] = token
                 responseHeader.set("id", idUser.toString())
                 responseHeader.set("token", token)
-                logger.info("user $idUser logged in succesfully")
+                logger.info("user $idUser logged in successfully")
                 ResponseEntity(true, responseHeader, HttpStatus.ACCEPTED)
 
 
@@ -243,8 +238,8 @@ class UserRestController {
 
                     ResponseEntity(photo, HttpStatus.OK)
 
-                }catch(e: NullPointerException){
-                    logger.error("Error geting image $e")
+                } catch (e: NullPointerException) {
+                    logger.error("Error getting image $e")
                     ResponseEntity(false, HttpStatus.NOT_FOUND)
                 }
             } ?: ResponseEntity(false, HttpStatus.NOT_FOUND)
@@ -294,21 +289,33 @@ class UserRestController {
      * @exception AlreadyExistsException if the nickname already exists
      */
     @PostMapping("")
-    fun insertUser(@RequestBody user: UserDTOInsert): ResponseEntity<Any> {
+    fun insertUser(
+        @RequestBody user: UserDTOInsert
+    ): ResponseEntity<Any> {
+        val responseHeader = HttpHeaders()
 
         return try {
 
             val id = userService.save(user)
-            val responseHeader = HttpHeaders()
-            responseHeader.set("location", Constants.URL_BASE_USER + "/" + id)
+            responseHeader.set("id", Constants.URL_BASE_USER + "/" + id)
 
-            ResponseEntity(responseHeader, HttpStatus.CREATED)
+            val token = tokenGen(25) //max users online: 25 char * 71 charset = 1775 users
+
+            tokenSimple[id] = token
+            responseHeader.set("id", id.toString())
+            responseHeader.set("token", token)
+
+            ResponseEntity("true", responseHeader, HttpStatus.CREATED)
 
         } catch (e: ServiceException) {
-            ResponseEntity(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
+            responseHeader.set("error", e.message)
+            logger.info("exception insertUser ServiceException $e")
+            ResponseEntity(false, responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
 
         } catch (e: AlreadyExistsException) {
-            ResponseEntity(e.message, HttpStatus.ALREADY_REPORTED)
+            responseHeader.set("error", e.message)
+            logger.info("exception insertUser AlreadyExistsException ${e.message.toString()}")
+            ResponseEntity(false, responseHeader, HttpStatus.ALREADY_REPORTED)
         }
     }
 
@@ -339,22 +346,29 @@ class UserRestController {
                     img,
                     "user_${user.getNickname()}_${LocalDate.now()}_${LocalTime.now()}.jpg"
                 )
+                //delete old image
                 oldName?.let {
                     storeService.delete(it)
                 }
                 //save  reference to picture
                 logger.info("New file name $newName, user $idUser")
-                userService.setUserPicture(idUser,newName)
-                ResponseEntity(HttpStatus.OK)
+                userService.setUserPicture(idUser, newName)
+                ResponseEntity(true, HttpStatus.OK)
             }
 
         } catch (e: NotFoundException) {
+            val responseHeader = HttpHeaders()
+             responseHeader.set("error", e.message)
             ResponseEntity(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
 
         } catch (e: ServiceException) {
+            val responseHeader = HttpHeaders()
+             responseHeader.set("error", e.message)
             ResponseEntity(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
 
         } catch (e: NotLoggedException) {
+            val responseHeader = HttpHeaders()
+             responseHeader.set("error", e.message)
             ResponseEntity(e.message, HttpStatus.FORBIDDEN)
         }
     }
@@ -929,7 +943,7 @@ class UserRestController {
     /**
      * Listen to a Get with a [idUser] as id of the asking user,
      * [auth] as Header for authentication,
-     * a formated date as [day]-[month]-[year],
+     * a formatted date as [day]-[month]-[year],
      * and [cityId] to return a list of [UserSnapProjection] with the friends of the user on the specified date and city
      *
      * @return a Response with a body with the a list of [UserSnapProjection]
@@ -962,7 +976,7 @@ class UserRestController {
                     Regex("(((0?[1-9]|[1-2][0-9]|3[0-1])-(0?[13578]|(10|12)))|((0?[1-9]|[1-2][0-9])-0?2)|((0?[1-9]|[1-2][0-9]|30)-(0?[469]|11)))-[0-9]{4}")
 
                 if (!dateString.matches(datePatter))
-                    ResponseEntity("Date error, plase use date as  day-month-year", HttpStatus.UNAUTHORIZED)
+                    ResponseEntity("Date error, please use date as  day-month-year", HttpStatus.UNAUTHORIZED)
                 else {
 
                     val dateCity = DateCityDTO(LocalDate.of(year, month, day), cityId)

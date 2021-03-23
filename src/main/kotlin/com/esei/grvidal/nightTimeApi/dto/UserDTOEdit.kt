@@ -21,7 +21,6 @@ fun UserDTOEdit.toUser(user: User): User {
         password = password ?: user.password,
         state = state ?: user.state,
         email = email ?: user.email,
-        birthdate = user.birthdate
     ).apply {
         id = this@toUser.id
         nextDates = user.nextDates
