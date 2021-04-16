@@ -13,8 +13,8 @@ import javax.persistence.*
 @Table(name ="message")
 class Message(
     var text: String,
-    var date: LocalDate,
-    var hour: LocalTime,
+    var date: LocalDate = LocalDate.now(),
+    var hour: LocalTime = LocalTime.now(),
 
     @ManyToOne
         @JoinColumn(name = "friendship_id", nullable = false)

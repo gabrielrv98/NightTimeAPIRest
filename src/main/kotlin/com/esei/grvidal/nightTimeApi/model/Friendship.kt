@@ -21,7 +21,7 @@ class Friendship(
 
 ) {
     @Enumerated(EnumType.STRING)
-    var answer: AnswerOptions? = AnswerOptions.NOT_ANSWERED
+    var answer: AnswerOptions = AnswerOptions.NOT_ANSWERED
 
     @OneToMany(mappedBy = "friendship",cascade = [CascadeType.REMOVE])
     var messages : Set<Message> ? = null

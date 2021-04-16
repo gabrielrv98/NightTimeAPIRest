@@ -1,7 +1,6 @@
 package com.esei.grvidal.nightTimeApi.serviceInterface
 
 import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
-import com.esei.grvidal.nightTimeApi.dto.FriendshipInsertDTO
 import com.esei.grvidal.nightTimeApi.dto.FriendshipUpdateDTO
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
@@ -25,13 +24,17 @@ interface IFriendshipService {
     //Lists all the users that have any message on the chat with the user
     fun listUsersWithChatFromFriendsByUser(userId: Long): List<ChatView>
 
-    //Show one chat
+    //Show one FriendShip
     @Throws( NotFoundException::class)
     fun load(friendsId: Long): FriendshipProjection
 
+    //Show one FriendShip
+    @Throws( NotFoundException::class)
+    fun load(user1Id: Long, user2Id: Long): FriendshipProjection
+
     //Save a new FriendShip
     @Throws(NotFoundException::class, AlreadyExistsException::class)
-    fun save(friendship: FriendshipInsertDTO): Long
+    fun save(userAsk: Long, userAnswer: Long): Long
 
     //Updates a  FriendShip
     @Throws(NotFoundException::class)
@@ -51,4 +54,6 @@ interface IFriendshipService {
 
     //Returns a list with all the friendships not accepted yet
     fun getFriendsRequest(idUser: Long): List<UserFriendView>
+
+    fun friendShipState(idUser1: Long, idUser2: Long): AnswerOptions
 }

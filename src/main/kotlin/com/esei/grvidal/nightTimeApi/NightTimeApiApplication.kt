@@ -1,6 +1,8 @@
 package com.esei.grvidal.nightTimeApi
 
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
+import com.esei.grvidal.nightTimeApi.init.ChatInit
+import com.esei.grvidal.nightTimeApi.init.MessageInit
 import com.esei.grvidal.nightTimeApi.repository.*
 import com.esei.grvidal.nightTimeApi.model.*
 import com.esei.grvidal.nightTimeApi.services.UserService
@@ -13,7 +15,6 @@ import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.runApplication
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import java.time.LocalDate
-import java.time.LocalTime
 
 @SpringBootApplication
 @EnableJpaRepositories("com.esei.grvidal.nightTimeApi.repository")
@@ -27,22 +28,22 @@ class NightTimeApiApplication : CommandLineRunner {
     lateinit var dateCityRepository: DateCityRepository
 
     @Autowired
-    lateinit var eventRepositories: EventRepository
+    lateinit var eventRepository: EventRepository
 
     @Autowired
-    lateinit var cityRepositories: CityRepository
+    lateinit var cityRepository: CityRepository
 
     @Autowired
-    lateinit var userRepositories: UserRepository
+    lateinit var userRepository: UserRepository
 
     @Autowired
     lateinit var userService: UserService
 
     @Autowired
-    lateinit var friendshipRepositories: FriendshipRepository
+    lateinit var friendshipRepository: FriendshipRepository
 
     @Autowired
-    lateinit var messageRepositories: MessageRepository
+    lateinit var messageRepository: MessageRepository
 
 
     val logger = LoggerFactory.getLogger(NightTimeApiApplication::class.java)!!
@@ -54,23 +55,23 @@ class NightTimeApiApplication : CommandLineRunner {
         val cityOu = City("Ourense", "Spain")
         val cityVigo = City("Vigo", "Spain")
 
-        cityRepositories.save(cityOu)
-        cityRepositories.save(cityVigo)
+        cityRepository.save(cityOu)
+        cityRepository.save(cityVigo)
 
         var genericCity = City("Pontevedra", "Spain")
-        cityRepositories.save(genericCity)
+        cityRepository.save(genericCity)
 
         genericCity = City("Coruña", "Spain")
-        cityRepositories.save(genericCity)
+        cityRepository.save(genericCity)
 
         genericCity = City("Allariz", "Spain")
-        cityRepositories.save(genericCity)
+        cityRepository.save(genericCity)
 
         genericCity = City("Lugo", "Spain")
-        cityRepositories.save(genericCity)
+        cityRepository.save(genericCity)
 
         genericCity = City("Rivadavia", "Spain")
-        cityRepositories.save(genericCity)
+        cityRepository.save(genericCity)
 
 
         // Bar with events ---------------------
@@ -104,23 +105,23 @@ class NightTimeApiApplication : CommandLineRunner {
         barRepository.save(bar)
 
         var event = Event("copas a menos de 1 euro", date = LocalDate.now(), bar = bar)
-        eventRepositories.save(event)
+        eventRepository.save(event)
 
         event = Event("Fardos gratis", date = LocalDate.now(), bar = bar)
-        eventRepositories.save(event)
+        eventRepository.save(event)
 
         event = Event("Musica en vivo", date = LocalDate.now().plusDays(1), bar = bar)
-        eventRepositories.save(event)
+        eventRepository.save(event)
 
         event = Event(
             "Hoy cerrado por defuncion, esperemos que todos se pongan mejor, gracias por su atencion",
             date = LocalDate.now().plusDays(3),
             bar = bar
         )
-        eventRepositories.save(event)
+        eventRepository.save(event)
 
         event = Event("Copas a 3 euros", date = LocalDate.now().plusDays(3), bar = bar)
-        eventRepositories.save(event)
+        eventRepository.save(event)
 
         bar = Bar(
             name = "Patio andaluz",
@@ -154,13 +155,13 @@ class NightTimeApiApplication : CommandLineRunner {
             date = LocalDate.now().plusDays(3),
             bar = bar
         )
-        eventRepositories.save(event)
+        eventRepository.save(event)
 
         event = Event("Copas a 3 euros", date = LocalDate.now().plusDays(3), bar = bar)
-        eventRepositories.save(event)
+        eventRepository.save(event)
 
         event = Event("No lo tenemos muy claro", date = LocalDate.now(), bar = bar)
-        eventRepositories.save(event)
+        eventRepository.save(event)
 
 
         bar = Bar(
@@ -180,7 +181,7 @@ class NightTimeApiApplication : CommandLineRunner {
 
 
         event = Event("Todo barato", date = LocalDate.now(), bar = bar)
-        eventRepositories.save(event)
+        eventRepository.save(event)
 
 
         bar = Bar(
@@ -201,10 +202,10 @@ class NightTimeApiApplication : CommandLineRunner {
 
 
         event = Event("Oferta 2 x 1", date = LocalDate.now(), bar = bar)
-        eventRepositories.save(event)
+        eventRepository.save(event)
 
         Event("Musica de los 90", date = LocalDate.now().plusDays(1), bar = bar)
-        eventRepositories.save(event)
+        eventRepository.save(event)
 
 
 
@@ -226,13 +227,13 @@ class NightTimeApiApplication : CommandLineRunner {
 
 
         event = Event("Oferta 2 x 1", date = LocalDate.now().plusDays(1), bar = bar)
-        eventRepositories.save(event)
+        eventRepository.save(event)
 
         event = Event("Fiesta de la espuma", date = LocalDate.now().plusDays(2), bar = bar)
-        eventRepositories.save(event)
+        eventRepository.save(event)
 
         event = Event("Hoy cerrado por fiesta infantil, nos vemos gente", date = LocalDate.now().plusDays(2), bar = bar)
-        eventRepositories.save(event)
+        eventRepository.save(event)
 
         bar = Bar(
             name = "Studio 34",
@@ -252,15 +253,15 @@ class NightTimeApiApplication : CommandLineRunner {
 
 
         event = Event("Musica en vivo", date = LocalDate.now().plusDays(1), bar = bar)
-        eventRepositories.save(event)
+        eventRepository.save(event)
         event = Event(
             "Hoy cerrado por defuncion, esperemos que todos se pongan mejor, gracias por su atencion",
             date = LocalDate.now().plusDays(3),
             bar = bar
         )
-        eventRepositories.save(event)
+        eventRepository.save(event)
         event = Event("Copas a 3 euros", date = LocalDate.now().plusDays(3), bar = bar)
-        eventRepositories.save(event)
+        eventRepository.save(event)
 
 
 
@@ -310,7 +311,7 @@ class NightTimeApiApplication : CommandLineRunner {
 
         )
         userService.save(user)
-        val user1 = userRepositories.findByNickname(user.nickname).get()
+        val user1 = userRepository.findByNickname(user.nickname).get()
         //userService.setUserPicture(user1.id, "/userpics/user_grvidal.jpg")
 
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user1))
@@ -333,7 +334,7 @@ class NightTimeApiApplication : CommandLineRunner {
         )
 
         userService.save(user)
-        val user2 = userRepositories.findByNickname(user.nickname).get()
+        val user2 = userRepository.findByNickname(user.nickname).get()
         userService.setUserPicture(user2.id, "/userpics/user_pinkxnut_2021-03-16_18-31-14-988.jpg")
 
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user2))
@@ -351,7 +352,7 @@ class NightTimeApiApplication : CommandLineRunner {
         )
 
         userService.save(user)
-        val user3 = userRepositories.findByNickname(user.nickname).get()
+        val user3 = userRepository.findByNickname(user.nickname).get()
         userService.setUserPicture(user3.id, "/userpics/user_santii810.jpg")
 
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user3))
@@ -368,7 +369,7 @@ class NightTimeApiApplication : CommandLineRunner {
         )
 
         userService.save(user)
-        val user4 = userRepositories.findByNickname(user.nickname).get()
+        val user4 = userRepository.findByNickname(user.nickname).get()
 
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user4))
         dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(2), nextCity = cityOu, user = user4))
@@ -384,47 +385,86 @@ class NightTimeApiApplication : CommandLineRunner {
         )
 
         userService.save(user)
-        val user5 = userRepositories.findByNickname(user.nickname).get()
+        val user5 = userRepository.findByNickname(user.nickname).get()
 
         dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user5))
         dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(1), nextCity = cityVigo, user = user5))
         dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(2), nextCity = cityVigo, user = user5))
+
+        user = UserDTOInsert(
+            "Sara Domarco",
+            "saraDom",
+            "passwordUser5",
+            "Cuando se acaba el covid??",
+            "saraDom@gmail.com"
+        )
+
+        userService.save(user)
+        val user6 = userRepository.findByNickname(user.nickname).get()
+
+        dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user6))
+        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(1), nextCity = cityOu, user = user6))
+        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(2), nextCity = cityVigo, user = user6))
 
 
         // Friends -----------------------
 
         val friend1_2 = Friendship(user1, user2)
         friend1_2.answer = AnswerOptions.YES
-        friendshipRepositories.save(friend1_2)// accepted friendship
+        friendshipRepository.save(friend1_2)// accepted friendship
 
-        val friend1_3 = Friendship(user3, user1 )
+        val friend1_3 = Friendship(user3, user1)
         friend1_3.answer = AnswerOptions.YES
-        friendshipRepositories.save(friend1_3)// accepted friendship
-
-        friendshipRepositories.save(Friendship(user3, user2)) // offered friendship
-        friendshipRepositories.save(Friendship(user4, user1)) // offered friendship
+        friendshipRepository.save(friend1_3)// accepted friendship
 
         val friend4_1 = Friendship(user4, user1)
         friend4_1.answer = AnswerOptions.YES
-        friendshipRepositories.save(friend4_1)// accepted friendship
+        friendshipRepository.save(friend4_1)// accepted friendship
+
+        friendshipRepository.save(Friendship(user5, user1)) // offered friendship
 
         // Chats -----------------------
 
-        var friendship = friendshipRepositories.findFriendsByUserAsk_IdOrUserAnswer_Id(user1.id, user1.id)[0]
-        var msg = Message("Hola nuria", LocalDate.now(), LocalTime.now(), friendship, friendship.userAsk)
-        messageRepositories.save(msg)
-        msg = Message(
-            "Adios Gabriel",
-            LocalDate.now().plusDays(1),
-            LocalTime.now().plusHours(1),
-            friendship,
-            friendship.userAnswer
-        )
-        messageRepositories.save(msg)
+        ChatInit(
+            friendshipRepository.findFriendsByUserAsk_IdOrUserAnswer_Id(user1.id, user1.id)[0],
+            messageRepository,
+            listOf(
+                MessageInit("Hola Nuria", 0),
+                MessageInit("Que tal?", 0),
+                MessageInit("Todo bien que tal estas tu?", 1),
+                MessageInit("Genial, tengo ganas de ir al cine a ver esa nueva peli", 0),
+                MessageInit("Yo tambien, dicen que esta muy bien", 1),
+                MessageInit("Además hace mucho que no vamos al cine", 1),
+                MessageInit("Te veo a las 12, no llegues tarde!", 0),
+            )
+        ).saveData()
 
-        friendship = friendshipRepositories.findFriendsByUserAsk_IdOrUserAnswer_Id(user1.id, user1.id)[1]
-        msg = Message("Hola Santii", LocalDate.now(), LocalTime.now(), friendship, friendship.userAnswer)
-        messageRepositories.save(msg)
+        ChatInit(
+            friendshipRepository.findFriendsByUserAsk_IdOrUserAnswer_Id(user1.id, user1.id)[1],
+            messageRepository,
+            listOf(
+                MessageInit("Santiii al final lograste conectarlo?", 0),
+                MessageInit("Si, ahora todo funciona bien, no se muy bien por que fallaba", 1),
+                MessageInit("Seria un bug", 1),
+                MessageInit("Tu hiciste tu parte", 1),
+                MessageInit("Claroo, deberiamos estar listos para pasar a produccion", 0),
+                MessageInit("Perfecto, te veo el jueves a las 6", 1),
+                MessageInit("A las 16*", 1),
+            )
+        ).saveData()
+
+        ChatInit(
+            friendshipRepository.findFriendsByUserAsk_IdOrUserAnswer_Id(user4.id, user4.id)[0],
+            messageRepository,
+            listOf(
+                MessageInit("Hola, la aplicacion dice que el sabado sales, nos vamos encontes?", 0),
+                MessageInit("Claro, estare donde siempre, fijo que nos vemos", 1),
+                MessageInit("Me puedes dar esa copa que me debias si quires", 0),
+                MessageInit("Nunca perdonas una eh, el primero en ser encontrado invita a un chupito", 1),
+                MessageInit("Mira que eres rata!!!", 0),
+                MessageInit("Buena suerte XD", 1)
+            )
+        ).saveData()
 
         logger.info("Application ready to use")
     }

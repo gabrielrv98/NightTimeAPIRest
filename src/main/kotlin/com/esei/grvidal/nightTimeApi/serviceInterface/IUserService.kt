@@ -6,9 +6,7 @@ import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
-import com.esei.grvidal.nightTimeApi.projections.DateCityReducedProjection
-import com.esei.grvidal.nightTimeApi.projections.UserEditProjection
-import com.esei.grvidal.nightTimeApi.projections.UserProjection
+import com.esei.grvidal.nightTimeApi.projections.*
 import kotlin.jvm.Throws
 
 /**
@@ -57,5 +55,6 @@ interface IUserService {
     @Throws(NotFoundException::class)
     fun getPicture(id: Long): String?
 
+    fun searchUsersByString(userString: String, page: Int, size: Int): List<UserSnapProjection>
 
 }

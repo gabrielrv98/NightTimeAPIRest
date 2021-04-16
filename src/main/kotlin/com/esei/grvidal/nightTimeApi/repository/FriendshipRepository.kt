@@ -22,15 +22,15 @@ interface FriendshipRepository : JpaRepository<Friendship, Long> {
     //Returns all the FriendsShips where an user is involved
     fun findFriendsByUserAsk_IdOrUserAnswer_Id(user1_id: Long, user2_id: Long) : List<Friendship>
 
-    //Returns all the FriendsShips where an user is involved and has a specific answer
+    //Returns all the FriendsShips where an user is involved and has a YES answer
     @Query(value = "SELECT f FROM Friendship f WHERE (f.userAsk.id = ?1 OR f.userAnswer.id = ?1) AND f.answer = com.esei.grvidal.nightTimeApi.utlis.AnswerOptions.YES ")
     fun findFriendshipsFromUser(user_id: Long) : List<FriendshipProjection>
 
     //Returns a friendShip with the specified users IDs
-    fun findFriendshipByUserAsk_IdAndUserAnswer_Id(userAsk_id: Long, userAnswer_id: Long) : Optional<Friendship>
+    fun findFriendshipByUserAsk_IdAndUserAnswer_Id(userAsk_id: Long, userAnswer_id: Long) : Optional<FriendshipProjection>
 
-    //Returns all the ids of the Friendships where the user is involved and there is any message
-    @Query(value = "SELECT DISTINCT f FROM Friendship f INNER JOIN Message m ON f.id = m.friendship.id WHERE f.userAsk.id = ?1 OR f.userAnswer.id = ?1")
+    //Returns all the Friendships where the user is involved and there is any message
+    @Query(value = "SELECT DISTINCT f FROM Friendship f INNER JOIN Message m ON f.id = m.friendship.id WHERE f.userAsk.id = ?1 OR f.userAnswer.id = ?1 ORDER BY m.date ASC")
     fun getChatsWithMessages(idUser: Long): List<Friendship>
 
     /**
@@ -50,7 +50,6 @@ interface FriendshipRepository : JpaRepository<Friendship, Long> {
     /**
      *  Returns the number of friends of user_ask with id [idUser] who checked the date [date] in the city with id [idCity]
      */
-    //@Query(value = "SELECT F.userAnswer.id, F.userAnswer.nickname " +
     @Query(value = "SELECT F " +
             "FROM Friendship AS F JOIN DateCity AS DC on F.userAnswer.id = DC.user.id WHERE F.answer= com.esei.grvidal.nightTimeApi.utlis.AnswerOptions.YES AND F.userAsk.id = ?1 AND DC.nextCity.id = ?2 AND DC.nextDate = ?3")
     fun getFriendsFromUserAskOnDate(idUser: Long, idCity: Long, date: LocalDate) : List<FriendshipProjection>
@@ -58,7 +57,6 @@ interface FriendshipRepository : JpaRepository<Friendship, Long> {
     /**
      *  Returns the number of friends of user_answer with id [idUser] who checked the date [date] in the city with id [idCity]
      */
-    //@Query(value = "SELECT F.userAsk.id, F.userAsk.nickname " +
     @Query(value = "SELECT F " +
             "FROM Friendship AS F JOIN DateCity AS DC on F.userAsk.id = DC.user.id WHERE F.answer= com.esei.grvidal.nightTimeApi.utlis.AnswerOptions.YES AND F.userAnswer.id = ?1 AND DC.nextCity.id = ?2 AND DC.nextDate = ?3")
     fun getFriendsFromUserAnswerOnDate(idUser: Long, idCity: Long, date: LocalDate) : List<FriendshipProjection>

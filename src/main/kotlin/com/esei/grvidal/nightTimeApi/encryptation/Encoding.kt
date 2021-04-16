@@ -92,7 +92,7 @@ class Encoding {
                 keyBytes = sub_secret_key.toByteArray(charset("UTF8"))
                 val skey = SecretKeySpec(keyBytes, algorithm)
                 val input = Base64
-                    .decode(strToDecrypt?.trim { it <= ' ' }?.toByteArray(charset("UTF8")))
+                    .decode(strToDecrypt.trim { it <= ' ' }.toByteArray(charset("UTF8")))
 
                 synchronized(Cipher::class.java) {
                     val cipher = Cipher.getInstance("AES/ECB/PKCS7Padding")

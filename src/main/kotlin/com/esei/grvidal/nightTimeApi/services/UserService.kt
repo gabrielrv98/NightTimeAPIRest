@@ -11,15 +11,13 @@ import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.User
 import com.esei.grvidal.nightTimeApi.model.nicknameLength
-import com.esei.grvidal.nightTimeApi.projections.DateCityReducedProjection
-import com.esei.grvidal.nightTimeApi.projections.UserProjection
-import com.esei.grvidal.nightTimeApi.projections.toUserDTOEdit
+import com.esei.grvidal.nightTimeApi.projections.*
 import com.esei.grvidal.nightTimeApi.repository.DateCityRepository
 import com.esei.grvidal.nightTimeApi.serviceInterface.IUserService
-import org.hibernate.engine.jdbc.spi.SqlExceptionHelper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import kotlin.jvm.Throws
 
@@ -76,8 +74,8 @@ class UserService : IUserService {
 
         if (!user.isPresent)
             throw  NotFoundException("Couldn't find the user with id $idUser")
-        else{
-            return user.get().toUserDTOEdit().also{ userDTOEdit ->
+        else {
+            return user.get().toUserDTOEdit().also { userDTOEdit ->
                 userDTOEdit.password = Encoding.decrypt(
                     strToDecrypt = userDTOEdit.password!!,//Should always have password
                     secret_key = user.get().getNickname()
@@ -135,13 +133,13 @@ class UserService : IUserService {
         try {
             return userRepository.save(user.toUser()).id
 
-        } catch(e : Exception){
-            when(e){
+        } catch (e: Exception) {
+            when (e) {
                 is DataIntegrityViolationException,
-                is DataAccessException ->{
+                is DataAccessException -> {
                     throw AlreadyExistsException("User with nickname ${user.nickname} already exists")
                 }
-                else ->  throw ServiceException("Error adding ${user.nickname}, ${e.toString()} ")
+                else -> throw ServiceException("Error adding ${user.nickname}, $e ")
             }
         }
     }
@@ -149,14 +147,14 @@ class UserService : IUserService {
     override fun update(idUser: Long, user: UserDTOEdit) {
         val userOriginal = load(idUser)
 
-        user.password?.let{ passRaw ->
+        user.password?.let { passRaw ->
             user.password = Encoding.encrypt(
                 strToEncrypt = passRaw,
                 secret_key = userOriginal.nickname
             )
         }
 
-        userRepository.save( user.toUser(userOriginal) )
+        userRepository.save(user.toUser(userOriginal))
     }
 
 
@@ -227,6 +225,20 @@ class UserService : IUserService {
     override fun getPicture(id: Long): String? {
         return load(id).picture
     }
+
+    override fun searchUsersByString(userString: String, page: Int, size: Int): List<UserSnapProjection> {
+        val list = userRepository.findUsersByNameContainsOrNicknameContains(
+            userString,
+            userString,
+            pageable = PageRequest.of(page, size)
+        )
+
+        return list.map { user ->
+            UserSnapProjection(user)
+        }
+    }
+
+
 
 }
 

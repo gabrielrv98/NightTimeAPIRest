@@ -1,9 +1,9 @@
 package com.esei.grvidal.nightTimeApi.repository
 
-import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
 import com.esei.grvidal.nightTimeApi.model.User
 import com.esei.grvidal.nightTimeApi.projections.UserEditProjection
 import com.esei.grvidal.nightTimeApi.projections.UserProjection
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
@@ -18,6 +18,7 @@ interface UserRepository : JpaRepository<User, Long> {
     fun getAllBy(): List<UserProjection>
     fun getUserById (id: Long): Optional<UserProjection>
     fun findUserById (id: Long): Optional<UserEditProjection>
+    fun findUsersByNameContainsOrNicknameContains(name: String, nickname: String,pageable: Pageable):List<UserProjection>
 
     fun findByNickname(nickname: String): Optional<User>
 

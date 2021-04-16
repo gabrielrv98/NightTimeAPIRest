@@ -7,7 +7,8 @@ package com.esei.grvidal.nightTimeApi.projections
 class UserSnapProjection(
     var userId: Long,
     var username: String,
-    val realname: String
+    val name: String,
+    val image: Boolean
 ) : java.io.Serializable {
 
 
@@ -24,15 +25,16 @@ class UserSnapProjection(
     )
 
     /**
-     *  Private constructor, receives the friendship ID, the set of messages an the oth
+     *  Constructor, receives the friendship ID, the set of messages an the oth
      *
      */
-    private constructor(
+    constructor(
         user: UserProjection
     ) : this(
         userId = user.getId(),
         username = user.getNickname(),
-        realname = user.getName()
+        name = user.getName(),
+        image = user.getPicture() != null
     )
 
 

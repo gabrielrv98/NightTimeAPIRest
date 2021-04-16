@@ -12,6 +12,7 @@ class ChatView(
     var friendshipId: Long,
     var userId: Long,
     var userNickname: String,
+    val hasImage: Boolean,
     var messages: List<MessageView>
 ) : java.io.Serializable {
 
@@ -41,6 +42,7 @@ class ChatView(
         friendshipId = friendshipId,
         userId = user.id,
         userNickname = user.nickname,
+        hasImage = user.picture != null,
         messages = messages.map { MessageView(it) }
     )
 
