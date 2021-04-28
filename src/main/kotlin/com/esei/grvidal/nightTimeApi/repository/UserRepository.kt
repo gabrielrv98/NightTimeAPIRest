@@ -19,6 +19,7 @@ interface UserRepository : JpaRepository<User, Long> {
     fun getUserById (id: Long): Optional<UserProjection>
     fun findUserById (id: Long): Optional<UserEditProjection>
     fun findUsersByNameContainsOrNicknameContains(name: String, nickname: String,pageable: Pageable):List<UserProjection>
+    fun countUsersByNameContainsOrNicknameContains(name: String, nickname: String):Int
 
     fun findByNickname(nickname: String): Optional<User>
 

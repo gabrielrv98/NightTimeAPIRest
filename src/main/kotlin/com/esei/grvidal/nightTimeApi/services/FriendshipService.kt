@@ -16,8 +16,9 @@ import com.esei.grvidal.nightTimeApi.projections.UserFriendView
 import com.esei.grvidal.nightTimeApi.projections.UserSnapProjection
 import com.esei.grvidal.nightTimeApi.repository.UserRepository
 import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendshipService
-import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
+import com.esei.grvidal.nightTimeApi.utils.AnswerOptions
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import kotlin.jvm.Throws
 
@@ -145,15 +146,16 @@ class FriendshipService : IFriendshipService {
         return friendshipRepository.getFriendshipsRequest(idUser).map { UserFriendView(it, idUser) }
     }
 
-    override fun friendShipState(idUser1: Long, idUser2: Long): AnswerOptions {
-        val friendship = friendshipRepository.findFriendsByUserAsk_IdOrUserAnswer_Id(idUser1, idUser1)
-            .filter {
-                (it.userAnswer.id == idUser1 && it.userAsk.id == idUser2) ||
-                        (it.userAnswer.id == idUser2 && it.userAsk.id == idUser1)
-            }
+    override fun getCountFriendsRequest(idUser: Long): Int {
+        return friendshipRepository.getCountAllByUserAnswerAndAnswer(idUser)
+    }
 
-        return if (friendship.isEmpty()) AnswerOptions.NO
-        else friendship[0].answer
+    override fun friendShipState(idUser1: Long, idUser2: Long): AnswerOptions {
+        val friendshipList = friendshipRepository.findFriendsByUserAsk_IdOrUserAnswer_Id(idUser1, idUser1)
+            .filter { it.userAnswer.id == idUser2 || it.userAsk.id == idUser2  }
+
+        return if (friendshipList.isEmpty()) AnswerOptions.NO
+        else friendshipList[0].answer
     }
 
     override fun getCountFriendsOnDate(idUser: Long, dateCityDTO: DateCityDTO): Int {
@@ -168,19 +170,38 @@ class FriendshipService : IFriendshipService {
         return numberFriends
     }
 
-    override fun getFriendsOnDate(idUser: Long, dateCityDTO: DateCityDTO): List<UserSnapProjection> {
+    override fun getFriendsOnDate(idUser: Long, dateCityDTO: DateCityDTO, page:Int, size:Int): List<UserSnapProjection> {
 
-        val friendList =
-            friendshipRepository.getFriendsFromUserAskOnDate(idUser, dateCityDTO.nextCityId, dateCityDTO.nextDate)
-                .toMutableList()
-        friendList += friendshipRepository.getFriendsFromUserAnswerOnDate(
-            idUser,
-            dateCityDTO.nextCityId,
-            dateCityDTO.nextDate
+        val friendList = friendshipRepository.getFriendsOnDate(
+
+            idUser = idUser,
+            idCity = dateCityDTO.nextCityId,
+            date = dateCityDTO.nextDate,
+            pageable = PageRequest.of(page, size)
         )
+/*
 
-        return friendList.map { UserSnapProjection(it, idUser) }
+            friendshipRepository.getFriendsFromUserAskOnDate(
+                idUser = idUser,
+                idCity = dateCityDTO.nextCityId,
+                date = dateCityDTO.nextDate,
+                pageable = PageRequest.of(page, size)
+            )
+                .toMutableList()
 
+        friendList += friendshipRepository.getFriendsFromUserAnswerOnDate(
+            idUser = idUser,
+            idCity = dateCityDTO.nextCityId,
+            date = dateCityDTO.nextDate,
+            pageable = PageRequest.of(page, size)
+        )
+        */
+
+        //todo remove this (trick to check pagination)
+
+       // val friendListAll = friendshipRepository.getAllOnDate(idCity = dateCityDTO.nextCityId, dateCityDTO.nextDate, PageRequest.of(page,size))
+        //return friendListAll.map{ UserSnapProjection(it, idUser) }
+       return friendList.map { UserSnapProjection(it, idUser) }
     }
 
 }

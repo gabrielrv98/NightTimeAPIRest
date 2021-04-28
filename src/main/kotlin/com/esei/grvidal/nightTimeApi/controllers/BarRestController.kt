@@ -10,7 +10,7 @@ import com.esei.grvidal.nightTimeApi.projections.BarDetailsProjection
 import com.esei.grvidal.nightTimeApi.projections.BarProjection
 import com.esei.grvidal.nightTimeApi.serviceInterface.ICityService
 import com.esei.grvidal.nightTimeApi.serviceInterface.IPhotoService
-import com.esei.grvidal.nightTimeApi.utlis.Constants
+import com.esei.grvidal.nightTimeApi.utils.Constants
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders

@@ -1,4 +1,4 @@
-package com.esei.grvidal.nightTimeApi.utlis
+package com.esei.grvidal.nightTimeApi.utils
 
 /**
  * Class with the constants of the api, used to minimize errors

@@ -238,6 +238,10 @@ class UserService : IUserService {
         }
     }
 
+    override  fun countUsersByString(userString: String): Int{
+        return userRepository.countUsersByNameContainsOrNicknameContains(userString,userString)
+    }
+
 
 
 }

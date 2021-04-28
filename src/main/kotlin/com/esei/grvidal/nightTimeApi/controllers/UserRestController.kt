@@ -6,9 +6,9 @@ import com.esei.grvidal.nightTimeApi.exception.*
 import com.esei.grvidal.nightTimeApi.model.*
 import com.esei.grvidal.nightTimeApi.projections.*
 import com.esei.grvidal.nightTimeApi.serviceInterface.*
-import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
-import com.esei.grvidal.nightTimeApi.utlis.Constants
-import com.esei.grvidal.nightTimeApi.utlis.Constants.Companion.ERROR_HEADER_TAG
+import com.esei.grvidal.nightTimeApi.utils.AnswerOptions
+import com.esei.grvidal.nightTimeApi.utils.Constants
+import com.esei.grvidal.nightTimeApi.utils.Constants.Companion.ERROR_HEADER_TAG
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -172,7 +172,7 @@ class UserRestController {
 
 
     @Deprecated("Testing proposes")
-    @GetMapping("")
+    @GetMapping("/test/all")
     fun list(): ResponseEntity<List<UserProjection>> {
         return ResponseEntity(userService.list(), HttpStatus.OK)
 
@@ -188,7 +188,7 @@ class UserRestController {
     fun loadProjection(
         @PathVariable("idSearchedUser") searchedUserId: Long,
         @RequestHeader("auth") auth: String,
-        @RequestHeader("myUser") clientId: Long
+        @RequestHeader("clientUser") clientId: Long
     ): ResponseEntity<Any> {
 
         return try {
@@ -199,12 +199,15 @@ class UserRestController {
 
                 val user = UserProjectionProfile(
                     user = userService.loadProjection(searchedUserId),
-                    friendshipState = if (searchedUserId != clientId) friendshipService.friendShipState(
-                        searchedUserId,
-                        clientId
-                    )
+                    friendshipState = if (searchedUserId != clientId) //If the user is not looking for himself check if they are friends
+                        friendshipService.friendShipState(searchedUserId, clientId)
                     else AnswerOptions.NO
                 )
+
+                if (user.friendshipState != AnswerOptions.YES) //If users are not friends hide private fields projection
+                    user.nextDate = null
+
+
                 ResponseEntity(user, HttpStatus.OK)
             }
 
@@ -559,6 +562,7 @@ class UserRestController {
 
     /**
      * Listen to a Get with the [Constants.URL_BASE_BAR] and an Id as a parameter to show one Bar
+     * TODO this is used to start a new chat
      *
      * @return A List<[UserFriendView]> with all the friendship of the user
      *
@@ -583,17 +587,22 @@ class UserRestController {
         }
     }
 
-    @GetMapping("/search/{usernickname}")
+    @GetMapping("/search/{nickname}")
     fun searchUser(
-        @PathVariable("usernickname") userString: String,
+        @PathVariable("nickname") userString: String,
         @RequestParam(defaultValue = "0") page: Int,
-        @RequestParam(defaultValue = "10") size: Int
+        @RequestParam(defaultValue = "17") size: Int
     ): ResponseEntity<List<UserSnapProjection>> {
+
+        val responseHeader = HttpHeaders()
+
+        responseHeader.set("total", userService.countUsersByString(userString = userString).toString())
 
         return ResponseEntity(
             userService.searchUsersByString(
                 userString = userString, page = page, size = size
             ),
+            responseHeader,
             HttpStatus.OK
         )
 
@@ -625,7 +634,7 @@ class UserRestController {
                 val id = friendshipService.save(idUser, idFriend)
 
                 responseHeader.set("location", "${Constants.URL_BASE_USER}/$idUser/chat/$id")
-                ResponseEntity(true,responseHeader, HttpStatus.CREATED)
+                ResponseEntity(true, responseHeader, HttpStatus.CREATED)
             }
 
         } catch (e: NotFoundException) {
@@ -651,16 +660,29 @@ class UserRestController {
     fun getFriendRequest(
         @PathVariable("id") idUser: Long,
         @RequestHeader("auth") auth: String
-    ): ResponseEntity<Any> {
-
+    ): ResponseEntity<List<UserFriendView>> {
+        val responseHeader = HttpHeaders()
         return try {
 
-            if (!securityCheck(idUser, auth))//if authentication fails
-                ResponseEntity("Security error, credentials don't match", HttpStatus.UNAUTHORIZED)
-            else ResponseEntity(friendshipService.getFriendsRequest(idUser), HttpStatus.OK)
+            if (!securityCheck(idUser, auth)) {
+                //if authentication fails
+                responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
+                ResponseEntity(listOf(), responseHeader, HttpStatus.UNAUTHORIZED)
+            } else {
+
+
+                responseHeader.set("total", friendshipService.getCountFriendsRequest(idUser).toString())
+
+                ResponseEntity(
+                    friendshipService.getFriendsRequest(idUser),
+                    responseHeader,
+                    HttpStatus.OK
+                )
+            }
 
         } catch (e: NotLoggedException) {
-            ResponseEntity(e.message, HttpStatus.FORBIDDEN)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(listOf(), responseHeader, HttpStatus.FORBIDDEN)
         }
     }
 
@@ -691,16 +713,10 @@ class UserRestController {
             if (!securityCheck(idUser, auth))//if authentication fails
                 return ResponseEntity("Security error, credentials don't match", HttpStatus.UNAUTHORIZED)
 
-        } catch (e: NotLoggedException) {
-            return ResponseEntity(e.message.toString(), HttpStatus.FORBIDDEN)
-        }
-
-
-        try {
             val friendRequestDB = friendshipService.load(friendRequest.id)
 
             //only non accepted requests can be updated
-            if (friendRequestDB.getAnswer() == AnswerOptions.YES)
+            if (friendRequestDB.getAnswer() != AnswerOptions.NOT_ANSWERED)
                 return ResponseEntity("Friendship already accepted, can only be deleted", HttpStatus.FORBIDDEN)
 
 
@@ -715,7 +731,7 @@ class UserRestController {
                         friendshipService.update(friendRequest)
                         responseHeader.set("Friendship Id", "${friendRequestDB.getId()}")
 
-                        ResponseEntity(responseHeader, HttpStatus.OK)
+                        ResponseEntity(true, responseHeader, HttpStatus.OK)
 
                     }
                     //answer no
@@ -723,7 +739,7 @@ class UserRestController {
 
                         //remove request
                         friendshipService.remove(friendRequestDB.getId())
-                        ResponseEntity(responseHeader, HttpStatus.OK)
+                        ResponseEntity(true, responseHeader, HttpStatus.OK)
 
                     }
                     //any other answer
@@ -735,9 +751,11 @@ class UserRestController {
             }
 
 
+        } catch (e: NotLoggedException) {
+            return ResponseEntity(e.message.toString(), HttpStatus.FORBIDDEN)
+
         } catch (e: NotFoundException) {
             return ResponseEntity(e.message.toString(), HttpStatus.NOT_FOUND)
-
         }
 
     }
@@ -799,7 +817,11 @@ class UserRestController {
             if (!securityCheck(idUser, auth)) {//if authentication fails
                 header.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
                 ResponseEntity(listOf(), header, HttpStatus.UNAUTHORIZED)
-            } else ResponseEntity(friendshipService.listUsersWithChatFromFriendsByUser(idUser), HttpStatus.OK)
+            } else {
+                logger.info("getFriendshipWithMessages called for user $idUser")
+
+                ResponseEntity(friendshipService.listUsersWithChatFromFriendsByUser(idUser), HttpStatus.OK)
+            }
 
         } catch (e: NotLoggedException) {
             header.set(ERROR_HEADER_TAG, e.message.toString())
@@ -988,7 +1010,9 @@ class UserRestController {
         @PathVariable("day") day: Int,
         @PathVariable("month") month: Int,
         @PathVariable("year") year: Int,
-        @PathVariable("idCity") cityId: Long
+        @PathVariable("idCity") cityId: Long,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "17") size: Int
     ): ResponseEntity<Any> {
 
         return try {
@@ -1012,8 +1036,9 @@ class UserRestController {
 
                     val dateCity = DateCityDTO(LocalDate.of(year, month, day), cityId)
 
-                    val users = friendshipService.getFriendsOnDate(idUser, dateCity)
+                    val users = friendshipService.getFriendsOnDate(idUser, dateCity, page, size)
 
+                    logger.info("User $idUser, checking date $day-$month-$year city id $cityId, page $page users sent ${users.size}")
                     ResponseEntity(users, HttpStatus.OK)
 
                 }

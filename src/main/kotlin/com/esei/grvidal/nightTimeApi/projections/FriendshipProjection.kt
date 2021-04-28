@@ -1,6 +1,6 @@
 package com.esei.grvidal.nightTimeApi.projections
 
-import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
+import com.esei.grvidal.nightTimeApi.utils.AnswerOptions
 
 interface FriendshipProjection {
 

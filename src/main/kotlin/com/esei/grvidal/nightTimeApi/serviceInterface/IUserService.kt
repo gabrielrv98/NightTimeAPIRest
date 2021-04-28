@@ -56,5 +56,6 @@ interface IUserService {
     fun getPicture(id: Long): String?
 
     fun searchUsersByString(userString: String, page: Int, size: Int): List<UserSnapProjection>
+    fun countUsersByString(userString: String): Int
 
 }

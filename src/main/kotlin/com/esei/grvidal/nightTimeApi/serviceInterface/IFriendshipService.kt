@@ -9,7 +9,7 @@ import com.esei.grvidal.nightTimeApi.projections.ChatView
 import com.esei.grvidal.nightTimeApi.projections.FriendshipProjection
 import com.esei.grvidal.nightTimeApi.projections.UserFriendView
 import com.esei.grvidal.nightTimeApi.projections.UserSnapProjection
-import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
+import com.esei.grvidal.nightTimeApi.utils.AnswerOptions
 import kotlin.jvm.Throws
 
 /**
@@ -50,10 +50,11 @@ interface IFriendshipService {
     fun getCountFriendsOnDate(idUser: Long, dateCityDTO: DateCityDTO): Int
 
     //Returns the friends preview of an user on a date on a place
-    fun getFriendsOnDate(idUser: Long, dateCityDTO: DateCityDTO): List<UserSnapProjection>
+    fun getFriendsOnDate(idUser: Long, dateCityDTO: DateCityDTO, page:Int, size:Int ): List<UserSnapProjection>
 
     //Returns a list with all the friendships not accepted yet
     fun getFriendsRequest(idUser: Long): List<UserFriendView>
+    fun getCountFriendsRequest(idUser: Long): Int
 
     fun friendShipState(idUser1: Long, idUser2: Long): AnswerOptions
 }

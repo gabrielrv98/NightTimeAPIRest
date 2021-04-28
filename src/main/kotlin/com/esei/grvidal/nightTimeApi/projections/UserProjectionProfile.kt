@@ -1,6 +1,6 @@
 package com.esei.grvidal.nightTimeApi.projections
 
-import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
+import com.esei.grvidal.nightTimeApi.utils.AnswerOptions
 
 
 data class UserProjectionProfile(
@@ -8,7 +8,7 @@ data class UserProjectionProfile(
     val name: String,
     val nickname: String,
     val state: String,
-    val nextDate: DateCityProjection?,
+    var nextDate: DateCityProjection?,
     val picture: String?,
     val friendshipState: AnswerOptions
 ) {

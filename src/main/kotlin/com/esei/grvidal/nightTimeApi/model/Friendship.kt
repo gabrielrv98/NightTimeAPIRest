@@ -1,6 +1,6 @@
 package com.esei.grvidal.nightTimeApi.model
 
-import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
+import com.esei.grvidal.nightTimeApi.utils.AnswerOptions
 import com.fasterxml.jackson.annotation.JsonIdentityInfo
 import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import javax.persistence.*

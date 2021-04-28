@@ -6,13 +6,12 @@ import com.esei.grvidal.nightTimeApi.dto.toEvent
 import com.esei.grvidal.nightTimeApi.serviceInterface.IEventService
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.serviceInterface.IBarService
-import com.esei.grvidal.nightTimeApi.utlis.Constants
+import com.esei.grvidal.nightTimeApi.utils.Constants
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.time.LocalDate
 
 /**
  * This is the Event Controller todo delete

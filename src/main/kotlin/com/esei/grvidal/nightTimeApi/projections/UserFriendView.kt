@@ -8,7 +8,8 @@ class UserFriendView(
     var friendshipId: Long,
     var userId: Long,
     var userNickname: String,
-    var state: String
+    var state: String,
+    var image: Boolean
 ) : java.io.Serializable {
 
 
@@ -36,7 +37,8 @@ class UserFriendView(
         friendshipId = friendshipId,
         userId = user.getId(),
         userNickname = user.getNickname(),
-        state = user.getState()
+        state = user.getState(),
+        image = user.getPicture() != null
     )
 
 

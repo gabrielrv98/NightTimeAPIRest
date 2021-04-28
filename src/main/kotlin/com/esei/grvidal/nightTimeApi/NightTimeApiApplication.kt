@@ -3,10 +3,11 @@ package com.esei.grvidal.nightTimeApi
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
 import com.esei.grvidal.nightTimeApi.init.ChatInit
 import com.esei.grvidal.nightTimeApi.init.MessageInit
+import com.esei.grvidal.nightTimeApi.init.UserInit
 import com.esei.grvidal.nightTimeApi.repository.*
 import com.esei.grvidal.nightTimeApi.model.*
 import com.esei.grvidal.nightTimeApi.services.UserService
-import com.esei.grvidal.nightTimeApi.utlis.AnswerOptions
+import com.esei.grvidal.nightTimeApi.utils.AnswerOptions
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
@@ -301,110 +302,220 @@ class NightTimeApiApplication : CommandLineRunner {
 
         // Users --------------------------
 
-        var user = UserDTOInsert(
-            // user grvidal
+        val userInit = UserInit(userService, userRepository, dateCityRepository)
+
+        userInit.addUser(
+            user = UserDTOInsert(
+                // user grvidal
             "Gabriel Rguez",
             "grvidal",
             "1234",
             "Hey there i'm using NightTime",
             email = "grvidal@esei.uvigo.es"
-
-        )
-        userService.save(user)
-        val user1 = userRepository.findByNickname(user.nickname).get()
-        //userService.setUserPicture(user1.id, "/userpics/user_grvidal.jpg")
-
-        dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user1))
-        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(1), nextCity = cityOu, user = user1))
-        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(2), nextCity = cityVigo, user = user1))
-        dateCityRepository.save(
-            DateCity(
-                nextDate = LocalDate.now().plusWeeks(1).plusDays(3),
-                nextCity = cityOu,
-                user = user1
+            ),
+            daysInFuture = hashMapOf(
+                Pair(0, cityOu),
+                Pair(1, cityOu),
+                Pair(2, cityVigo),
+                Pair(9, cityOu)
             )
         )
 
-        user = UserDTOInsert( // user pinkxnut
-            "Nuria Sotelo",
-            "pinkxnut",
-            "passwordUser2",
-            ".",
-            "nuasotelo@gmail.com"
+        val user1 = userRepository.findByNickname("grvidal").get()
+
+        userInit.addUser(
+            user = UserDTOInsert(
+                // user pinkxnut
+                "Nuria Sotelo",
+                "pinkxnut",
+                "passwordUser2",
+                ".",
+                "nuasotelo@gmail.com"
+            ),
+            daysInFuture = hashMapOf(
+                Pair(0, cityOu),
+                Pair(1, cityOu),
+                Pair(3, cityOu)
+            )
         )
 
-        userService.save(user)
-        val user2 = userRepository.findByNickname(user.nickname).get()
+        val user2 = userRepository.findByNickname("pinkxnut").get()
         userService.setUserPicture(user2.id, "/userpics/user_pinkxnut_2021-03-16_18-31-14-988.jpg")
 
-        dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user2))
-        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(1), nextCity = cityOu, user = user2))
-        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(3), nextCity = cityOu, user = user2))
-
-
-        user = UserDTOInsert(
-            // user santii810
-            "Santi Gómez",
-            "santii810",
-            "santiSuperSecret",
-            "Programando y coodirigiendo TFGs",
-            "santii810@gmail.com"
+        userInit.addUser(
+            user = UserDTOInsert(
+                // user santii810
+                "Santi Gómez",
+                "santii810",
+                "santiSuperSecret",
+                "Programando y coodirigiendo TFGs",
+                "santii810@gmail.com"
+            ),
+            daysInFuture = hashMapOf(
+                Pair(0, cityOu),
+                Pair(1, cityOu),
+                Pair(3, cityOu)
+            )
         )
 
-        userService.save(user)
-        val user3 = userRepository.findByNickname(user.nickname).get()
+
+        val user3 = userRepository.findByNickname("santii810").get()
         userService.setUserPicture(user3.id, "/userpics/user_santii810.jpg")
 
-        dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user3))
-        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(1), nextCity = cityOu, user = user3))
-        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(3), nextCity = cityOu, user = user3))
+        userInit.addUser(
+            user = UserDTOInsert(
+                "Maria Vidal",
+                "mvittae",
+                "Gabriel<3",
+                "Que es \"Luxus\"",
+                email = "mjvidal@hotmail.com"
+            ),
+            daysInFuture = hashMapOf(
+                Pair(0, cityOu),
+                Pair(1, cityOu),
+                Pair(3, cityOu)
+            )
+        )
+        val user4 = userRepository.findByNickname("mvittae").get()
+
+        userInit.addUser(
+            user = UserDTOInsert(
+                "Jose Negro",
+                "joseju",
+                "passwordUser4",
+                "Todo lo que se pueda decir es irrelevante",
+                "joseNegro@gmail.com"
+            ),
+            daysInFuture = hashMapOf(
+                Pair(0, cityOu),
+                Pair(1, cityVigo),
+                Pair(3, cityVigo)
+            )
+        )
+        val user5 = userRepository.findByNickname("joseju").get()
 
 
-        user = UserDTOInsert( // user monteRey
-            "Maria Vidal",
-            "mvittae",
-            "Gabriel<3",
-            "Que es \"Luxus\"",
-            email = "mjvidal@hotmail.com"
+        userInit.addUser(
+            user = UserDTOInsert(
+                "Sara Domarco",
+                "saraDom",
+                "passwordUser5",
+                "Cuando se acaba el covid??",
+                "saraDom@gmail.com"
+            ),
+            daysInFuture = hashMapOf(
+                Pair(0, cityOu),
+                Pair(1, cityOu),
+                Pair(3, cityOu)
+            )
         )
 
-        userService.save(user)
-        val user4 = userRepository.findByNickname(user.nickname).get()
 
-        dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user4))
-        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(2), nextCity = cityOu, user = user4))
-        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(3), nextCity = cityOu, user = user4))
-
-
-        user = UserDTOInsert(
-            "Jose Negro",
-            "joseju",
-            "passwordUser4",
-            "Todo lo que se pueda decir es irrelevante",
-            "joseNegro@gmail.com"
+        userInit.addUser(
+            user = UserDTOInsert(
+                "Manuel Costa",
+                "costaNotCoffe",
+                "passwordUser5",
+                "Soy Manuel",
+                "manuelm@gmail.com"
+            ),
+            daysInFuture = hashMapOf(
+                Pair(0, cityOu),
+                Pair(1, cityOu),
+                Pair(2, cityOu)
+            )
         )
 
-        userService.save(user)
-        val user5 = userRepository.findByNickname(user.nickname).get()
 
-        dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user5))
-        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(1), nextCity = cityVigo, user = user5))
-        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(2), nextCity = cityVigo, user = user5))
-
-        user = UserDTOInsert(
-            "Sara Domarco",
-            "saraDom",
-            "passwordUser5",
-            "Cuando se acaba el covid??",
-            "saraDom@gmail.com"
+        userInit.addUser(
+            user = UserDTOInsert(
+                "Juan Quintás",
+                "juquint",
+                "passwordUser5",
+                "Fiesta ya!",
+                "juanjuan@gmail.com"
+            ),
+            daysInFuture = hashMapOf(
+                Pair(0, cityOu),
+                Pair(1, cityOu),
+                Pair(2, cityOu)
+            )
         )
 
-        userService.save(user)
-        val user6 = userRepository.findByNickname(user.nickname).get()
+        userInit.addUser(
+            user = UserDTOInsert(
+                "Manuel Serrano",
+                "UnSerrano",
+                "passwordUser5",
+                "Has visto mi serie?",
+                "Manujamones@gmail.com"
+            ),
+            daysInFuture = hashMapOf(
+                Pair(0, cityOu),
+                Pair(1, cityOu),
+                Pair(2, cityOu)
+            )
+        )
+        userInit.addUser(
+            user = UserDTOInsert(
+                "Laura Keyclass",
+                "soyMonisima",
+                "passwordUser5",
+                "Alguien toma algo?",
+                "specialKey@gmail.com"
+            ),
+            daysInFuture = hashMapOf(
+                Pair(0, cityOu),
+                Pair(1, cityOu),
+                Pair(2, cityOu)
+            )
+        )
 
-        dateCityRepository.save(DateCity(nextDate = LocalDate.now(), nextCity = cityOu, user = user6))
-        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(1), nextCity = cityOu, user = user6))
-        dateCityRepository.save(DateCity(nextDate = LocalDate.now().plusDays(2), nextCity = cityVigo, user = user6))
+        userInit.addUser(
+            user = UserDTOInsert(
+                "John Bay",
+                "Mkrpf",
+                "passwordUser5",
+                "Trabajando",
+                "jonhMkBay@gmail.com"
+            ),
+            daysInFuture = hashMapOf(
+                Pair(0, cityOu),
+                Pair(1, cityOu),
+                Pair(2, cityOu)
+            )
+        )
+
+        var friendsExtra : Friendship
+        var user : User
+        // Refill some extra users
+        for( i in 0 .. 25) {
+            userInit.addUser(
+                user = UserDTOInsert(
+                    "Laura Keyclass$i",
+                    "soyMonisima$i",
+                    "passwordUser5",
+                    "Alguien toma algo?",
+                    "specialKey@gmail.com"
+                ),
+                daysInFuture = hashMapOf(
+                    Pair(0, cityOu),
+                    Pair(1, cityOu),
+                    Pair(2, cityOu)
+                )
+            )
+
+            user = userRepository.findByNickname("soyMonisima$i").get()
+            friendsExtra = Friendship(user,user1)
+            friendsExtra.answer = AnswerOptions.YES
+            friendshipRepository.save(friendsExtra)
+
+        }
+
+
+
+
+
 
 
         // Friends -----------------------

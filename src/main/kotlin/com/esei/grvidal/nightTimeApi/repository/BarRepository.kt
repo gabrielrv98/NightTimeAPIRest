@@ -5,7 +5,6 @@ import com.esei.grvidal.nightTimeApi.projections.BarDetailsProjection
 import com.esei.grvidal.nightTimeApi.projections.BarFullProjection
 import com.esei.grvidal.nightTimeApi.projections.BarProjection
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
 import org.springframework.data.domain.Pageable
 import java.util.*

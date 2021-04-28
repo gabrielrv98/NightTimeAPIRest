@@ -1,4 +1,4 @@
-package com.esei.grvidal.nightTimeApi.utlis
+package com.esei.grvidal.nightTimeApi.utils
 
 /**
  * Enum with the option to answer a friendship request
