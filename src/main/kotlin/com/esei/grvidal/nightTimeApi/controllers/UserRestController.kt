@@ -106,10 +106,10 @@ class UserRestController {
     fun login(
         @RequestHeader(name = "username") username: String,
         @RequestHeader(name = "password") password: String,
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<Boolean> {
+        val responseHeader = HttpHeaders()
         return try {
             val idUser = userService.login(username, password)
-            val responseHeader = HttpHeaders()
 
             if (idUser != -1L) {
 
@@ -130,10 +130,12 @@ class UserRestController {
 
 
         } catch (e: NotFoundException) {
-            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(false, responseHeader, HttpStatus.NOT_FOUND)
 
         } catch (e: ServiceException) {
-            ResponseEntity(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(false, responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
 
         }
     }
@@ -147,7 +149,7 @@ class UserRestController {
     fun logoff(
         @PathVariable("id") idUser: Long,
         @RequestHeader("auth") auth: String
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<String> {
 
         return try {
 
@@ -163,21 +165,6 @@ class UserRestController {
         }
     }
 
-    @Deprecated("Testing proposes")
-    @GetMapping("/alllogins")
-    fun getLogged2(): ResponseEntity<Any> {
-
-        return ResponseEntity(tokenSimple, HttpStatus.OK)
-    }
-
-
-    @Deprecated("Testing proposes")
-    @GetMapping("/test/all")
-    fun list(): ResponseEntity<List<UserProjection>> {
-        return ResponseEntity(userService.list(), HttpStatus.OK)
-
-    }
-
 
     /**
      * Receives an [searchedUserId] and returns a UserProjection
@@ -189,13 +176,14 @@ class UserRestController {
         @PathVariable("idSearchedUser") searchedUserId: Long,
         @RequestHeader("auth") auth: String,
         @RequestHeader("clientUser") clientId: Long
-    ): ResponseEntity<Any> {
-
+    ): ResponseEntity<UserProjectionProfile?> {
+        val responseHeader = HttpHeaders()
         return try {
 
-            if (!securityCheck(clientId, auth))//if authentication fails
-                ResponseEntity("Security error, credentials don't match", HttpStatus.UNAUTHORIZED)
-            else {
+            if (!securityCheck(clientId, auth)) {//if authentication fails
+                responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
+                ResponseEntity(null, responseHeader, HttpStatus.UNAUTHORIZED)
+            } else {
 
                 val user = UserProjectionProfile(
                     user = userService.loadProjection(searchedUserId),
@@ -212,10 +200,12 @@ class UserRestController {
             }
 
         } catch (e: NotLoggedException) {
-            ResponseEntity(e.message, HttpStatus.FORBIDDEN)
+            responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
+            ResponseEntity(null, responseHeader, HttpStatus.FORBIDDEN)
 
         } catch (e: NotFoundException) {
-            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+            responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
+            ResponseEntity(null, responseHeader, HttpStatus.NOT_FOUND)
         }
     }
 
@@ -228,27 +218,31 @@ class UserRestController {
     fun loadPrivateProjection(
         @PathVariable("id") idUser: Long,
         @RequestHeader("auth") auth: String
-    ): ResponseEntity<Any> {
-
+    ): ResponseEntity<UserDTOEdit?> {
+        val responseHeader = HttpHeaders()
         return try {
-            if (!securityCheck(idUser, auth))//if authentication fails
-                ResponseEntity("Security error, credentials don't match", HttpStatus.UNAUTHORIZED)
-            else {
+            if (!securityCheck(idUser, auth)) {//if authentication fails
+                responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
+                ResponseEntity(null, responseHeader, HttpStatus.UNAUTHORIZED)
+            } else {
                 ResponseEntity(userService.loadEditProjection(idUser), HttpStatus.OK)
             }
 
         } catch (e: NotLoggedException) {
-            ResponseEntity(e.message, HttpStatus.FORBIDDEN)
+            responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
+            ResponseEntity(null, responseHeader, HttpStatus.FORBIDDEN)
 
         } catch (e: NotFoundException) {
-            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+            responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
+            ResponseEntity(null, responseHeader, HttpStatus.NOT_FOUND)
         }
     }
 
     @GetMapping("/{id}/photo")
     fun getPicture(
         @PathVariable("id") id: Long
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<ByteArray?> {
+        val responseHeader = HttpHeaders()
         return try {
 
             val userPic = userService.getPicture(id)
@@ -266,13 +260,21 @@ class UserRestController {
 
                 } catch (e: NullPointerException) {
                     logger.error("Error getting image $e")
-                    ResponseEntity(false, HttpStatus.NOT_FOUND)
+                    responseHeader.set(ERROR_HEADER_TAG, "Error getting image $e")
+                    ResponseEntity(null, responseHeader, HttpStatus.NOT_FOUND)
                 }
-            } ?: ResponseEntity(false, HttpStatus.NOT_FOUND)
+
+            } ?: ResponseEntity(
+                null,
+                responseHeader
+                    .apply { this.set(ERROR_HEADER_TAG, "User has no image") },
+                HttpStatus.NOT_FOUND
+            )
 
 
         } catch (e: NotFoundException) {
-            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(null, responseHeader, HttpStatus.NOT_FOUND)
         }
     }
 
@@ -284,13 +286,14 @@ class UserRestController {
         @RequestHeader("auth") auth: String,
         @PathVariable("id") idUser: Long,
         @PathVariable("idCity") idCity: Long
-    ): ResponseEntity<Any> {
-
+    ): ResponseEntity<List<DateCityReducedProjection>> {
+        val responseHeader = HttpHeaders()
         return try {
-            if (!securityCheck(idUser, auth))//if authentication fails
-                ResponseEntity("Security error, credentials don't match", HttpStatus.UNAUTHORIZED)
-            else {
-                val responseHeader = HttpHeaders()
+            if (!securityCheck(idUser, auth)) {//if authentication fails
+                responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
+                ResponseEntity(listOf(), responseHeader, HttpStatus.UNAUTHORIZED)
+            } else {
+
 
                 val userList = userService.loadUserDatesList(idUser, DateCityDTO(LocalDate.now().minusDays(1), idCity))
 
@@ -299,7 +302,8 @@ class UserRestController {
             }
 
         } catch (e: NotLoggedException) {
-            ResponseEntity(e.message, HttpStatus.FORBIDDEN)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(listOf(), responseHeader, HttpStatus.FORBIDDEN)
         }
 
     }
@@ -317,7 +321,7 @@ class UserRestController {
     @PostMapping("")
     fun insertUser(
         @RequestBody user: UserDTOInsert
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<Boolean> {
         val responseHeader = HttpHeaders()
 
         return try {
@@ -331,7 +335,7 @@ class UserRestController {
             responseHeader.set("id", id.toString())
             responseHeader.set("token", token)
 
-            ResponseEntity("true", responseHeader, HttpStatus.CREATED)
+            ResponseEntity(true, responseHeader, HttpStatus.CREATED)
 
         } catch (e: ServiceException) {
             responseHeader.set(ERROR_HEADER_TAG, e.message)
@@ -355,12 +359,14 @@ class UserRestController {
         @PathVariable("idUser") idUser: Long,
         @RequestHeader("auth") auth: String,
         @RequestParam img: MultipartFile
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<Boolean> {
+        val responseHeader = HttpHeaders()
         return try {
 
-            if (!securityCheck(idUser, auth))//if authentication fails
-                ResponseEntity("Security error, credentials don't match", HttpStatus.UNAUTHORIZED)
-            else {
+            if (!securityCheck(idUser, auth)) {//if authentication fails
+                responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
+                ResponseEntity(false, responseHeader, HttpStatus.UNAUTHORIZED)
+            } else {
                 logger.info("filename original ${img.originalFilename}")
 
                 val user = userService.loadProjection(idUser)
@@ -383,19 +389,19 @@ class UserRestController {
             }
 
         } catch (e: NotFoundException) {
-            val responseHeader = HttpHeaders()
+
             responseHeader.set(ERROR_HEADER_TAG, e.message)
-            ResponseEntity(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
+            ResponseEntity(false, responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
 
         } catch (e: ServiceException) {
-            val responseHeader = HttpHeaders()
+
             responseHeader.set(ERROR_HEADER_TAG, e.message)
-            ResponseEntity(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
+            ResponseEntity(false, responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
 
         } catch (e: NotLoggedException) {
-            val responseHeader = HttpHeaders()
+
             responseHeader.set(ERROR_HEADER_TAG, e.message)
-            ResponseEntity(e.message, HttpStatus.FORBIDDEN)
+            ResponseEntity(false, responseHeader, HttpStatus.FORBIDDEN)
         }
     }
 
@@ -413,15 +419,18 @@ class UserRestController {
         @PathVariable("id") idUser: Long,
         @RequestHeader("auth") auth: String,
         @RequestBody user: UserDTOEdit
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<Boolean> {
 
+        val responseHeader = HttpHeaders()
         return try {
 
-            if (!securityCheck(idUser, auth))//if authentication fails
-                ResponseEntity("Security error, credentials don't match", HttpStatus.UNAUTHORIZED)
-            else {
+            if (!securityCheck(idUser, auth)) {//if authentication fails
+                responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
+                ResponseEntity(false, responseHeader, HttpStatus.UNAUTHORIZED)
+            } else {
                 if (idUser != user.id) {
-                    ResponseEntity("User $idUser, has no rights to edit user ${user.id}", HttpStatus.FORBIDDEN)
+                    responseHeader.set(ERROR_HEADER_TAG, "User $idUser, has no rights to edit user ${user.id}")
+                    ResponseEntity(false, responseHeader, HttpStatus.FORBIDDEN)
                 } else {
                     userService.update(idUser, user)
                     ResponseEntity(true, HttpStatus.OK)
@@ -429,10 +438,14 @@ class UserRestController {
             }
 
         } catch (e: NotFoundException) {
-            ResponseEntity(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
+
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(false, responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
 
         } catch (e: NotLoggedException) {
-            ResponseEntity(e.message, HttpStatus.FORBIDDEN)
+
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(false, responseHeader, HttpStatus.FORBIDDEN)
         }
     }
 
@@ -447,19 +460,23 @@ class UserRestController {
     fun deleteUser(
         @PathVariable("id") idUser: Long,
         @RequestHeader("auth") auth: String
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<Boolean> {
+        val responseHeader = HttpHeaders()
         return try {
-            if (!securityCheck(idUser, auth))//if authentication fails
-                ResponseEntity("Security error, credentials don't match", HttpStatus.UNAUTHORIZED)
-            else {
+            if (!securityCheck(idUser, auth)) {//if authentication fails
+                responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
+                ResponseEntity(false, responseHeader, HttpStatus.UNAUTHORIZED)
+            } else {
                 userService.remove(idUser)
-                ResponseEntity(HttpStatus.NO_CONTENT)
+                ResponseEntity(true, HttpStatus.NO_CONTENT)
             }
         } catch (e: NotFoundException) {
-            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(false, responseHeader, HttpStatus.NOT_FOUND)
 
         } catch (e: NotLoggedException) {
-            ResponseEntity(e.message, HttpStatus.FORBIDDEN)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(false, responseHeader, HttpStatus.FORBIDDEN)
         }
     }
 
@@ -485,31 +502,37 @@ class UserRestController {
         @PathVariable("id") idUser: Long,
         @RequestHeader("auth") auth: String,
         @RequestBody dateCity: DateCityDTO
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<Boolean> {
 
+        val responseHeader = HttpHeaders()
         return try {
 
-            if (!securityCheck(idUser, auth))//if authentication fails
-                ResponseEntity("Security error, credentials don't match", HttpStatus.UNAUTHORIZED)
-            else {
-                if (!userService.exists(idUser))
-                    ResponseEntity("No user with id $idUser found", HttpStatus.NOT_FOUND)
-                else {
-                    val id = dateCityService.addDate(idUser, dateCity)
-                    val responseHeader = HttpHeaders()
-                    responseHeader.set("id", id.toString())
-                    ResponseEntity(true, responseHeader, HttpStatus.OK)
-                }
+            if (!securityCheck(idUser, auth)) {//if authentication fails
+                responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
+                ResponseEntity(false, responseHeader, HttpStatus.UNAUTHORIZED)
+            } else {
+
+                val id = dateCityService.addDate(idUser, dateCity)
+                responseHeader.set("id", id.toString())
+                ResponseEntity(true, responseHeader, HttpStatus.OK)
+
             }
 
         } catch (e: AlreadyExistsException) {
-            ResponseEntity(e.message, HttpStatus.ALREADY_REPORTED)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(false, responseHeader, HttpStatus.ALREADY_REPORTED)
 
         } catch (e: ServiceException) {
-            ResponseEntity(e.message, HttpStatus.FORBIDDEN)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(false, responseHeader, HttpStatus.FORBIDDEN)
+
+        } catch (e: NotFoundException) {
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(false, responseHeader, HttpStatus.NOT_FOUND)
 
         } catch (e: NotLoggedException) {
-            ResponseEntity(e.message, HttpStatus.FORBIDDEN)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(false, responseHeader, HttpStatus.FORBIDDEN)
         }
     }
 
@@ -532,12 +555,13 @@ class UserRestController {
         @PathVariable("id") idUser: Long,
         @RequestHeader("auth") auth: String,
         @RequestBody dateCity: DateCityDTO
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<Boolean> {
+        val responseHeader = HttpHeaders()
         return try {
-            if (!securityCheck(idUser, auth))//if authentication fails
-                ResponseEntity("Security error, credentials don't match", HttpStatus.UNAUTHORIZED)
-            else {
-                val responseHeader = HttpHeaders()
+            if (!securityCheck(idUser, auth)) {//if authentication fails
+                responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
+                ResponseEntity(false, responseHeader, HttpStatus.UNAUTHORIZED)
+            } else {
 
                 val id = userService.deleteDate(idUser, dateCity)
                 responseHeader.set("deleted", id.toString())
@@ -546,10 +570,12 @@ class UserRestController {
             }
 
         } catch (e: NotFoundException) {
-            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(false, responseHeader, HttpStatus.NOT_FOUND)
 
         } catch (e: NotLoggedException) {
-            ResponseEntity(e.message, HttpStatus.FORBIDDEN)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(false, responseHeader, HttpStatus.FORBIDDEN)
         }
     }
 
@@ -571,19 +597,22 @@ class UserRestController {
     fun getUsersFromFriendList(
         @PathVariable("id") idUser: Long,
         @RequestHeader("auth") auth: String
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<List<UserFriendView>> {
 
+        val responseHeader = HttpHeaders()
         return try {
-            if (!securityCheck(idUser, auth))//if authentication fails
-                ResponseEntity("Security error, credentials don't match", HttpStatus.UNAUTHORIZED)
-            else {
+            if (!securityCheck(idUser, auth)) {//if authentication fails
+                responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
+                ResponseEntity(listOf(), responseHeader, HttpStatus.UNAUTHORIZED)
+            } else {
                 ResponseEntity(
                     friendshipService.listUsersFromFriendsByUser(idUser),
                     HttpStatus.OK
                 )
             }
         } catch (e: NotLoggedException) {
-            ResponseEntity(e.message, HttpStatus.FORBIDDEN)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(listOf(), responseHeader, HttpStatus.FORBIDDEN)
         }
     }
 
@@ -612,7 +641,7 @@ class UserRestController {
      * Listen to a Post with an user logged and an ID of other user to request a new [Friendship]
      *
      * @param idUser User who request the friendship
-     * @param idFriend User who is requested freidnship
+     * @param idFriend User who is requested friendship
      *
      * @exception NotFoundException when the [idFriend] doesn't match any user
      * @exception AlreadyExistsException if the relationship already existed in any way
@@ -624,13 +653,14 @@ class UserRestController {
         @PathVariable("id") idUser: Long,
         @RequestHeader("auth") auth: String,
         @PathVariable("idFriend") idFriend: Long,
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<Boolean> {
         val responseHeader = HttpHeaders()
 
         return try {
-            if (!securityCheck(idUser, auth))//if authentication fails
-                ResponseEntity("Security error, credentials don't match", HttpStatus.UNAUTHORIZED)
-            else {
+            if (!securityCheck(idUser, auth)) {//if authentication fails
+                responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
+                ResponseEntity(false, responseHeader, HttpStatus.UNAUTHORIZED)
+            } else {
                 val id = friendshipService.save(idUser, idFriend)
 
                 responseHeader.set("location", "${Constants.URL_BASE_USER}/$idUser/chat/$id")
@@ -638,13 +668,17 @@ class UserRestController {
             }
 
         } catch (e: NotFoundException) {
-            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
-
-        } catch (e: AlreadyExistsException) {
-            ResponseEntity(e.message, HttpStatus.ALREADY_REPORTED)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(false, responseHeader, HttpStatus.NOT_FOUND)
 
         } catch (e: NotLoggedException) {
-            ResponseEntity(e.message, HttpStatus.FORBIDDEN)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(false, responseHeader, HttpStatus.FORBIDDEN)
+
+        } catch (e: AlreadyExistsException) {
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(false, responseHeader, HttpStatus.ALREADY_REPORTED)
+
         }
     }
 
@@ -706,24 +740,29 @@ class UserRestController {
         @PathVariable("id") idUser: Long,
         @RequestHeader("auth") auth: String,
         @RequestBody friendRequest: FriendshipUpdateDTO
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<Boolean> {
         val responseHeader = HttpHeaders()
 
         try {
-            if (!securityCheck(idUser, auth))//if authentication fails
-                return ResponseEntity("Security error, credentials don't match", HttpStatus.UNAUTHORIZED)
+            if (!securityCheck(idUser, auth)) {//if authentication fails
+                responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
+                return ResponseEntity(false, responseHeader, HttpStatus.UNAUTHORIZED)
+            }
 
             val friendRequestDB = friendshipService.load(friendRequest.id)
 
             //only non accepted requests can be updated
-            if (friendRequestDB.getAnswer() != AnswerOptions.NOT_ANSWERED)
-                return ResponseEntity("Friendship already accepted, can only be deleted", HttpStatus.FORBIDDEN)
+            if (friendRequestDB.getAnswer() != AnswerOptions.NOT_ANSWERED) {
+                responseHeader.set(ERROR_HEADER_TAG, "Friendship already accepted, can only be deleted")
+                return ResponseEntity(false, responseHeader, HttpStatus.FORBIDDEN)
+            }
 
 
             //Only the userAnswer can update the request
-            if (idUser != friendRequestDB.getUserAnswer().getId())
-                return ResponseEntity("Error: Only userAnswer can update the request", HttpStatus.FORBIDDEN)
-            else {
+            if (idUser != friendRequestDB.getUserAnswer().getId()) {
+                responseHeader.set(ERROR_HEADER_TAG, "Error: Only userAnswer can update the request")
+                return ResponseEntity(false, responseHeader, HttpStatus.FORBIDDEN)
+            } else {
                 return when (friendRequest.answer) {
                     //Answer yes
                     AnswerOptions.YES -> {
@@ -751,11 +790,14 @@ class UserRestController {
             }
 
 
-        } catch (e: NotLoggedException) {
-            return ResponseEntity(e.message.toString(), HttpStatus.FORBIDDEN)
-
         } catch (e: NotFoundException) {
-            return ResponseEntity(e.message.toString(), HttpStatus.NOT_FOUND)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            return ResponseEntity(false, responseHeader, HttpStatus.NOT_FOUND)
+
+        } catch (e: NotLoggedException) {
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            return ResponseEntity(false, responseHeader, HttpStatus.FORBIDDEN)
+
         }
 
     }
@@ -772,24 +814,29 @@ class UserRestController {
         @PathVariable("id") idUser: Long,
         @RequestHeader("auth") auth: String,
         @PathVariable("idFriend") idFriend: Long
-    ): ResponseEntity<Any> {
-
+    ): ResponseEntity<Boolean> {
+        val responseHeader = HttpHeaders()
         return try {
 
-            if (!securityCheck(idUser, auth))//if authentication fails
-                ResponseEntity("Security error, credentials don't match", HttpStatus.UNAUTHORIZED)
-            else {
+            if (!securityCheck(idUser, auth)) {//if authentication fails
+                responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
+                ResponseEntity(false, responseHeader, HttpStatus.UNAUTHORIZED)
+            } else {
                 val friends = friendshipService.load(idUser, idFriend)
 
                 friendshipService.remove(friends.getId())
 
                 ResponseEntity(true, HttpStatus.OK)
             }
+
         } catch (e: NotFoundException) {
-            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(false, responseHeader, HttpStatus.NOT_FOUND)
 
         } catch (e: NotLoggedException) {
-            ResponseEntity(e.message, HttpStatus.FORBIDDEN)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(false, responseHeader, HttpStatus.FORBIDDEN)
+
         }
     }
 
@@ -812,11 +859,11 @@ class UserRestController {
         @PathVariable("idUser") idUser: Long,
         @RequestHeader("auth") auth: String
     ): ResponseEntity<List<ChatView>> {
-        val header = HttpHeaders()
+        val responseHeader = HttpHeaders()
         return try {
             if (!securityCheck(idUser, auth)) {//if authentication fails
-                header.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
-                ResponseEntity(listOf(), header, HttpStatus.UNAUTHORIZED)
+                responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
+                ResponseEntity(listOf(), responseHeader, HttpStatus.UNAUTHORIZED)
             } else {
                 logger.info("getFriendshipWithMessages called for user $idUser")
 
@@ -824,8 +871,8 @@ class UserRestController {
             }
 
         } catch (e: NotLoggedException) {
-            header.set(ERROR_HEADER_TAG, e.message.toString())
-            ResponseEntity(listOf(), header, HttpStatus.FORBIDDEN)
+            responseHeader.set(ERROR_HEADER_TAG, e.message.toString())
+            ResponseEntity(listOf(), responseHeader, HttpStatus.FORBIDDEN)
         }
     }
 
@@ -845,25 +892,30 @@ class UserRestController {
         @PathVariable("idUser") idUser: Long,
         @PathVariable("idFriendship") idFriendship: Long,
         @RequestHeader("auth") auth: String
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<ChatView?> {
 
+        val responseHeader = HttpHeaders()
         return try {
 
-            if (!securityCheck(idUser, auth))//if authentication fails
-                ResponseEntity("Security error, credentials don't match", HttpStatus.UNAUTHORIZED)
-            else {
+            if (!securityCheck(idUser, auth)) {//if authentication fails
+                responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
+                ResponseEntity(null, responseHeader, HttpStatus.UNAUTHORIZED)
+            } else {
                 val chat = messageService.getChat(idFriendship, idUser)
                 ResponseEntity(chat, HttpStatus.OK)
             }
 
         } catch (e: NotFoundException) {
-            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+            responseHeader.set(ERROR_HEADER_TAG, e.message.toString())
+            ResponseEntity(null, responseHeader, HttpStatus.NOT_FOUND)
 
         } catch (e: NoAuthorizationException) {
-            ResponseEntity(e.message, HttpStatus.UNAUTHORIZED)
+            responseHeader.set(ERROR_HEADER_TAG, e.message.toString())
+            ResponseEntity(null, responseHeader, HttpStatus.UNAUTHORIZED)
 
         } catch (e: NotLoggedException) {
-            ResponseEntity(e.message, HttpStatus.FORBIDDEN)
+            responseHeader.set(ERROR_HEADER_TAG, e.message.toString())
+            ResponseEntity(null, responseHeader, HttpStatus.FORBIDDEN)
         }
     }
 
@@ -882,32 +934,37 @@ class UserRestController {
         @PathVariable("idUser") idUser: Long,
         @RequestHeader("auth") auth: String,
         @RequestBody msg: MessageForm
-    ): ResponseEntity<Any> {
-        try {
-            val responseHeader = HttpHeaders()
+    ): ResponseEntity<Boolean> {
+        val responseHeader = HttpHeaders()
+        return try {
 
-            if (!securityCheck(idUser, auth))//if authentication fails
-                return ResponseEntity("Security error, credentials don't match", HttpStatus.UNAUTHORIZED)
+            if (!securityCheck(idUser, auth)) {//if authentication fails
+                responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
+                ResponseEntity(null, responseHeader, HttpStatus.UNAUTHORIZED)
+            } else {
+                //Load the friendship to check the user
+                val friendsDB = friendshipService.load(msg.friendshipId)
 
-            //Load the friendship to check the user
-            val friendsDB = friendshipService.load(msg.friendshipId)
+                //If idUser is not on the friendship
+                if (friendsDB.getUserAsk().getId() != idUser && friendsDB.getUserAnswer().getId() != idUser) {
+                    responseHeader.set(ERROR_HEADER_TAG, "User must be in the friendship")
+                    ResponseEntity(false, responseHeader, HttpStatus.NOT_FOUND)
+                } else {
+                    val id = messageService.save(msg, idUser)
+                    responseHeader.set("location", Constants.URL_BASE_BAR + "/" + id)
 
-            //If idUser is not on the friendship
-            return if (friendsDB.getUserAsk().getId() != idUser && friendsDB.getUserAnswer().getId() != idUser)
-                ResponseEntity("User must be in the friendship", HttpStatus.NOT_FOUND)
-            else {
-                val id = messageService.save(msg, idUser)
-                responseHeader.set("location", Constants.URL_BASE_BAR + "/" + id)
-
-                ResponseEntity(responseHeader, HttpStatus.CREATED)
+                    ResponseEntity(true, responseHeader, HttpStatus.CREATED)
+                }
             }
 
 
         } catch (e: NotFoundException) {
-            return ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+            responseHeader.set(ERROR_HEADER_TAG, e.message.toString())
+            ResponseEntity(null, responseHeader, HttpStatus.NOT_FOUND)
 
         } catch (e: NotLoggedException) {
-            return ResponseEntity(e.message, HttpStatus.FORBIDDEN)
+            responseHeader.set(ERROR_HEADER_TAG, e.message.toString())
+            ResponseEntity(null, responseHeader, HttpStatus.FORBIDDEN)
         }
     }
 
@@ -931,12 +988,14 @@ class UserRestController {
         @PathVariable("month") month: Int,
         @PathVariable("year") year: Int,
         @PathVariable("idCity") cityId: Long
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<List<EventProjection>> {
+        val responseHeader = HttpHeaders()
         return try {
 
-            if (!securityCheck(idUser, auth))//if authentication fails
-                ResponseEntity("Security error, credentials don't match", HttpStatus.UNAUTHORIZED)
-            else {
+            if (!securityCheck(idUser, auth)) {//if authentication fails
+                responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
+                ResponseEntity(listOf(), responseHeader, HttpStatus.UNAUTHORIZED)
+            } else {
 
                 val st = StringBuilder()
                 val dateString = st.append(day)
@@ -950,35 +1009,38 @@ class UserRestController {
                     Regex("(((0?[1-9]|[1-2][0-9]|3[0-1])-(0?[13578]|(10|12)))|((0?[1-9]|[1-2][0-9])-0?2)|((0?[1-9]|[1-2][0-9]|30)-(0?[469]|11)))-[0-9]{4}")
 
 
-                if (!dateString.matches(datePatter))
-                    ResponseEntity("Date error, please use date as  day-month-year", HttpStatus.UNAUTHORIZED)
-                else {
+                if (!dateString.matches(datePatter)) {
+                    responseHeader.set(ERROR_HEADER_TAG, "Date error, please use date as  day-month-year")
+                    ResponseEntity(listOf(), responseHeader, HttpStatus.UNAUTHORIZED)
+                } else {
                     try {
                         val date = LocalDate.of(year, month, day)
-                        if (!securityCheck(idUser, auth))//if authentication fails
-                            ResponseEntity("Security error, credentials don't match", HttpStatus.UNAUTHORIZED)
-                        else {
-                            val responseHeader = HttpHeaders()
-                            val dateCity = DateCityDTO(date, cityId)
 
-                            responseHeader.set("total", userService.getTotal(dateCity).toString())
-                            responseHeader.set(
-                                "friends",
-                                friendshipService.getCountFriendsOnDate(idUser, dateCity).toString()
-                            )
+                        val dateCity = DateCityDTO(date, cityId)
+
+                        responseHeader.set("total", userService.getTotal(dateCity).toString())
+                        responseHeader.set(
+                            "friends",
+                            friendshipService.getCountFriendsOnDate(idUser, dateCity).toString()
+                        )
 
 
 
-                            ResponseEntity(
-                                eventService.listEventByDayAndCity(date = date, idCity = cityId),
-                                responseHeader,
-                                HttpStatus.OK
-                            )
-                        }
+                        ResponseEntity(
+                            eventService.listEventByDayAndCity(date = date, idCity = cityId),
+                            responseHeader,
+                            HttpStatus.OK
+                        )
+
 
                     } catch (e: DateTimeException) {
+                        responseHeader.set(
+                            ERROR_HEADER_TAG,
+                            "Date error, please use a valid date, from 1-31 days and 1-12 month"
+                        )
                         ResponseEntity(
-                            "Date error, please use a valid date, from 1-31 days and 1-12 month",
+                            listOf(),
+                            responseHeader,
                             HttpStatus.UNAUTHORIZED
                         )
                     }
@@ -989,7 +1051,8 @@ class UserRestController {
 
 
         } catch (e: NotLoggedException) {
-            ResponseEntity(e.message, HttpStatus.FORBIDDEN)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(listOf(), responseHeader, HttpStatus.FORBIDDEN)
         }
     }
 
@@ -1013,13 +1076,14 @@ class UserRestController {
         @PathVariable("idCity") cityId: Long,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "17") size: Int
-    ): ResponseEntity<Any> {
-
+    ): ResponseEntity<List<UserSnapProjection>> {
+        val responseHeader = HttpHeaders()
         return try {
 
-            if (!securityCheck(idUser, auth))//if authentication fails
-                ResponseEntity("Security error, credentials don't match", HttpStatus.UNAUTHORIZED)
-            else {
+            if (!securityCheck(idUser, auth)) {//if authentication fails
+                responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
+                ResponseEntity(listOf(), responseHeader, HttpStatus.UNAUTHORIZED)
+            } else {
                 val st = StringBuilder()
                 val dateString = st.append(day)
                     .append("-")
@@ -1030,9 +1094,10 @@ class UserRestController {
                 val datePatter =
                     Regex("(((0?[1-9]|[1-2][0-9]|3[0-1])-(0?[13578]|(10|12)))|((0?[1-9]|[1-2][0-9])-0?2)|((0?[1-9]|[1-2][0-9]|30)-(0?[469]|11)))-[0-9]{4}")
 
-                if (!dateString.matches(datePatter))
-                    ResponseEntity("Date error, please use date as  day-month-year", HttpStatus.UNAUTHORIZED)
-                else {
+                if (!dateString.matches(datePatter)) {
+                    responseHeader.set(ERROR_HEADER_TAG, "Date error, please use date as  day-month-year")
+                    ResponseEntity(listOf(), responseHeader, HttpStatus.UNAUTHORIZED)
+                } else {
 
                     val dateCity = DateCityDTO(LocalDate.of(year, month, day), cityId)
 
@@ -1046,7 +1111,8 @@ class UserRestController {
 
 
         } catch (e: NotLoggedException) {
-            ResponseEntity(e.message, HttpStatus.FORBIDDEN)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(listOf(), responseHeader, HttpStatus.FORBIDDEN)
         }
 
 
@@ -1059,7 +1125,7 @@ class UserRestController {
      * @return a Response with a body with the a list of [City]
      */
     @GetMapping("/cities")
-    fun getAllCities(): ResponseEntity<Any> {
+    fun getAllCities(): ResponseEntity<List<City>> {
         return ResponseEntity(cityService.list(), HttpStatus.OK)
     }
 
