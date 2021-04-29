@@ -159,7 +159,7 @@ class FriendshipService : IFriendshipService {
     }
 
     override fun getCountFriendsOnDate(idUser: Long, dateCityDTO: DateCityDTO): Int {
-
+// TODO: 29/04/2021 improve this with getFriendsOnDate prototype
         var numberFriends =
             friendshipRepository.getCountFriendsFromUserAskOnDate(idUser, dateCityDTO.nextCityId, dateCityDTO.nextDate)
         numberFriends += friendshipRepository.getCountFriendsFromAnswerOnDate(
@@ -179,28 +179,6 @@ class FriendshipService : IFriendshipService {
             date = dateCityDTO.nextDate,
             pageable = PageRequest.of(page, size)
         )
-/*
-
-            friendshipRepository.getFriendsFromUserAskOnDate(
-                idUser = idUser,
-                idCity = dateCityDTO.nextCityId,
-                date = dateCityDTO.nextDate,
-                pageable = PageRequest.of(page, size)
-            )
-                .toMutableList()
-
-        friendList += friendshipRepository.getFriendsFromUserAnswerOnDate(
-            idUser = idUser,
-            idCity = dateCityDTO.nextCityId,
-            date = dateCityDTO.nextDate,
-            pageable = PageRequest.of(page, size)
-        )
-        */
-
-        //todo remove this (trick to check pagination)
-
-       // val friendListAll = friendshipRepository.getAllOnDate(idCity = dateCityDTO.nextCityId, dateCityDTO.nextDate, PageRequest.of(page,size))
-        //return friendListAll.map{ UserSnapProjection(it, idUser) }
        return friendList.map { UserSnapProjection(it, idUser) }
     }
 
