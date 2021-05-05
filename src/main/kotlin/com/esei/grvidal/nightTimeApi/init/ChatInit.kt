@@ -14,30 +14,34 @@ data class MessageInit(
 )
 
 class ChatInit(
-    private val friendship: Friendship,
+    private val friendship: Friendship?,
     private val messageRepositories: MessageRepository,
     private val msgList: List<MessageInit>
 ) {
 
     fun saveData() {
         var i: Long
-        for (msg in this.msgList) {
 
-            i = if (Random(LocalTime.now().nano.toLong()).nextInt() % 2 == 0) {
-                0
-            } else 1
+        friendship?.let{ friendship ->
+            for (msg in this.msgList) {
 
-            messageRepositories.save(
-                Message(
-                    msg.txt,
-                    LocalDate.now().plusDays(i),
-                    LocalTime.now().plusHours(i),
-                    friendship,
-                    user = if (msg.user == 0) friendship.userAsk
-                    else friendship.userAnswer
+                i = if (Random(LocalTime.now().nano.toLong()).nextInt() % 2 == 0) {
+                    0
+                } else 1
+
+                messageRepositories.save(
+                    Message(
+                        msg.txt,
+                        LocalDate.now().plusDays(i),
+                        LocalTime.now().plusHours(i),
+                        friendship,
+                        user = if (msg.user == 0) friendship.userAsk
+                        else friendship.userAnswer
+                    )
                 )
-            )
+            }
         }
+
     }
 
 }

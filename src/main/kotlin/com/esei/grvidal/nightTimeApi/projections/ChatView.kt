@@ -22,12 +22,13 @@ class ChatView(
      */
     constructor(
         friendship: Friendship,
-        userId: Long
+        userId: Long,
+        isSnap: Boolean
     ) : this(
         friendshipId = friendship.id,
         user = if (friendship.userAsk.id == userId) friendship.userAnswer
         else friendship.userAsk,
-        messages = friendship.messages!!
+        messages = if(isSnap) setOf(friendship.messages!!.last()) else friendship.messages!!
     )
 
     /**

@@ -51,7 +51,7 @@ class NightTimeApiApplication : CommandLineRunner {
 
     override fun run(vararg args: String?) {
 
-        // Cities -----------------------------
+        // Cities ------------------------------------------------------------------------------------------------------
 
         val cityOu = City("Ourense", "Spain")
         val cityVigo = City("Vigo", "Spain")
@@ -75,7 +75,7 @@ class NightTimeApiApplication : CommandLineRunner {
         cityRepository.save(genericCity)
 
 
-        // Bar with events ---------------------
+        // Bar with events ---------------------------------------------------------------------------------------------
 
         var bar = Bar(
             name = "Luxus",
@@ -300,7 +300,13 @@ class NightTimeApiApplication : CommandLineRunner {
             barRepository.save(bar)
         }
 
-        // Users --------------------------
+
+
+
+
+
+
+        // Users -------------------------------------------------------------------------------------------------------
 
         val userInit = UserInit(userService, userRepository, dateCityRepository)
 
@@ -518,13 +524,13 @@ class NightTimeApiApplication : CommandLineRunner {
 
 
 
-        // Friends -----------------------
+        // Friends -----------------------------------------------------------------------------------------------------
 
         val friend1_2 = Friendship(user1, user2)
         friend1_2.answer = AnswerOptions.YES
         friendshipRepository.save(friend1_2)// accepted friendship
 
-        val friend1_3 = Friendship(user3, user1)
+        val friend1_3 = Friendship(user1, user3)
         friend1_3.answer = AnswerOptions.YES
         friendshipRepository.save(friend1_3)// accepted friendship
 
@@ -534,10 +540,17 @@ class NightTimeApiApplication : CommandLineRunner {
 
         friendshipRepository.save(Friendship(user5, user1)) // offered friendship
 
-        // Chats -----------------------
+
+
+
+
+
+
+        // Chats -------------------------------------------------------------------------------------------------------
 
         ChatInit(
-            friendshipRepository.findFriendsByUserAsk_IdOrUserAnswer_Id(user1.id, user1.id)[0],
+            friendshipRepository.findFriendsByUserAsk_IdOrUserAnswer_Id(user1.id, user1.id)
+                .firstOrNull { friendship -> friendship.userAsk.id == user1.id && friendship.userAnswer.id == user2.id   },
             messageRepository,
             listOf(
                 MessageInit("Hola Nuria", 0),
@@ -551,7 +564,8 @@ class NightTimeApiApplication : CommandLineRunner {
         ).saveData()
 
         ChatInit(
-            friendshipRepository.findFriendsByUserAsk_IdOrUserAnswer_Id(user1.id, user1.id)[1],
+            friendshipRepository.findFriendsByUserAsk_IdOrUserAnswer_Id(user1.id, user1.id)
+                .firstOrNull { friendship -> friendship.userAsk.id == user1.id && friendship.userAnswer.id == user3.id   },
             messageRepository,
             listOf(
                 MessageInit("Santiii al final lograste conectarlo?", 0),
@@ -565,7 +579,8 @@ class NightTimeApiApplication : CommandLineRunner {
         ).saveData()
 
         ChatInit(
-            friendshipRepository.findFriendsByUserAsk_IdOrUserAnswer_Id(user4.id, user4.id)[0],
+            friendshipRepository.findFriendsByUserAsk_IdOrUserAnswer_Id(user4.id, user1.id)
+            .firstOrNull { friendship -> friendship.userAsk.id == user4.id && friendship.userAnswer.id == user1.id   },
             messageRepository,
             listOf(
                 MessageInit("Hola, la aplicacion dice que el sabado sales, nos vamos encontes?", 0),

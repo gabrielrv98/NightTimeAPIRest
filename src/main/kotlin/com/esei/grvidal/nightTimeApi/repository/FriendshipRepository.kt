@@ -2,7 +2,6 @@ package com.esei.grvidal.nightTimeApi.repository
 
 import com.esei.grvidal.nightTimeApi.model.Friendship
 import com.esei.grvidal.nightTimeApi.projections.FriendshipProjection
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
@@ -29,15 +28,18 @@ interface FriendshipRepository : JpaRepository<Friendship, Long> {
     //Returns a friendShip with the specified users IDs
     fun findFriendshipByUserAsk_IdAndUserAnswer_Id(userAsk_id: Long, userAnswer_id: Long) : Optional<FriendshipProjection>
 
-    //Returns all the Friendships where the user is involved and there is any message
-    @Query(value = "SELECT DISTINCT f FROM Friendship f INNER JOIN Message m ON f.id = m.friendship.id WHERE f.userAsk.id = ?1 OR f.userAnswer.id = ?1 ORDER BY m.date ASC")
+    /**
+     * Returns all the Friendships where the user is involved and there is any message
+     */
+    @Query(value = "SELECT DISTINCT f FROM Friendship f INNER JOIN Message m ON f.id = m.friendship.id " +
+            "WHERE f.userAsk.id = ?1 OR f.userAnswer.id = ?1 ORDER BY m.date ASC")
     fun getChatsWithMessages(idUser: Long): List<Friendship>
 
     /**
      *  Returns the number of friends of user_ask with id [idUser] who checked the date [date] in the city with id [idCity]
      */
-    @Query(value = "SELECT COUNT(F.id) " +
-            "FROM Friendship AS F JOIN DateCity AS DC on F.userAnswer.id = DC.user.id WHERE F.answer= com.esei.grvidal.nightTimeApi.utils.AnswerOptions.YES AND F.userAsk.id = ?1 AND DC.nextCity.id = ?2 AND DC.nextDate = ?3"
+    @Query(value = "SELECT COUNT(F.id) FROM Friendship AS F JOIN DateCity AS DC on F.userAnswer.id = DC.user.id " +
+            "WHERE F.answer= com.esei.grvidal.nightTimeApi.utils.AnswerOptions.YES AND F.userAsk.id = ?1 AND DC.nextCity.id = ?2 AND DC.nextDate = ?3"
     )
     fun getCountFriendsFromUserAskOnDate(idUser: Long, idCity: Long, date: LocalDate) : Int
 

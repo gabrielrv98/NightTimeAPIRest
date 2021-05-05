@@ -52,7 +52,7 @@ class FriendshipService : IFriendshipService {
      * Lists all friendships with Messages from an User
      */
     override fun listUsersWithChatFromFriendsByUser(userId: Long): List<ChatView> {
-        return friendshipRepository.getChatsWithMessages(userId).map { ChatView(it, userId) }
+        return friendshipRepository.getChatsWithMessages(userId).map { ChatView(it, userId,true) }
     }
 
 
