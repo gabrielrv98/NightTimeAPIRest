@@ -48,7 +48,7 @@ class MessageRestController {
         val responseHeader = HttpHeaders()
 
         return try {
-            if (false){//!securityCheck(idUser, auth)) {//if authentication fails TODO change this
+            if (!securityCheck(idUser, auth)) {//if authentication fails
                 responseHeader.set(Constants.ERROR_HEADER_TAG, "Security error, credentials don't match")
                 ResponseEntity(false, responseHeader, HttpStatus.UNAUTHORIZED)
 

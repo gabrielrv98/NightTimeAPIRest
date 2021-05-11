@@ -11,8 +11,6 @@ import javax.persistence.*
  * @param owner is the owner of the bar
  * @param address is the address of the bar
  *
- * //TODO LOOK https://www.baeldung.com/jpa-cascade-types
- * https://stackoverflow.com/questions/7197181/jpa-unidirectional-many-to-one-and-cascading-delete
  *
  */
 @Entity
