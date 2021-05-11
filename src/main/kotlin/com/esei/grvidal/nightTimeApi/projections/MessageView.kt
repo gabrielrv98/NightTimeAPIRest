@@ -8,11 +8,11 @@ import java.time.LocalTime
 /**
  * Interface to show a list of chats
  */
-class MessageView(
+data class MessageView(
     var messageId: Long,
     var text: String,
     var date: LocalDate,
-    var hour: LocalTime,
+    var time: LocalTime,
     var user: Long
 ): java.io.Serializable {
 
@@ -27,7 +27,7 @@ class MessageView(
         messageId= message.id,
         text = message.text,
         date = message.date,
-        hour = message.hour,
+        time = message.hour,
         user = message.user.id
     )
 

@@ -530,7 +530,7 @@ class NightTimeApiApplication : CommandLineRunner {
         friend1_2.answer = AnswerOptions.YES
         friendshipRepository.save(friend1_2)// accepted friendship
 
-        val friend1_3 = Friendship(user1, user3)
+        val friend1_3 = Friendship(user3, user1)
         friend1_3.answer = AnswerOptions.YES
         friendshipRepository.save(friend1_3)// accepted friendship
 
@@ -565,7 +565,7 @@ class NightTimeApiApplication : CommandLineRunner {
 
         ChatInit(
             friendshipRepository.findFriendsByUserAsk_IdOrUserAnswer_Id(user1.id, user1.id)
-                .firstOrNull { friendship -> friendship.userAsk.id == user1.id && friendship.userAnswer.id == user3.id   },
+                .firstOrNull { friendship -> friendship.userAsk.id == user3.id && friendship.userAnswer.id == user1.id   },
             messageRepository,
             listOf(
                 MessageInit("Santiii al final lograste conectarlo?", 0),
@@ -579,7 +579,7 @@ class NightTimeApiApplication : CommandLineRunner {
         ).saveData()
 
         ChatInit(
-            friendshipRepository.findFriendsByUserAsk_IdOrUserAnswer_Id(user4.id, user1.id)
+            friendshipRepository.findFriendsByUserAsk_IdOrUserAnswer_Id(user1.id, user1.id)
             .firstOrNull { friendship -> friendship.userAsk.id == user4.id && friendship.userAnswer.id == user1.id   },
             messageRepository,
             listOf(

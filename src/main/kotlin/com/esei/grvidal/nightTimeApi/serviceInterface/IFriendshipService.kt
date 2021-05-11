@@ -19,7 +19,7 @@ interface IFriendshipService {
 
 
     //Lists all the users that are friend of one User //api propose
-    fun listUsersFromFriendsByUser(userId: Long): List<UserFriendView>
+    fun listUsersFromFriendsByUser(userId: Long, page: Int, size: Int): List<UserSnapProjection>
 
     //Lists all the users that have any message on the chat with the user
     fun listUsersWithChatFromFriendsByUser(userId: Long): List<ChatView>
@@ -40,7 +40,6 @@ interface IFriendshipService {
     @Throws(NotFoundException::class)
     fun update(friendshipParam: FriendshipUpdateDTO)
 
-
     //remove a chat with cascade on delete //api propose
     fun remove(friendsId: Long)
 
@@ -57,4 +56,6 @@ interface IFriendshipService {
     fun getCountFriendsRequest(idUser: Long): Int
 
     fun friendShipState(idUser1: Long, idUser2: Long): AnswerOptions
+    fun listFriendshipsIds(idUser: Long): List<Long>
+    fun getCountFriends(userId: Long): Int
 }

@@ -22,8 +22,9 @@ interface FriendshipRepository : JpaRepository<Friendship, Long> {
     fun findFriendsByUserAsk_IdOrUserAnswer_Id(user1_id: Long, user2_id: Long) : List<Friendship>
 
     //Returns all the FriendsShips where an user is involved and has a YES answer
-    @Query(value = "SELECT f FROM Friendship f WHERE (f.userAsk.id = ?1 OR f.userAnswer.id = ?1) AND f.answer = com.esei.grvidal.nightTimeApi.utils.AnswerOptions.YES ")
-    fun findFriendshipsFromUser(user_id: Long) : List<FriendshipProjection>
+    @Query(value = "SELECT f FROM Friendship f " +
+            "WHERE (f.userAsk.id = ?1 OR f.userAnswer.id = ?1) AND f.answer = com.esei.grvidal.nightTimeApi.utils.AnswerOptions.YES ")
+    fun findFriendshipsFromUser(user_id: Long,pageable: Pageable) : List<FriendshipProjection>
 
     //Returns a friendShip with the specified users IDs
     fun findFriendshipByUserAsk_IdAndUserAnswer_Id(userAsk_id: Long, userAnswer_id: Long) : Optional<FriendshipProjection>
@@ -69,6 +70,12 @@ interface FriendshipRepository : JpaRepository<Friendship, Long> {
 
     @Query(value = "SELECT COUNT (f) FROM Friendship f WHERE  f.userAnswer.id = ?1 AND f.answer = com.esei.grvidal.nightTimeApi.utils.AnswerOptions.NOT_ANSWERED")
     fun getCountAllByUserAnswerAndAnswer(user_id: Long): Int
+
+    @Query(value = "SELECT f.id FROM Friendship f WHERE f.userAnswer.id = ?1 OR f.userAsk.id = ?1 ")
+    fun getFriendshipIds(user_id: Long) : List<Long>
+
+    @Query(value = "SELECT COUNT (F.id) FROM Friendship F WHERE ( F.userAnswer.id = ?1 OR F.userAsk.id = ?1 ) AND F.answer = com.esei.grvidal.nightTimeApi.utils.AnswerOptions.YES")
+    fun getCountFriends(userId: Long): Int
 
 
 

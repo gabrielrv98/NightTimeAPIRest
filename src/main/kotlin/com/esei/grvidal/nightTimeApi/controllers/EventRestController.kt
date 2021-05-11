@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 /**
- * This is the Event Controller todo delete
+ * This is the Event Controller
  */
 @RestController
 @RequestMapping(Constants.URL_BASE_EVENT)

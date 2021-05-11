@@ -1,5 +1,6 @@
 package com.esei.grvidal.nightTimeApi.model
 
+import com.esei.grvidal.nightTimeApi.utils.AnswerOptions
 import com.fasterxml.jackson.annotation.JsonIdentityInfo
 import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import java.time.LocalDate
@@ -24,7 +25,16 @@ class Message(
         @JoinColumn(name = "user_id", nullable = false)
         var user: User
 ) {
+
+    @Enumerated(EnumType.STRING)
+    var readState: ReadState = ReadState.NOT_READ
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     var id: Long = 0
+}
+
+enum class ReadState{
+    READ,
+    NOT_READ
 }

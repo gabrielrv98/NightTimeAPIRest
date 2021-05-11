@@ -10,6 +10,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.time.LocalTime;
 import java.util.Collections;
 
 //http://192.168.1.11:8080/swagger-ui.html#/
@@ -21,6 +22,9 @@ public class SwaggerConfig {
     @Bean
     public Docket apiDocket() {
         return new Docket(DocumentationType.SWAGGER_2)
+                .groupName("")
+                .directModelSubstitute(LocalTime.class, String.class)
+                .apiInfo(getApiInfo())
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.esei.grvidal.nightTimeApi.controllers"))
                 .paths(PathSelectors.any())
@@ -31,11 +35,11 @@ public class SwaggerConfig {
 
     private ApiInfo getApiInfo() {
         return new ApiInfo(
-                "Order Service API",
-                "Order Service API Description",
+                "NightTime Service API",
+                "Api rest service to allow connection between clients",
                 "1.0",
                 "http://codmind.com/terms",
-                new Contact("Codmind", "https://codmind.com", "apis@codmind.com"),
+                new Contact("Gabriel RV", "https://codmind.com", "gabrielrv98@gmail.com"),
                 "LICENSE",
                 "LICENSE URL",
                 Collections.emptyList()

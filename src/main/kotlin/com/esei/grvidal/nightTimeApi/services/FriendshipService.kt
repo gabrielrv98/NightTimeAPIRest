@@ -44,15 +44,22 @@ class FriendshipService : IFriendshipService {
     /**
      * Lists all the users that where the friendship answer is 1 (YES) ( they are friends)
      */
-    override fun listUsersFromFriendsByUser(userId: Long): List<UserFriendView> {
-        return friendshipRepository.findFriendshipsFromUser(userId).map { UserFriendView(it, userId) }
+    override fun listUsersFromFriendsByUser(userId: Long, page: Int, size: Int): List<UserSnapProjection> {
+        return friendshipRepository
+            .findFriendshipsFromUser(userId,PageRequest.of(page, size))
+            .map {  UserSnapProjection(it, userId)
+                .apply { this.userId = it.getId() }
+            }
     }
 
     /**
      * Lists all friendships with Messages from an User
      */
     override fun listUsersWithChatFromFriendsByUser(userId: Long): List<ChatView> {
-        return friendshipRepository.getChatsWithMessages(userId).map { ChatView(it, userId,true) }
+        return friendshipRepository.getChatsWithMessages(userId)
+            .map { ChatView(it, userId,true) }
+            .sortedByDescending { it.messages[0].date }
+            .sortedByDescending { it.messages[0].time }
     }
 
 
@@ -120,7 +127,6 @@ class FriendshipService : IFriendshipService {
 
     /**
      * This will remove a CHAT through its id, if not, will throw an Exception, or if it cant find it, it will throw a NotFoundException
-     * //TODO Should be marked as "deleted" instead of being deleted
      */
     override fun remove(friendsId: Long) {
         friendshipRepository.deleteById(friendsId)
@@ -180,6 +186,15 @@ class FriendshipService : IFriendshipService {
             pageable = PageRequest.of(page, size)
         )
        return friendList.map { UserSnapProjection(it, idUser) }
+    }
+
+
+    override fun listFriendshipsIds(idUser: Long): List<Long> {
+        return friendshipRepository.getFriendshipIds(idUser)
+    }
+
+    override fun getCountFriends(userId: Long): Int {
+        return friendshipRepository.getCountFriends(userId)
     }
 
 }

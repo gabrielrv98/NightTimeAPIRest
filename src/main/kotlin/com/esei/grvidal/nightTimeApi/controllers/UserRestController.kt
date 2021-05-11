@@ -9,6 +9,9 @@ import com.esei.grvidal.nightTimeApi.serviceInterface.*
 import com.esei.grvidal.nightTimeApi.utils.AnswerOptions
 import com.esei.grvidal.nightTimeApi.utils.Constants
 import com.esei.grvidal.nightTimeApi.utils.Constants.Companion.ERROR_HEADER_TAG
+import com.esei.grvidal.nightTimeApi.utils.TokenSimple.TokenSimple
+import com.esei.grvidal.nightTimeApi.utils.TokenSimple.TokenSimple.securityCheck
+import com.esei.grvidal.nightTimeApi.utils.TokenSimple.TokenSimple.tokenGen
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -21,8 +24,6 @@ import java.io.InputStream
 import java.time.DateTimeException
 import java.time.LocalDate
 import java.time.LocalTime
-import kotlin.collections.HashMap
-import kotlin.jvm.Throws
 
 
 /**
@@ -57,42 +58,6 @@ class UserRestController {
     @Autowired
     lateinit var storeService: IStoreService
 
-    //HashMap with the tokens for authorization
-    private val tokenSimple: HashMap<Long, String> = hashMapOf()
-
-    /**
-     * Receives [id] of the user that is also the key for the hashMap, [token] as the secure string
-     *
-     * @return true if the parameter token equals the saved token
-     * @exception [NotLoggedException] if the token for the [id] is null
-     */
-    @Throws(NotLoggedException::class)
-    private fun securityCheck(id: Long, token: String): Boolean {
-        tokenSimple[id]?.let {
-            return it == token
-        }
-        throw NotLoggedException("user with id $id is not logged in")
-    }
-
-    /**
-     * Receives [length] as an int for the length of the generated string
-     *
-     * @return a random string of length [length] and characters from the array [charset]
-     */
-    fun tokenGen(length: Int): String {
-        val charset = "ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz0123456789$@-_=//\\*$&" // 71 characters
-        var token: String
-
-        do {
-            token = (1..length)
-                .map { charset.random() }
-                .joinToString("")
-
-        } while (tokenSimple.values.contains(token))//If token is repeated, a new one is calculated
-
-        return token
-    }
-
 
     /**
      * Receives an [username] and a [password] and checks if the [username] exists,
@@ -115,7 +80,7 @@ class UserRestController {
 
                 val token = tokenGen(25) //max users online: 25 char * 71 charset = 1775 users
 
-                tokenSimple[idUser] = token
+                TokenSimple[idUser] = token
                 responseHeader.set("id", idUser.toString())
                 responseHeader.set("token", token)
                 logger.info("user $idUser logged in successfully")
@@ -154,7 +119,7 @@ class UserRestController {
         return try {
 
             if (securityCheck(idUser, auth)) {
-                tokenSimple.remove(idUser)
+                TokenSimple.remove(idUser)
                 ResponseEntity("Good bye", HttpStatus.ACCEPTED)
 
             } else
@@ -331,7 +296,7 @@ class UserRestController {
 
             val token = tokenGen(25) //max users online: 25 char * 71 charset = 1775 users
 
-            tokenSimple[id] = token
+            TokenSimple[id] = token
             responseHeader.set("id", id.toString())
             responseHeader.set("token", token)
 
@@ -543,7 +508,7 @@ class UserRestController {
      * @param dateCity data of the date
      *
      * @exception NotFoundException when the [DateCityDTO] doesn't match any db entry
-     * @exception NotLoggedException if the [idUser] is not in the hashMap [tokenSimple]
+     * @exception NotLoggedException if the [idUser] is not in the hashMap [TokenSimple]
      *
      * Try to delete it, if there is no problem it will return true, id, [HttpStatus.ACCEPTED],
      * if the [dateCity] doesn't exist it will return [HttpStatus.NOT_FOUND]
@@ -588,16 +553,18 @@ class UserRestController {
 
     /**
      * Listen to a Get with the [Constants.URL_BASE_BAR] and an Id as a parameter to show one Bar
-     * TODO this is used to start a new chat
      *
-     * @return A List<[UserFriendView]> with all the friendship of the user
+     *
+     * @return A List<[UserSnapProjection]> with all the friendship of the user with friendshipId as userId
      *
      */
     @GetMapping("/{id}/friends/users")
     fun getUsersFromFriendList(
         @PathVariable("id") idUser: Long,
-        @RequestHeader("auth") auth: String
-    ): ResponseEntity<List<UserFriendView>> {
+        @RequestHeader("auth") auth: String,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "17") size: Int
+     ): ResponseEntity<List<UserSnapProjection>> {
 
         val responseHeader = HttpHeaders()
         return try {
@@ -605,8 +572,11 @@ class UserRestController {
                 responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
                 ResponseEntity(listOf(), responseHeader, HttpStatus.UNAUTHORIZED)
             } else {
+
+                responseHeader.set("total",friendshipService.getCountFriends(idUser).toString())
                 ResponseEntity(
-                    friendshipService.listUsersFromFriendsByUser(idUser),
+                    friendshipService.listUsersFromFriendsByUser(idUser,page,size),
+                    responseHeader,
                     HttpStatus.OK
                 )
             }
@@ -645,7 +615,7 @@ class UserRestController {
      *
      * @exception NotFoundException when the [idFriend] doesn't match any user
      * @exception AlreadyExistsException if the relationship already existed in any way
-     * @exception NotLoggedException if the [idUser] is not in the hashMap [tokenSimple]
+     * @exception NotLoggedException if the [idUser] is not in the hashMap [TokenSimple]
      *
      */
     @PostMapping("/{id}/friends/{idFriend}")
@@ -687,7 +657,7 @@ class UserRestController {
      *
      * @return returns all the friendships that are not accepted
      *
-     * @exception NotLoggedException if the [idUser] is not in the hashMap [tokenSimple]
+     * @exception NotLoggedException if the [idUser] is not in the hashMap [TokenSimple]
      *
      */
     @GetMapping("/{id}/friends")
@@ -732,7 +702,7 @@ class UserRestController {
      * @return returns a message with information
      *
      * @exception NotFoundException when the [FriendshipUpdateDTO.id] doesn't match any friendships
-     * @exception NotLoggedException if the [idUser] is not in the hashMap [tokenSimple]
+     * @exception NotLoggedException if the [idUser] is not in the hashMap [TokenSimple]
      *
      */
     @PatchMapping("/{id}/friends")
@@ -807,7 +777,7 @@ class UserRestController {
      * @return The check of a deleted [Friendship]
      *
      * @exception NotFoundException if the [idFriend] and [idUser] don't have any friendship
-     * @exception NotLoggedException if the [idUser] is not in the hashMap [tokenSimple]
+     * @exception NotLoggedException if the [idUser] is not in the hashMap [TokenSimple]
      */
     @DeleteMapping("/{id}/friends/{idFriend}")
     fun deleteFriendship(
@@ -852,7 +822,7 @@ class UserRestController {
      *
      * @return a [List<[Friendship]>] with all the friendship with any messages
      *
-     * @exception NotLoggedException if the [idUser] is not in the hashMap [tokenSimple]
+     * @exception NotLoggedException if the [idUser] is not in the hashMap [TokenSimple]
      */
     @GetMapping("/{idUser}/chat")
     fun getFriendshipWithMessages(
@@ -865,9 +835,45 @@ class UserRestController {
                 responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
                 ResponseEntity(listOf(), responseHeader, HttpStatus.UNAUTHORIZED)
             } else {
-                logger.info("getFriendshipWithMessages called for user $idUser")
+                logger.info("user $idUser is cheking his chats")
+                ResponseEntity(
+                    friendshipService
+                        .listUsersWithChatFromFriendsByUser(idUser)
+                        .sortedByDescending { it.messages[0].date }
+                        .sortedByDescending { it.messages[0].time },
+                    HttpStatus.OK
+                )
+            }
 
-                ResponseEntity(friendshipService.listUsersWithChatFromFriendsByUser(idUser), HttpStatus.OK)
+        } catch (e: NotLoggedException) {
+            responseHeader.set(ERROR_HEADER_TAG, e.message.toString())
+            ResponseEntity(listOf(), responseHeader, HttpStatus.FORBIDDEN)
+        }
+    }
+
+
+    /**
+     * Returns all the ids of the friendships where there user is involved
+     *
+     */
+    @GetMapping("/{idUser}/friends/id")
+    fun getFriendshipsIds(
+        @PathVariable("idUser") idUser: Long,
+        @RequestHeader("auth") auth: String
+    ): ResponseEntity<List<Long>> {
+
+        val responseHeader = HttpHeaders()
+        return try {
+            if (!securityCheck(idUser, auth)) {//if authentication fails
+                responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
+                ResponseEntity(listOf(), responseHeader, HttpStatus.UNAUTHORIZED)
+            } else {
+
+                ResponseEntity(
+                    friendshipService
+                        .listFriendshipsIds(idUser),
+                    HttpStatus.OK
+                )
             }
 
         } catch (e: NotLoggedException) {
@@ -885,7 +891,7 @@ class UserRestController {
      *
      * @exception NotFoundException when the [idFriendship] doesn't match any friendships
      * @exception NoAuthorizationException if the [idUser] is not in the friendship with id [idFriendship]
-     * @exception NotLoggedException if the [idUser] is not in the hashMap [tokenSimple]
+     * @exception NotLoggedException if the [idUser] is not in the hashMap [TokenSimple]
      */
     @GetMapping("/{idUser}/chat/{idFriendship}")
     fun getChat(
@@ -920,53 +926,6 @@ class UserRestController {
     }
 
 
-    /**
-     * Listen to a Post with the [Constants.URL_BASE_USER] and a requestBody with a Message to create a Message
-     * Save a message with the check that the [idUser] is in the [Friendship]
-     *
-     * @param msg new [Message] to insert in the database
-     *
-     * @exception NotFoundException if the [MessageForm.friendshipId] doesn't exist
-     * @exception NotLoggedException if the [idUser] is not in the hashMap [tokenSimple]
-     */
-    @PostMapping("/{idUser}/chat")
-    fun insertMessage(
-        @PathVariable("idUser") idUser: Long,
-        @RequestHeader("auth") auth: String,
-        @RequestBody msg: MessageForm
-    ): ResponseEntity<Boolean> {
-        val responseHeader = HttpHeaders()
-        return try {
-
-            if (!securityCheck(idUser, auth)) {//if authentication fails
-                responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
-                ResponseEntity(null, responseHeader, HttpStatus.UNAUTHORIZED)
-            } else {
-                //Load the friendship to check the user
-                val friendsDB = friendshipService.load(msg.friendshipId)
-
-                //If idUser is not on the friendship
-                if (friendsDB.getUserAsk().getId() != idUser && friendsDB.getUserAnswer().getId() != idUser) {
-                    responseHeader.set(ERROR_HEADER_TAG, "User must be in the friendship")
-                    ResponseEntity(false, responseHeader, HttpStatus.NOT_FOUND)
-                } else {
-                    val id = messageService.save(msg, idUser)
-                    responseHeader.set("location", Constants.URL_BASE_BAR + "/" + id)
-
-                    ResponseEntity(true, responseHeader, HttpStatus.CREATED)
-                }
-            }
-
-
-        } catch (e: NotFoundException) {
-            responseHeader.set(ERROR_HEADER_TAG, e.message.toString())
-            ResponseEntity(null, responseHeader, HttpStatus.NOT_FOUND)
-
-        } catch (e: NotLoggedException) {
-            responseHeader.set(ERROR_HEADER_TAG, e.message.toString())
-            ResponseEntity(null, responseHeader, HttpStatus.FORBIDDEN)
-        }
-    }
 
 
     /**
@@ -978,7 +937,7 @@ class UserRestController {
      *
      * @return a Response with two headers, "total" for total people, and "friends" for user's friends. Also a body with the events on that date
      *
-     * @exception NotLoggedException if the [idUser] is not in the hashMap [tokenSimple]
+     * @exception NotLoggedException if the [idUser] is not in the hashMap [TokenSimple]
      */
     @GetMapping("/{idUser}/{day}-{month}-{year}/{idCity}")
     fun getPeopleAndFriends(
@@ -1064,7 +1023,7 @@ class UserRestController {
      *
      * @return a Response with a body with the a list of [UserSnapProjection]
      *
-     * @exception NotLoggedException if the [idUser] is not in the hashMap [tokenSimple]
+     * @exception NotLoggedException if the [idUser] is not in the hashMap [TokenSimple]
      */
     @GetMapping("/{idUser}/{day}-{month}-{year}/{idCity}/users")
     fun getFriendsOnDate(

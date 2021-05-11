@@ -20,25 +20,27 @@ class ChatInit(
 ) {
 
     fun saveData() {
-        var i: Long
+        var i: Long = 0
+        var j: Long = 0
 
         friendship?.let{ friendship ->
             for (msg in this.msgList) {
 
-                i = if (Random(LocalTime.now().nano.toLong()).nextInt() % 2 == 0) {
+                i += if (Random(LocalTime.now().nano.toLong()).nextInt() % 2 == 0) {
                     0
                 } else 1
 
                 messageRepositories.save(
                     Message(
                         msg.txt,
-                        LocalDate.now().plusDays(i),
-                        LocalTime.now().plusHours(i),
+                        LocalDate.now(),
+                        LocalTime.now().plusMinutes(i).plusSeconds(j),
                         friendship,
                         user = if (msg.user == 0) friendship.userAsk
                         else friendship.userAnswer
                     )
                 )
+                j++
             }
         }
 
