@@ -5,10 +5,7 @@ import com.esei.grvidal.nightTimeApi.dto.FriendshipUpdateDTO
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Message
-import com.esei.grvidal.nightTimeApi.projections.ChatView
-import com.esei.grvidal.nightTimeApi.projections.FriendshipProjection
-import com.esei.grvidal.nightTimeApi.projections.UserFriendView
-import com.esei.grvidal.nightTimeApi.projections.UserSnapProjection
+import com.esei.grvidal.nightTimeApi.projections.*
 import com.esei.grvidal.nightTimeApi.utils.AnswerOptions
 import kotlin.jvm.Throws
 
@@ -19,7 +16,7 @@ interface IFriendshipService {
 
 
     //Lists all the users that are friend of one User //api propose
-    fun listUsersFromFriendsByUser(userId: Long, page: Int, size: Int): List<UserSnapProjection>
+    fun listUsersFromFriendsByUser(userId: Long, page: Int, size: Int): List<FriendshipSnapProjection>
 
     //Lists all the users that have any message on the chat with the user
     fun listUsersWithChatFromFriendsByUser(userId: Long): List<ChatView>

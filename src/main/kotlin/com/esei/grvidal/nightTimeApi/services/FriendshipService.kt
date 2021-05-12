@@ -10,10 +10,7 @@ import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Friendship
 import com.esei.grvidal.nightTimeApi.model.Message
 import com.esei.grvidal.nightTimeApi.model.User
-import com.esei.grvidal.nightTimeApi.projections.ChatView
-import com.esei.grvidal.nightTimeApi.projections.FriendshipProjection
-import com.esei.grvidal.nightTimeApi.projections.UserFriendView
-import com.esei.grvidal.nightTimeApi.projections.UserSnapProjection
+import com.esei.grvidal.nightTimeApi.projections.*
 import com.esei.grvidal.nightTimeApi.repository.UserRepository
 import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendshipService
 import com.esei.grvidal.nightTimeApi.utils.AnswerOptions
@@ -44,11 +41,11 @@ class FriendshipService : IFriendshipService {
     /**
      * Lists all the users that where the friendship answer is 1 (YES) ( they are friends)
      */
-    override fun listUsersFromFriendsByUser(userId: Long, page: Int, size: Int): List<UserSnapProjection> {
+    override fun listUsersFromFriendsByUser(userId: Long, page: Int, size: Int): List<FriendshipSnapProjection> {
         return friendshipRepository
-            .findFriendshipsFromUser(userId,PageRequest.of(page, size))
-            .map {  UserSnapProjection(it, userId)
-                .apply { this.userId = it.getId() }
+            .findFriendshipsFromUser(userId, PageRequest.of(page, size))
+            .map {
+                FriendshipSnapProjection(it,userId)
             }
     }
 
@@ -57,7 +54,7 @@ class FriendshipService : IFriendshipService {
      */
     override fun listUsersWithChatFromFriendsByUser(userId: Long): List<ChatView> {
         return friendshipRepository.getChatsWithMessages(userId)
-            .map { ChatView(it, userId,true) }
+            .map { ChatView(it, userId, true) }
             .sortedByDescending { it.messages[0].date }
             .sortedByDescending { it.messages[0].time }
     }
@@ -104,7 +101,7 @@ class FriendshipService : IFriendshipService {
         if (!friends.isPresent) {
 
             //Check if the userAnswer exists ( if service has been called, userAsk has to be logged)
-            if(!userRepository.findById(userAnswer).isPresent )
+            if (!userRepository.findById(userAnswer).isPresent)
                 throw  NotFoundException("User requested with id $userAnswer not found")
 
             return friendshipRepository.save(
@@ -158,25 +155,28 @@ class FriendshipService : IFriendshipService {
 
     override fun friendShipState(idUser1: Long, idUser2: Long): AnswerOptions {
         val friendshipList = friendshipRepository.findFriendsByUserAsk_IdOrUserAnswer_Id(idUser1, idUser1)
-            .filter { it.userAnswer.id == idUser2 || it.userAsk.id == idUser2  }
+            .filter { it.userAnswer.id == idUser2 || it.userAsk.id == idUser2 }
 
         return if (friendshipList.isEmpty()) AnswerOptions.NO
         else friendshipList[0].answer
     }
 
     override fun getCountFriendsOnDate(idUser: Long, dateCityDTO: DateCityDTO): Int {
-// TODO: 29/04/2021 improve this with getFriendsOnDate prototype
-        var numberFriends =
-            friendshipRepository.getCountFriendsFromUserAskOnDate(idUser, dateCityDTO.nextCityId, dateCityDTO.nextDate)
-        numberFriends += friendshipRepository.getCountFriendsFromAnswerOnDate(
-            idUser,
-            dateCityDTO.nextCityId,
-            dateCityDTO.nextDate
+
+        return friendshipRepository.getCountFriendsFromUserOnDate(
+            idUser = idUser,
+            idCity = dateCityDTO.nextCityId,
+            date = dateCityDTO.nextDate
         )
-        return numberFriends
+
     }
 
-    override fun getFriendsOnDate(idUser: Long, dateCityDTO: DateCityDTO, page:Int, size:Int): List<UserSnapProjection> {
+    override fun getFriendsOnDate(
+        idUser: Long,
+        dateCityDTO: DateCityDTO,
+        page: Int,
+        size: Int
+    ): List<UserSnapProjection> {
 
         val friendList = friendshipRepository.getFriendsOnDate(
 
@@ -185,7 +185,7 @@ class FriendshipService : IFriendshipService {
             date = dateCityDTO.nextDate,
             pageable = PageRequest.of(page, size)
         )
-       return friendList.map { UserSnapProjection(it, idUser) }
+        return friendList.map { UserSnapProjection(it, idUser) }
     }
 
 

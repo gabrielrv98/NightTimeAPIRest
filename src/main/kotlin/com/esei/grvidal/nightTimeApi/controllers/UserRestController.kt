@@ -262,7 +262,6 @@ class UserRestController {
 
                 val userList = userService.loadUserDatesList(idUser, DateCityDTO(LocalDate.now().minusDays(1), idCity))
 
-                responseHeader.set("total", userList.size.toString())
                 ResponseEntity(userList, responseHeader, HttpStatus.OK)
             }
 
@@ -564,7 +563,7 @@ class UserRestController {
         @RequestHeader("auth") auth: String,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "17") size: Int
-     ): ResponseEntity<List<UserSnapProjection>> {
+     ): ResponseEntity<List<FriendshipSnapProjection>> {
 
         val responseHeader = HttpHeaders()
         return try {
