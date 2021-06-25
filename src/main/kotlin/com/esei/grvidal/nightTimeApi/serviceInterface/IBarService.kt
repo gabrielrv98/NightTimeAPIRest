@@ -25,9 +25,6 @@ interface IBarService {
     @Throws(NotFoundException::class)
     fun getDetails(idBar: Long): BarDetailsProjection
 
-    @Deprecated("used fot testing")
-    fun getFullProjection(idBar: Long): BarFullProjection
-
     //Saves a new bar
     fun save(bar: Bar): Long
 

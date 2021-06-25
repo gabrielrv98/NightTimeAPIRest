@@ -15,9 +15,6 @@ import java.util.*
 @Repository
 interface BarRepository : JpaRepository<Bar, Long>{
 
-    @Deprecated("only testing")
-    fun getFullBarById(id: Long): BarFullProjection
-
     //return all the bars that has the city in common
     fun findByCity_Id(city_id: Long, pageable: Pageable) : List<BarProjection>
 

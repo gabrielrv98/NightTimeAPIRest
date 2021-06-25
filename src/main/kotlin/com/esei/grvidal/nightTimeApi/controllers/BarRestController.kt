@@ -110,22 +110,6 @@ class BarRestController {
         }
     }
 
-    /**
-     * Listen to a Get with the [idBar] to show all the information of a bar
-     *
-     * @param idBar id of the bar
-     */
-    @Deprecated("This method returns all the information, only for testing propose")
-    @GetMapping("/{id}")
-    fun load(@PathVariable("id") idBar: Long): ResponseEntity<Any> {
-
-        return try {
-            ResponseEntity(barService.getFullProjection(idBar), HttpStatus.OK)
-        } catch (e: NotFoundException) {
-            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
-        }
-
-    }
 
     /**
      * Listen to a Post and a requestBody with a [BarDTOInsert] to create a new Bar

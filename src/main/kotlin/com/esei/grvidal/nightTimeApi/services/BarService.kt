@@ -162,16 +162,7 @@ class BarService : IBarService {
 
     }
 
-    @Throws(NotFoundException::class)
-    override fun getFullProjection(idBar: Long): BarFullProjection {
 
-        try {
-            return barRepository.getFullBarById(idBar)
-
-        } catch (e: EmptyResultDataAccessException) {
-            throw NotFoundException("No bar with id $idBar have been found")
-        }
-    }
 }
 
 
