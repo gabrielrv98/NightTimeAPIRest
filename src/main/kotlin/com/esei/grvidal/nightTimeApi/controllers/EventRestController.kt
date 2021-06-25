@@ -64,7 +64,7 @@ class EventRestController {
     }
 
     /**
-     * Listen to a Delete with the [Constants.URL_BASE_EVENT] and a Id as a paramter to delete a Event
+     * Listen to a Delete with the [Constants.URL_BASE_EVENT] and a Id as a parameter to delete a Event
      */
     @DeleteMapping("/{id}")
     fun delete(@PathVariable("id") idEvent: Long): ResponseEntity<Any> {
