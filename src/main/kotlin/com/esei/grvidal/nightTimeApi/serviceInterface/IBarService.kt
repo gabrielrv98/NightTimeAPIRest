@@ -2,10 +2,8 @@ package com.esei.grvidal.nightTimeApi.serviceInterface
 
 import com.esei.grvidal.nightTimeApi.dto.BarDTOEdit
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
-import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.model.Bar
 import com.esei.grvidal.nightTimeApi.projections.BarDetailsProjection
-import com.esei.grvidal.nightTimeApi.projections.BarFullProjection
 import com.esei.grvidal.nightTimeApi.projections.BarProjection
 import kotlin.jvm.Throws
 

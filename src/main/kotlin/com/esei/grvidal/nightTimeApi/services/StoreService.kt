@@ -11,25 +11,28 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 
+enum class PhotoType{
+    barPhoto,
+    userPhoto
+}
 
 @Service
 class StoreService: IStoreService {
 
-    //@Value("\${app.upload.path}")
-    //val uploadPath: String = """C:\Users\reyga\IdeaProjects\NightTimeAPIRest\src\main\resources"""
     val uploadPath: String = """C:\Users\reyga\IdeaProjects\NightTimeAPIRest\target\classes"""
 
     val logger = LoggerFactory.getLogger(NightTimeApiApplication::class.java)!!
 
-    override fun store(file: MultipartFile, filename: String): String {
+    override fun store(file: MultipartFile, filename: String, photoType: PhotoType): String {
         logger.info("Starting to store")
 
-        //var filename = file.originalFilename?.let { StringUtils.cleanPath(it) } ?: "noOriginalFilename"
-        val formattedFilename = filename
+        var formattedFilename = filename
             .toLowerCase()
             .replace(" ".toRegex(), "-")
             .replace(":","-")
-            .replaceFirst(".","-")
+
+        if(photoType == PhotoType.userPhoto)
+            formattedFilename = formattedFilename.replaceFirst(".","-")
 
 
         logger.info("filename = $formattedFilename")
@@ -45,7 +48,8 @@ class StoreService: IStoreService {
 
         val storedLocation: String = try {
 
-            val location = Paths.get("$uploadPath/userpics/$formattedFilename")
+            val type = if(photoType == PhotoType.barPhoto) "barpics" else "userpics"
+            val location = Paths.get("$uploadPath/$type/$formattedFilename")
             if( !Files.exists(location) ) {
                 logger.info("Creating file")
                 Files.createFile(location)
@@ -65,7 +69,6 @@ class StoreService: IStoreService {
         }
 
         logger.info("StoredLocation =  $storedLocation ")
-        //return storedLocation.split("resources")[1].replace("\\","/")
         return storedLocation.split("classes")[1].replace("\\","/")
     }
 

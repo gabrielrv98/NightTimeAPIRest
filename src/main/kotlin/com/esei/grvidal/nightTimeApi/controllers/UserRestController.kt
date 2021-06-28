@@ -6,6 +6,7 @@ import com.esei.grvidal.nightTimeApi.exception.*
 import com.esei.grvidal.nightTimeApi.model.*
 import com.esei.grvidal.nightTimeApi.projections.*
 import com.esei.grvidal.nightTimeApi.serviceInterface.*
+import com.esei.grvidal.nightTimeApi.services.PhotoType
 import com.esei.grvidal.nightTimeApi.utils.AnswerOptions
 import com.esei.grvidal.nightTimeApi.utils.Constants
 import com.esei.grvidal.nightTimeApi.utils.Constants.Companion.ERROR_HEADER_TAG
@@ -141,7 +142,7 @@ class UserRestController {
         @PathVariable("idSearchedUser") searchedUserId: Long,
         @RequestHeader("auth") auth: String,
         @RequestHeader("clientUser") clientId: Long
-    ): ResponseEntity<UserProjectionProfile?> {
+    ): ResponseEntity<UserProfileView?> {
         val responseHeader = HttpHeaders()
         return try {
 
@@ -150,7 +151,7 @@ class UserRestController {
                 ResponseEntity(null, responseHeader, HttpStatus.UNAUTHORIZED)
             } else {
 
-                val user = UserProjectionProfile(
+                val user = UserProfileView(
                     user = userService.loadProjection(searchedUserId),
                     friendshipState = if (searchedUserId != clientId) //If the user is not looking for himself check if they are friends
                         friendshipService.friendShipState(searchedUserId, clientId)
@@ -340,7 +341,8 @@ class UserRestController {
                 //save image in directory
                 val newName = storeService.store(
                     img,
-                    "user_${user.getNickname()}_${LocalDate.now()}_${LocalTime.now()}.jpg"
+                    "user_${user.getNickname()}_${LocalDate.now()}_${LocalTime.now()}.jpg",
+                    PhotoType.userPhoto
                 )
                 //delete old image
                 oldName?.let {
@@ -554,7 +556,7 @@ class UserRestController {
      * Listen to a Get with the [Constants.URL_BASE_BAR] and an Id as a parameter to show one Bar
      *
      *
-     * @return A List<[UserSnapProjection]> with all the friendship of the user with friendshipId as userId
+     * @return A List<[UserSnapView]> with all the friendship of the user with friendshipId as userId
      *
      */
     @GetMapping("/{id}/friends/users")
@@ -563,7 +565,7 @@ class UserRestController {
         @RequestHeader("auth") auth: String,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "17") size: Int
-     ): ResponseEntity<List<FriendshipSnapProjection>> {
+     ): ResponseEntity<List<FriendshipSnapView>> {
 
         val responseHeader = HttpHeaders()
         return try {
@@ -590,7 +592,7 @@ class UserRestController {
         @PathVariable("nickname") userString: String,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "17") size: Int
-    ): ResponseEntity<List<UserSnapProjection>> {
+    ): ResponseEntity<List<UserSnapView>> {
 
         val responseHeader = HttpHeaders()
 
@@ -690,7 +692,7 @@ class UserRestController {
     }
 
     /**
-     * Listen to a Patch with a [idUser] and [auth] for authorization and a RequestBody with [FriendshipUpdateDTO]
+     * Listen to a Patch with a [idUser] and [auth] for authorization and a RequestBody with [FriendshipDTOUpdate]
      *
      * Checks if the user and token are right, if they are checks if the friendship is accepted, if it is, then it's immutable,
      * if its not, then only the userAnswer can update the friendship.
@@ -700,7 +702,7 @@ class UserRestController {
      *
      * @return returns a message with information
      *
-     * @exception NotFoundException when the [FriendshipUpdateDTO.id] doesn't match any friendships
+     * @exception NotFoundException when the [FriendshipDTOUpdate.id] doesn't match any friendships
      * @exception NotLoggedException if the [idUser] is not in the hashMap [TokenSimple]
      *
      */
@@ -708,7 +710,7 @@ class UserRestController {
     fun updateRequest(
         @PathVariable("id") idUser: Long,
         @RequestHeader("auth") auth: String,
-        @RequestBody friendRequest: FriendshipUpdateDTO
+        @RequestBody friendRequest: FriendshipDTOUpdate
     ): ResponseEntity<Boolean> {
         val responseHeader = HttpHeaders()
 
@@ -1018,9 +1020,9 @@ class UserRestController {
      * Listen to a Get with a [idUser] as id of the asking user,
      * [auth] as Header for authentication,
      * a formatted date as [day]-[month]-[year],
-     * and [cityId] to return a list of [UserSnapProjection] with the friends of the user on the specified date and city
+     * and [cityId] to return a list of [UserSnapView] with the friends of the user on the specified date and city
      *
-     * @return a Response with a body with the a list of [UserSnapProjection]
+     * @return a Response with a body with the a list of [UserSnapView]
      *
      * @exception NotLoggedException if the [idUser] is not in the hashMap [TokenSimple]
      */
@@ -1034,7 +1036,7 @@ class UserRestController {
         @PathVariable("idCity") cityId: Long,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "17") size: Int
-    ): ResponseEntity<List<UserSnapProjection>> {
+    ): ResponseEntity<List<UserSnapView>> {
         val responseHeader = HttpHeaders()
         return try {
 

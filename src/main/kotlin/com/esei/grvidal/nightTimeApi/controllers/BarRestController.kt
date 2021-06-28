@@ -6,11 +6,17 @@ import com.esei.grvidal.nightTimeApi.dto.BarDTOInsert
 import com.esei.grvidal.nightTimeApi.dto.toBar
 import com.esei.grvidal.nightTimeApi.serviceInterface.IBarService
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
+import com.esei.grvidal.nightTimeApi.exception.NotLoggedException
+import com.esei.grvidal.nightTimeApi.exception.ServiceException
+import com.esei.grvidal.nightTimeApi.model.PhotoURL
 import com.esei.grvidal.nightTimeApi.projections.BarDetailsProjection
 import com.esei.grvidal.nightTimeApi.projections.BarProjection
 import com.esei.grvidal.nightTimeApi.serviceInterface.ICityService
 import com.esei.grvidal.nightTimeApi.serviceInterface.IPhotoService
+import com.esei.grvidal.nightTimeApi.serviceInterface.IStoreService
+import com.esei.grvidal.nightTimeApi.services.PhotoType
 import com.esei.grvidal.nightTimeApi.utils.Constants
+import com.esei.grvidal.nightTimeApi.utils.TokenSimple
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
@@ -18,7 +24,10 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import java.io.InputStream
+import java.time.LocalDate
+import java.time.LocalTime
 
 /**
  * This is Bar Controller
@@ -26,6 +35,8 @@ import java.io.InputStream
 @RestController
 @RequestMapping(Constants.URL_BASE_BAR)
 class BarRestController {
+
+    val logger = LoggerFactory.getLogger(NightTimeApiApplication::class.java)!!
 
     //Bar Service with the logic of bar
     @Autowired
@@ -38,6 +49,9 @@ class BarRestController {
     //City Service with the logic of city
     @Autowired
     lateinit var cityService: ICityService
+
+    @Autowired
+    lateinit var storeService: IStoreService
 
 
     /**
@@ -74,7 +88,6 @@ class BarRestController {
     }
 
 
-    val logger = LoggerFactory.getLogger(NightTimeApiApplication::class.java)!!
     @GetMapping(
         value = ["/{idBar}/photo/{idPhoto}"],
         produces = [MediaType.IMAGE_JPEG_VALUE]
@@ -99,14 +112,57 @@ class BarRestController {
 
                 ResponseEntity(photo.readBytes(), responseHeader, HttpStatus.OK)
 
-            }catch (e: NullPointerException){
+            } catch (e: NullPointerException) {
                 ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
             }
 
-        }else {
+        } else {
             responseHeader.set("error", "no photo with id $idPhoto")
             logger.info("photoProjection = it was null")
-            ResponseEntity( responseHeader, HttpStatus.NOT_FOUND)
+            ResponseEntity(responseHeader, HttpStatus.NOT_FOUND)
+        }
+    }
+
+    @PutMapping("/{idBar}/photo")
+    fun addPicture(
+        @PathVariable("idBar") idBar: Long,
+        @RequestParam img: MultipartFile
+    ): ResponseEntity<Boolean> {
+
+
+        val responseHeader = HttpHeaders()
+        return try {
+
+            logger.info("filename original ${img.originalFilename}")
+
+            //Get the new name of the img
+            val idNewPhoto = barService.getDetails(idBar).getPhotos()
+
+            // save new img
+            val newName = storeService.store(
+                img,
+                "bar${idBar}_$idNewPhoto.jpg",
+                PhotoType.barPhoto
+            )
+
+            logger.info("New file name $newName, bar $idBar")
+
+            // save PhotoURL with new name todo doesnt now update Bar15 but yes night
+           photoService.addPhotoDir(barService.load(idBar), newName)
+
+            ResponseEntity(true, HttpStatus.OK)
+
+
+        } catch (e: NotFoundException) {
+
+            responseHeader.set(Constants.ERROR_HEADER_TAG, e.message)
+            ResponseEntity(false, responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
+
+        } catch (e: ServiceException) {
+
+            responseHeader.set(Constants.ERROR_HEADER_TAG, e.message)
+            ResponseEntity(false, responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
+
         }
     }
 
