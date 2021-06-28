@@ -1,9 +1,13 @@
 package com.esei.grvidal.nightTimeApi.controllers
 
 import com.esei.grvidal.nightTimeApi.NightTimeApiApplication
-import com.esei.grvidal.nightTimeApi.dto.*
+import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
+import com.esei.grvidal.nightTimeApi.dto.FriendshipDTOUpdate
+import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
+import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
 import com.esei.grvidal.nightTimeApi.exception.*
-import com.esei.grvidal.nightTimeApi.model.*
+import com.esei.grvidal.nightTimeApi.model.City
+import com.esei.grvidal.nightTimeApi.model.Friendship
 import com.esei.grvidal.nightTimeApi.projections.*
 import com.esei.grvidal.nightTimeApi.serviceInterface.*
 import com.esei.grvidal.nightTimeApi.services.PhotoType
@@ -15,7 +19,6 @@ import com.esei.grvidal.nightTimeApi.utils.TokenSimple.TokenSimple.securityCheck
 import com.esei.grvidal.nightTimeApi.utils.TokenSimple.TokenSimple.tokenGen
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
