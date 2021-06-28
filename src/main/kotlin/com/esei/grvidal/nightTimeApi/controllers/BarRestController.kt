@@ -6,9 +6,7 @@ import com.esei.grvidal.nightTimeApi.dto.BarDTOInsert
 import com.esei.grvidal.nightTimeApi.dto.toBar
 import com.esei.grvidal.nightTimeApi.serviceInterface.IBarService
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
-import com.esei.grvidal.nightTimeApi.exception.NotLoggedException
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
-import com.esei.grvidal.nightTimeApi.model.PhotoURL
 import com.esei.grvidal.nightTimeApi.projections.BarDetailsProjection
 import com.esei.grvidal.nightTimeApi.projections.BarProjection
 import com.esei.grvidal.nightTimeApi.serviceInterface.ICityService
@@ -16,7 +14,6 @@ import com.esei.grvidal.nightTimeApi.serviceInterface.IPhotoService
 import com.esei.grvidal.nightTimeApi.serviceInterface.IStoreService
 import com.esei.grvidal.nightTimeApi.services.PhotoType
 import com.esei.grvidal.nightTimeApi.utils.Constants
-import com.esei.grvidal.nightTimeApi.utils.TokenSimple
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
@@ -26,8 +23,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.io.InputStream
-import java.time.LocalDate
-import java.time.LocalTime
 
 /**
  * This is Bar Controller
