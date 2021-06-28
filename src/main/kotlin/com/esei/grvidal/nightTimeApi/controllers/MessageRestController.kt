@@ -6,7 +6,6 @@ import com.esei.grvidal.nightTimeApi.exception.NoAuthorizationException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.exception.NotLoggedException
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
-import com.esei.grvidal.nightTimeApi.projections.MessageView
 import com.esei.grvidal.nightTimeApi.serviceInterface.IMessageService
 import com.esei.grvidal.nightTimeApi.utils.Constants
 import com.esei.grvidal.nightTimeApi.utils.Constants.Companion.URL_BASE_MESSAGE
