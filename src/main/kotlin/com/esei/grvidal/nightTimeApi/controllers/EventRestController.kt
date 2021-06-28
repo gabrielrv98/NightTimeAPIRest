@@ -43,8 +43,6 @@ class EventRestController {
         }catch(e: NotFoundException){
             ResponseEntity(e.message, HttpStatus.NOT_FOUND)
         }
-
-
     }
 
     /**
