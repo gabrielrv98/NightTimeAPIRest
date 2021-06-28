@@ -3,7 +3,7 @@ package com.esei.grvidal.nightTimeApi.projections
 /**
  * Interface to show a list of chats
  */
-class FriendshipSnapProjection(
+class FriendshipSnapView(
     val userId: Long,
     val friendshipId :Long,
     var username: String,

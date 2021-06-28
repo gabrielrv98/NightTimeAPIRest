@@ -55,7 +55,7 @@ interface IUserService {
     @Throws(NotFoundException::class)
     fun getPicture(id: Long): String?
 
-    fun searchUsersByString(userString: String, page: Int, size: Int): List<UserSnapProjection>
+    fun searchUsersByString(userString: String, page: Int, size: Int): List<UserSnapView>
     fun countUsersByString(userString: String): Int
 
 }

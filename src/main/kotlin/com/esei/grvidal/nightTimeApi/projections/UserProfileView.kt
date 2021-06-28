@@ -3,7 +3,7 @@ package com.esei.grvidal.nightTimeApi.projections
 import com.esei.grvidal.nightTimeApi.utils.AnswerOptions
 
 
-data class UserProjectionProfile(
+data class UserProfileView(
     val id: Long,
     val name: String,
     val nickname: String,

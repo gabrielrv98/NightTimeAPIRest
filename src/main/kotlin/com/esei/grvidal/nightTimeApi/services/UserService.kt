@@ -226,7 +226,7 @@ class UserService : IUserService {
         return load(id).picture
     }
 
-    override fun searchUsersByString(userString: String, page: Int, size: Int): List<UserSnapProjection> {
+    override fun searchUsersByString(userString: String, page: Int, size: Int): List<UserSnapView> {
         val list = userRepository.findUsersByNameContainsOrNicknameContains(
             userString,
             userString,
@@ -234,7 +234,7 @@ class UserService : IUserService {
         )
 
         return list.map { user ->
-            UserSnapProjection(user)
+            UserSnapView(user)
         }
     }
 

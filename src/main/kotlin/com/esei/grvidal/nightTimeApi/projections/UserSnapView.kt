@@ -4,7 +4,7 @@ package com.esei.grvidal.nightTimeApi.projections
 /**
  * Interface to show a list of chats
  */
-class UserSnapProjection(
+class UserSnapView(
     var userId: Long,
     var username: String,
     val name: String,

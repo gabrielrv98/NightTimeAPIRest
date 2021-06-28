@@ -1,7 +1,7 @@
 package com.esei.grvidal.nightTimeApi.services
 
 import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
-import com.esei.grvidal.nightTimeApi.dto.FriendshipUpdateDTO
+import com.esei.grvidal.nightTimeApi.dto.FriendshipDTOUpdate
 import com.esei.grvidal.nightTimeApi.repository.FriendshipRepository
 import com.esei.grvidal.nightTimeApi.repository.MessageRepository
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
@@ -41,11 +41,11 @@ class FriendshipService : IFriendshipService {
     /**
      * Lists all the users that where the friendship answer is 1 (YES) ( they are friends)
      */
-    override fun listUsersFromFriendsByUser(userId: Long, page: Int, size: Int): List<FriendshipSnapProjection> {
+    override fun listUsersFromFriendsByUser(userId: Long, page: Int, size: Int): List<FriendshipSnapView> {
         return friendshipRepository
             .findFriendshipsFromUser(userId, PageRequest.of(page, size))
             .map {
-                FriendshipSnapProjection(it,userId)
+                FriendshipSnapView(it,userId)
             }
     }
 
@@ -111,7 +111,7 @@ class FriendshipService : IFriendshipService {
         throw AlreadyExistsException("Relationship already exists")
     }
 
-    override fun update(friendshipParam: FriendshipUpdateDTO) {
+    override fun update(friendshipParam: FriendshipDTOUpdate) {
 
         // We need to get the Entity Friends
         val friendshipDB = friendshipRepository.findById(friendshipParam.id)
@@ -176,7 +176,7 @@ class FriendshipService : IFriendshipService {
         dateCityDTO: DateCityDTO,
         page: Int,
         size: Int
-    ): List<UserSnapProjection> {
+    ): List<UserSnapView> {
 
         val friendList = friendshipRepository.getFriendsOnDate(
 
@@ -185,7 +185,7 @@ class FriendshipService : IFriendshipService {
             date = dateCityDTO.nextDate,
             pageable = PageRequest.of(page, size)
         )
-        return friendList.map { UserSnapProjection(it, idUser) }
+        return friendList.map { UserSnapView(it, idUser) }
     }
 
 
