@@ -7,7 +7,7 @@ import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.exception.NotLoggedException
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.serviceInterface.IMessageService
-import com.esei.grvidal.nightTimeApi.utils.Constants
+import com.esei.grvidal.nightTimeApi.utils.Constants.Companion.ERROR_HEADER_TAG
 import com.esei.grvidal.nightTimeApi.utils.Constants.Companion.URL_BASE_MESSAGE
 import com.esei.grvidal.nightTimeApi.utils.TokenSimple.TokenSimple.securityCheck
 import com.pusher.rest.Pusher
@@ -25,10 +25,10 @@ class MessageRestController {
 
 
     @Autowired
-    lateinit var messageService: IMessageService
+    private lateinit var messageService: IMessageService
 
 
-    val logger = LoggerFactory.getLogger(NightTimeApiApplication::class.java)!!
+    private val logger = LoggerFactory.getLogger(NightTimeApiApplication::class.java)!!
 
     //private val pusher = Pusher("PUSHER_APP_ID", "PUSHER_APP_KEY", "PUSHER_APP_SECRET")
     private val pusher = Pusher("1199159", "55882193049f9860a4af", "e5a502dd57c4eb3bbaaa")
@@ -48,7 +48,7 @@ class MessageRestController {
 
         return try {
             if (!securityCheck(idUser, auth)) {//if authentication fails
-                responseHeader.set(Constants.ERROR_HEADER_TAG, "Security error, credentials don't match")
+                responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
                 ResponseEntity(false, responseHeader, HttpStatus.UNAUTHORIZED)
 
             } else {
@@ -67,19 +67,19 @@ class MessageRestController {
                 ResponseEntity(true, responseHeader, HttpStatus.OK)
             }
         } catch (e: NotLoggedException) {
-            responseHeader.set(Constants.ERROR_HEADER_TAG, e.message)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
             ResponseEntity(false, responseHeader, HttpStatus.FORBIDDEN)
 
         } catch (e: NotFoundException) {
-            responseHeader.set(Constants.ERROR_HEADER_TAG, e.message)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
             ResponseEntity(false, responseHeader, HttpStatus.NOT_FOUND)
 
         } catch (e: NoAuthorizationException) {
-            responseHeader.set(Constants.ERROR_HEADER_TAG, e.message)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
             ResponseEntity(false, responseHeader, HttpStatus.UNAUTHORIZED)
 
         }catch (e: ServiceException) {
-            responseHeader.set(Constants.ERROR_HEADER_TAG, e.message)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
             ResponseEntity(false, responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
