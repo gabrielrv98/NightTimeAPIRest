@@ -32,7 +32,7 @@ class Bar(
         var saturdaySchedule : String? = null,
         var sundaySchedule : String? = null,
 
-        @ManyToOne//(cascade = [CascadeType.PERSIST])
+        @ManyToOne
         @JoinColumn(name = "city_id")
         var city: City,
 

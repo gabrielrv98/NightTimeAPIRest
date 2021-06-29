@@ -3,7 +3,6 @@ package com.esei.grvidal.nightTimeApi.dto
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Bar
 import com.esei.grvidal.nightTimeApi.model.City
-import java.util.*
 import kotlin.jvm.Throws
 
 data class BarDTOInsert(

@@ -7,7 +7,6 @@ import com.esei.grvidal.nightTimeApi.model.City
 import com.esei.grvidal.nightTimeApi.serviceInterface.ICityService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import java.util.*
 import kotlin.jvm.Throws
 
 /**
@@ -49,8 +48,8 @@ class CityService : ICityService {
      * This will save a new bar, if not, will throw an Exception
      */
     @Throws(ServiceException::class)
-    override fun save(City: City): City {
-        return cityRepository.save(City)
+    override fun save(city: City): City {
+        return cityRepository.save(city)
     }
 
     /**
@@ -60,10 +59,6 @@ class CityService : ICityService {
     override fun remove(idCity: Long) {
         val bar = load(idCity)
         cityRepository.delete(bar)
-    }
-
-    override fun exists(idCity: Long): Boolean {
-        return cityRepository.findById(idCity).isPresent
     }
 }
 

@@ -14,10 +14,8 @@ interface ICityService {
     fun load(idCity: Long): City
 
     //Save a new City
-    fun save(City: City): City
+    fun save(city: City): City
 
     //remove a City
     fun remove(idCity: Long)
-
-    fun exists(idCity: Long) : Boolean
 }

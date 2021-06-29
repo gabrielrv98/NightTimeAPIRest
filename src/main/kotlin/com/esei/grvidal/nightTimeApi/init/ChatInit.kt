@@ -2,7 +2,6 @@ package com.esei.grvidal.nightTimeApi.init
 
 import com.esei.grvidal.nightTimeApi.model.Friendship
 import com.esei.grvidal.nightTimeApi.model.Message
-import com.esei.grvidal.nightTimeApi.model.User
 import com.esei.grvidal.nightTimeApi.repository.MessageRepository
 import java.time.LocalDate
 import java.time.LocalTime

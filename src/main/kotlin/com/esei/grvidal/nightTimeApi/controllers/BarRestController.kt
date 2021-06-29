@@ -14,6 +14,7 @@ import com.esei.grvidal.nightTimeApi.serviceInterface.IPhotoService
 import com.esei.grvidal.nightTimeApi.serviceInterface.IStoreService
 import com.esei.grvidal.nightTimeApi.services.PhotoType
 import com.esei.grvidal.nightTimeApi.utils.Constants
+import com.esei.grvidal.nightTimeApi.utils.Constants.Companion.ERROR_HEADER_TAG
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
@@ -35,18 +36,19 @@ class BarRestController {
 
     //Bar Service with the logic of bar
     @Autowired
-    lateinit var barService: IBarService
+    private lateinit var barService: IBarService
+
+    //City Service with the logic of photosURL
+    @Autowired
+    private lateinit var photoService: IPhotoService
 
     //City Service with the logic of city
     @Autowired
-    lateinit var photoService: IPhotoService
+    private lateinit var cityService: ICityService
 
-    //City Service with the logic of city
+    //City Service with the logic of storing images
     @Autowired
-    lateinit var cityService: ICityService
-
-    @Autowired
-    lateinit var storeService: IStoreService
+    private lateinit var storeService: IStoreService
 
 
     /**
@@ -73,12 +75,18 @@ class BarRestController {
      * @param idBar id of the bar
      */
     @GetMapping("/{id}/details")
-    fun getDetails(@PathVariable("id") idBar: Long): ResponseEntity<Any> {
+    fun getDetails(@PathVariable("id") idBar: Long): ResponseEntity<BarDetailsProjection?> {
 
         return try {
             ResponseEntity(barService.getDetails(idBar), HttpStatus.OK)
         } catch (e: NotFoundException) {
-            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+            val responseHeader = HttpHeaders()
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(
+                null,
+                responseHeader,
+                HttpStatus.NOT_FOUND
+            )
         }
     }
 
@@ -90,7 +98,7 @@ class BarRestController {
     fun getPicture(
         @PathVariable("idBar") idBar: Long,
         @PathVariable("idPhoto") idPhoto: Int
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<ByteArray?> {
         val responseHeader = HttpHeaders()
 
 
@@ -108,13 +116,14 @@ class BarRestController {
                 ResponseEntity(photo.readBytes(), responseHeader, HttpStatus.OK)
 
             } catch (e: NullPointerException) {
-                ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+                responseHeader.set(ERROR_HEADER_TAG, e.message)
+                ResponseEntity(null, responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
             }
 
         } else {
-            responseHeader.set("error", "no photo with id $idPhoto")
+            responseHeader.set(ERROR_HEADER_TAG, "no photo with id $idPhoto")
             logger.info("photoProjection = it was null")
-            ResponseEntity(responseHeader, HttpStatus.NOT_FOUND)
+            ResponseEntity(null,responseHeader, HttpStatus.NOT_FOUND)
         }
     }
 
@@ -142,7 +151,6 @@ class BarRestController {
 
             logger.info("New file name $newName, bar $idBar")
 
-            // save PhotoURL with new name todo doesnt now update Bar15 but yes night
            photoService.addPhotoDir(barService.load(idBar), newName)
 
             ResponseEntity(true, HttpStatus.OK)
@@ -150,12 +158,12 @@ class BarRestController {
 
         } catch (e: NotFoundException) {
 
-            responseHeader.set(Constants.ERROR_HEADER_TAG, e.message)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
             ResponseEntity(false, responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
 
         } catch (e: ServiceException) {
 
-            responseHeader.set(Constants.ERROR_HEADER_TAG, e.message)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
             ResponseEntity(false, responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
 
         }
@@ -168,16 +176,17 @@ class BarRestController {
      * @param bar new Bar to insert in the database
      */
     @PostMapping("")
-    fun insert(@RequestBody bar: BarDTOInsert): ResponseEntity<Any> {
+    fun insert(@RequestBody bar: BarDTOInsert): ResponseEntity<Boolean> {
         val responseHeader = HttpHeaders()
 
         return try {
             val barId = barService.save(bar.toBar(cityService.load(bar.cityId)))
             responseHeader.set("location", Constants.URL_BASE_BAR + "/" + barId)
-            ResponseEntity(responseHeader, HttpStatus.CREATED)
+            ResponseEntity(true,responseHeader, HttpStatus.CREATED)
 
         } catch (e: NotFoundException) {
-            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+            responseHeader.set(ERROR_HEADER_TAG, e.message)
+            ResponseEntity(false, responseHeader, HttpStatus.NOT_FOUND)
         }
     }
 
@@ -191,14 +200,16 @@ class BarRestController {
      * If there is any mistake in Schedule object it will just omit the pair key value
      */
     @PatchMapping("/{id}")
-    fun update(@PathVariable("id") idBar: Long, @RequestBody barEdit: BarDTOEdit): ResponseEntity<Any> {
+    fun update(@PathVariable("id") idBar: Long, @RequestBody barEdit: BarDTOEdit): ResponseEntity<Boolean> {
 
         return try {
             barService.update(idBar, barEdit)
-            ResponseEntity(HttpStatus.OK)
+            ResponseEntity(true,HttpStatus.OK)
 
         } catch (e: NotFoundException) {
-            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+            val responseHeader = HttpHeaders()
+            responseHeader.set(ERROR_HEADER_TAG,e.message)
+            ResponseEntity(false, responseHeader, HttpStatus.NOT_FOUND)
         }
 
 
@@ -210,14 +221,16 @@ class BarRestController {
      * @param idBar id of the deleted bar
      */
     @DeleteMapping("/{id}")
-    fun delete(@PathVariable("id") idBar: Long): ResponseEntity<Any> {
+    fun delete(@PathVariable("id") idBar: Long): ResponseEntity<Boolean> {
         return try {
 
             barService.remove(idBar)
-            ResponseEntity(HttpStatus.NO_CONTENT)
+            ResponseEntity(true,HttpStatus.NO_CONTENT)
 
         } catch (e: NotFoundException) {
-            ResponseEntity(e.message, HttpStatus.NOT_FOUND)
+            val responseHeader = HttpHeaders()
+            responseHeader.set(ERROR_HEADER_TAG,e.message)
+            ResponseEntity(false,responseHeader, HttpStatus.NOT_FOUND)
         }
     }
 }

@@ -1,7 +1,6 @@
 package com.esei.grvidal.nightTimeApi.dto
 
 import com.esei.grvidal.nightTimeApi.model.User
-import java.time.LocalDate
 
 data class UserDTOInsert(
         val name: String,

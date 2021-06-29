@@ -3,7 +3,6 @@ package com.esei.grvidal.nightTimeApi.serviceInterface
 import com.esei.grvidal.nightTimeApi.dto.EventDTOEdit
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
-import com.esei.grvidal.nightTimeApi.model.Bar
 import com.esei.grvidal.nightTimeApi.model.Event
 import com.esei.grvidal.nightTimeApi.projections.EventProjection
 import java.time.LocalDate

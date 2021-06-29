@@ -39,7 +39,7 @@ public class SwaggerConfig {
                 "Api rest service to allow connection between clients",
                 "1.0",
                 "http://codmind.com/terms",
-                new Contact("Gabriel RV", "https://codmind.com", "gabrielrv98@gmail.com"),
+                new Contact("Gabriel RV", "", "gabrielrv98@gmail.com"),
                 "LICENSE",
                 "LICENSE URL",
                 Collections.emptyList()
