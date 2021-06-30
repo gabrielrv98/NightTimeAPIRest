@@ -3,12 +3,9 @@ package com.esei.grvidal.nightTimeApi.services
 import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
 import com.esei.grvidal.nightTimeApi.dto.FriendshipDTOUpdate
 import com.esei.grvidal.nightTimeApi.repository.FriendshipRepository
-import com.esei.grvidal.nightTimeApi.repository.MessageRepository
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
-import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Friendship
-import com.esei.grvidal.nightTimeApi.model.Message
 import com.esei.grvidal.nightTimeApi.model.User
 import com.esei.grvidal.nightTimeApi.projections.*
 import com.esei.grvidal.nightTimeApi.repository.UserRepository
@@ -17,7 +14,6 @@ import com.esei.grvidal.nightTimeApi.utils.AnswerOptions
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
-import kotlin.jvm.Throws
 
 /**
  * Friendship.kt service, is the implementation of the DAO interface
@@ -33,15 +29,12 @@ class FriendshipService : IFriendshipService {
     lateinit var friendshipRepository: FriendshipRepository
 
     @Autowired
-    lateinit var messageRepository: MessageRepository
-
-    @Autowired
     lateinit var userRepository: UserRepository
 
     /**
      * Lists all the users that where the friendship answer is 1 (YES) ( they are friends)
      */
-    override fun listUsersFromFriendsByUser(userId: Long, page: Int, size: Int): List<FriendshipSnapView> {
+    override fun listFriendsSnapByUser(userId: Long, page: Int, size: Int): List<FriendshipSnapView> {
         return friendshipRepository
             .findFriendshipsFromUser(userId, PageRequest.of(page, size))
             .map {
@@ -52,7 +45,7 @@ class FriendshipService : IFriendshipService {
     /**
      * Lists all friendships with Messages from an User
      */
-    override fun listUsersWithChatFromFriendsByUser(userId: Long): List<ChatView> {
+    override fun listChatByUser(userId: Long): List<ChatView> {
         return friendshipRepository.getChatsWithMessages(userId)
             .map { ChatView(it, userId, true) }
             .sortedByDescending { it.messages[0].date }
@@ -66,7 +59,7 @@ class FriendshipService : IFriendshipService {
      *
      *
      */
-    override fun load(friendsId: Long): FriendshipProjection {
+    override fun loadById(friendsId: Long): FriendshipProjection {
 
         return friendshipRepository.findFriendshipById(friendsId)
             .orElseThrow { NotFoundException("Couldn't find relationship with id $friendsId") }
@@ -78,7 +71,7 @@ class FriendshipService : IFriendshipService {
      * if the object cant be found, it will throw a NotFoundException
      *
      */
-    override fun load(user1Id: Long, user2Id: Long): FriendshipProjection {
+    override fun loadByUsers(user1Id: Long, user2Id: Long): FriendshipProjection {
 
         var friends = friendshipRepository.findFriendshipByUserAsk_IdAndUserAnswer_Id(user1Id, user2Id)
         if (!friends.isPresent) friends =
@@ -130,21 +123,6 @@ class FriendshipService : IFriendshipService {
 
     }
 
-    /**
-     * This will save a new Message, if not, will throw an Exception
-     * Checks if the signed user is in the friendship relationship
-     */
-    @Throws(ServiceException::class)
-    override fun saveMsg(msg: Message): Message {
-        val friends = msg.friendship
-
-        if (friends.userAsk != msg.user && friends.userAnswer != msg.user)
-            throw ServiceException("User it's not on the friendship")
-        else {
-            return messageRepository.save(msg)
-        }
-    }
-
     override fun getFriendsRequest(idUser: Long): List<UserFriendView> {
         return friendshipRepository.getFriendshipsRequest(idUser).map { UserFriendView(it, idUser) }
     }
@@ -153,7 +131,7 @@ class FriendshipService : IFriendshipService {
         return friendshipRepository.getCountAllByUserAnswerAndAnswer(idUser)
     }
 
-    override fun friendShipState(idUser1: Long, idUser2: Long): AnswerOptions {
+    override fun friendshipState(idUser1: Long, idUser2: Long): AnswerOptions {
         val friendshipList = friendshipRepository.findFriendsByUserAsk_IdOrUserAnswer_Id(idUser1, idUser1)
             .filter { it.userAnswer.id == idUser2 || it.userAsk.id == idUser2 }
 

@@ -4,7 +4,6 @@ import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
 import com.esei.grvidal.nightTimeApi.dto.FriendshipDTOUpdate
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
-import com.esei.grvidal.nightTimeApi.model.Message
 import com.esei.grvidal.nightTimeApi.projections.*
 import com.esei.grvidal.nightTimeApi.utils.AnswerOptions
 import kotlin.jvm.Throws
@@ -16,18 +15,18 @@ interface IFriendshipService {
 
 
     //Lists all the users that are friend of one User //api propose
-    fun listUsersFromFriendsByUser(userId: Long, page: Int, size: Int): List<FriendshipSnapView>
+    fun listFriendsSnapByUser(userId: Long, page: Int, size: Int): List<FriendshipSnapView>
 
     //Lists all the users that have any message on the chat with the user
-    fun listUsersWithChatFromFriendsByUser(userId: Long): List<ChatView>
+    fun listChatByUser(userId: Long): List<ChatView>
 
     //Show one FriendShip
     @Throws( NotFoundException::class)
-    fun load(friendsId: Long): FriendshipProjection
+    fun loadById(friendsId: Long): FriendshipProjection
 
     //Show one FriendShip
     @Throws( NotFoundException::class)
-    fun load(user1Id: Long, user2Id: Long): FriendshipProjection
+    fun loadByUsers(user1Id: Long, user2Id: Long): FriendshipProjection
 
     //Save a new FriendShip
     @Throws(NotFoundException::class, AlreadyExistsException::class)
@@ -40,8 +39,6 @@ interface IFriendshipService {
     //remove a chat with cascade on delete //api propose
     fun remove(friendsId: Long)
 
-    fun saveMsg(msg: Message): Message
-
     //Returns the number of friends of an user on a date on a place
     fun getCountFriendsOnDate(idUser: Long, dateCityDTO: DateCityDTO): Int
 
@@ -52,7 +49,7 @@ interface IFriendshipService {
     fun getFriendsRequest(idUser: Long): List<UserFriendView>
     fun getCountFriendsRequest(idUser: Long): Int
 
-    fun friendShipState(idUser1: Long, idUser2: Long): AnswerOptions
+    fun friendshipState(idUser1: Long, idUser2: Long): AnswerOptions
     fun listFriendshipsIds(idUser: Long): List<Long>
     fun getCountFriends(userId: Long): Int
 }

@@ -3,7 +3,6 @@ package com.esei.grvidal.nightTimeApi.services
 import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
 import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
-import com.esei.grvidal.nightTimeApi.dto.toUser
 import com.esei.grvidal.nightTimeApi.encryptation.Encoding
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.repository.UserRepository
@@ -131,7 +130,15 @@ class UserService : IUserService {
         )
 
         try {
-            return userRepository.save(user.toUser()).id
+            return userRepository.save(
+                User(
+                    user.name,
+                    user.nickname,
+                    user.password,
+                    user.state,
+                    user.email
+                )
+            ).id
 
         } catch (e: Exception) {
             when (e) {
@@ -154,7 +161,7 @@ class UserService : IUserService {
             )
         }
         userRepository.save(
-            userOriginal.apply{
+            userOriginal.apply {
                 name = user.name ?: name
                 password = user.password ?: password
                 state = user.state ?: state
@@ -250,10 +257,9 @@ class UserService : IUserService {
         }
     }
 
-    override  fun countUsersByString(userString: String): Int{
-        return userRepository.countUsersByNameContainsOrNicknameContains(userString,userString)
+    override fun countUsersByString(userString: String): Int {
+        return userRepository.countUsersByNameContainsOrNicknameContains(userString, userString)
     }
-
 
 
 }
