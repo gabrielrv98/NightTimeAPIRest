@@ -2,8 +2,8 @@ package com.esei.grvidal.nightTimeApi.serviceInterface
 
 import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
+import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.DateCity
-import javassist.NotFoundException
 import java.time.LocalDate
 
 /**

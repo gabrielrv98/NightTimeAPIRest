@@ -1,7 +1,6 @@
 package com.esei.grvidal.nightTimeApi.services
 
 import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
-import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.repository.DateCityRepository
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
