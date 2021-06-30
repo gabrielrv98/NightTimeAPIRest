@@ -2,9 +2,6 @@ package com.esei.grvidal.nightTimeApi.projections
 
 import java.time.LocalDate
 
-interface DateCityProjection {
-    fun getId(): Long
+interface DateCityReducedProjection {
     fun getNextDate(): LocalDate
-    fun getNextCity(): CityProjection
 }
-
