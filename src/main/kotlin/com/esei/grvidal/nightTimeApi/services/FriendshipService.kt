@@ -1,5 +1,6 @@
 package com.esei.grvidal.nightTimeApi.services
 
+import com.esei.grvidal.nightTimeApi.factories.ChatViewFactory
 import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
 import com.esei.grvidal.nightTimeApi.dto.FriendshipDTOUpdate
 import com.esei.grvidal.nightTimeApi.repository.FriendshipRepository
@@ -47,7 +48,7 @@ class FriendshipService : IFriendshipService {
      */
     override fun listChatByUser(userId: Long): List<ChatView> {
         return friendshipRepository.getChatsWithMessages(userId)
-            .map { ChatView(it, userId, true) }
+            .map { ChatViewFactory().createChatView(it, userId, true) }
             .sortedByDescending { it.messages[0].date }
             .sortedByDescending { it.messages[0].time }
     }

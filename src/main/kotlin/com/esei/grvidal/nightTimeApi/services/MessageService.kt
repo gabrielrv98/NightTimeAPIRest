@@ -1,11 +1,13 @@
 package com.esei.grvidal.nightTimeApi.services
 
+import com.esei.grvidal.nightTimeApi.factories.ChatViewFactory
 import com.esei.grvidal.nightTimeApi.dto.MessageForm
 import com.esei.grvidal.nightTimeApi.exception.NoAuthorizationException
 import com.esei.grvidal.nightTimeApi.repository.FriendshipRepository
 import com.esei.grvidal.nightTimeApi.repository.MessageRepository
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
+import com.esei.grvidal.nightTimeApi.factories.MessageViewFactory
 import com.esei.grvidal.nightTimeApi.model.Message
 import com.esei.grvidal.nightTimeApi.projections.ChatView
 import com.esei.grvidal.nightTimeApi.projections.MessageView
@@ -44,12 +46,12 @@ class MessageService : IMessageService {
         if (friendship.userAnswer.id != idUser && friendship.userAsk.id != idUser) {
             throw NoAuthorizationException("User is not part of the friendship")
 
-        }else if( friendship.answer != AnswerOptions.YES){
+        } else if (friendship.answer != AnswerOptions.YES) {
             throw ServiceException("Friendship must be accepted before chatting")
         }
 
         //adds the Message
-        return MessageView(
+        return MessageViewFactory().createMessageView(
             messageRepository.save(
                 Message(
                     text = msg.text,
@@ -73,9 +75,9 @@ class MessageService : IMessageService {
         if (friendship.userAnswer.id != idUser && friendship.userAsk.id != idUser)
             throw NoAuthorizationException("$idUser is not in the friendship and cannot see the messages")
 
-        messageRepository.markAllAsReadByFriendshipId(idFriendship,idUser)
+        messageRepository.markAllAsReadByFriendshipId(idFriendship, idUser)
 
-        return ChatView(
+        return ChatViewFactory().createChatView(
             friendship = friendship,
             userId = idUser,
             isSnap = false

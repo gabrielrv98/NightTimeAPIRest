@@ -1,6 +1,5 @@
 package com.esei.grvidal.nightTimeApi.projections
 
-import com.esei.grvidal.nightTimeApi.model.Message
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -14,22 +13,4 @@ data class MessageView(
     var date: LocalDate,
     var time: LocalTime,
     var user: Long
-): java.io.Serializable {
-
-
-    /**
-     *  Main constructor that receives a Friendship and an ID from the user who made the request,
-     *  extracts the other user and calls the private constructor
-     */
-    constructor(
-        message: Message
-    ) : this(
-        messageId= message.id,
-        text = message.text,
-        date = message.date,
-        time = message.hour,
-        user = message.user.id
-    )
-
-
-}
+): java.io.Serializable
