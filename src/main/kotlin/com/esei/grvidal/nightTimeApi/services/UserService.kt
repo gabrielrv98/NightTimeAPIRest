@@ -153,8 +153,14 @@ class UserService : IUserService {
                 secret_key = userOriginal.nickname
             )
         }
-
-        userRepository.save(user.toUser(userOriginal))
+        userRepository.save(
+            userOriginal.apply{
+                name = user.name ?: name
+                password = user.password ?: password
+                state = user.state ?: state
+                email = user.email ?: email
+            }
+        )
     }
 
 
@@ -193,9 +199,15 @@ class UserService : IUserService {
 
     override fun deleteDate(idUser: Long, dateCity: DateCityDTO): Long {
 
-        val date =
-            dateCityRepository.findByUser_IdAndNextCity_IdAndNextDate(idUser, dateCity.nextCityId, dateCity.nextDate)
-                .orElseThrow { NotFoundException("No date selected with user id $idUser, cityId ${dateCity.nextCityId} and date ${dateCity.nextDate}") }
+        val date = dateCityRepository
+            .findByUser_IdAndNextCity_IdAndNextDate(
+                idUser,
+                dateCity.nextCityId,
+                dateCity.nextDate
+            )
+            .orElseThrow {
+                NotFoundException("No date selected with user id $idUser, cityId ${dateCity.nextCityId} and date ${dateCity.nextDate}")
+            }
 
         val id = date.getId()
         dateCityRepository.deleteById(id)
