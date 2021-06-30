@@ -10,7 +10,7 @@ import com.esei.grvidal.nightTimeApi.projections.*
 import kotlin.jvm.Throws
 
 /**
- * DAO Interface for Bars
+ * Service Interface for Users
  */
 interface IUserService {
 

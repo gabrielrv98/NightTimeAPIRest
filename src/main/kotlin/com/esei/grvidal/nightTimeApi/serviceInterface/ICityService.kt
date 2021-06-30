@@ -3,7 +3,7 @@ package com.esei.grvidal.nightTimeApi.serviceInterface
 import com.esei.grvidal.nightTimeApi.model.City
 
 /**
- * DAO Interface for Cities
+ * Service Interface for Cities
  */
 interface ICityService {
 

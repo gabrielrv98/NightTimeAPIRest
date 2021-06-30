@@ -10,7 +10,7 @@ import com.esei.grvidal.nightTimeApi.utils.AnswerOptions
 import kotlin.jvm.Throws
 
 /**
- * DAO Interface for friendships
+ * Service Interface for friendships
  */
 interface IFriendshipService {
 

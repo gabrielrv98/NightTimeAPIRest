@@ -5,6 +5,9 @@ import com.esei.grvidal.nightTimeApi.services.PhotoType
 import org.springframework.web.multipart.MultipartFile
 import kotlin.jvm.Throws
 
+/**
+ * Service Interface for Store system
+ */
 interface IStoreService {
 
 

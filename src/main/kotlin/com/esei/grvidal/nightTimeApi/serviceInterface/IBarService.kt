@@ -8,7 +8,7 @@ import com.esei.grvidal.nightTimeApi.projections.BarProjection
 import kotlin.jvm.Throws
 
 /**
- * DAO Interface for Bars
+ * Service Interface for Bars
  */
 interface IBarService {
 

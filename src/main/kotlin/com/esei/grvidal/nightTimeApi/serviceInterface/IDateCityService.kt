@@ -7,7 +7,7 @@ import com.esei.grvidal.nightTimeApi.model.DateCity
 import java.time.LocalDate
 
 /**
- * DAO Interface for Bars
+ * Service Interface for DateCity
  */
 interface IDateCityService {
 
@@ -20,6 +20,6 @@ interface IDateCityService {
     fun getTotalPeopleByDateAndCity(nextCity_id: Long, nextDate: LocalDate): Int
 
     @Throws(NotFoundException::class, ServiceException::class)
-    fun addDate(idUser: Long, dateCity: DateCityDTO):Long
+    fun addDate(idUser: Long, dateCity: DateCityDTO): Long
 
 }

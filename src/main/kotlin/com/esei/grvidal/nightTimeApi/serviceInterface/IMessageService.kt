@@ -9,7 +9,7 @@ import com.esei.grvidal.nightTimeApi.projections.MessageView
 import kotlin.jvm.Throws
 
 /**
- * DAO Interface for Bars
+ * Service Interface for Message
  */
 interface IMessageService {
 

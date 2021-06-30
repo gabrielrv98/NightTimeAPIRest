@@ -9,7 +9,7 @@ import java.time.LocalDate
 import kotlin.jvm.Throws
 
 /**
- * DAO Interface for Bars
+ * Service Interface for Events
  */
 interface IEventService {
 
