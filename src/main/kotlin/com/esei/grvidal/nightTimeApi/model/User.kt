@@ -2,10 +2,9 @@ package com.esei.grvidal.nightTimeApi.model
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo
 import com.fasterxml.jackson.annotation.ObjectIdGenerators
-import java.time.LocalDate
 import javax.persistence.*
 
-const val nicknameLength = 30
+const val nicknameLength = 35
 
 @Entity
 @JsonIdentityInfo(
