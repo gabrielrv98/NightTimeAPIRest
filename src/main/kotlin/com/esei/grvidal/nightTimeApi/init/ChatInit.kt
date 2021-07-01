@@ -32,7 +32,7 @@ class ChatInit(
                 messageRepositories.save(
                     Message(
                         msg.txt,
-                        LocalDate.now(),
+                        LocalDate.now().minusDays(1),
                         LocalTime.now().plusMinutes(i).plusSeconds(j),
                         friendship,
                         user = if (msg.user == 0) friendship.userAsk
