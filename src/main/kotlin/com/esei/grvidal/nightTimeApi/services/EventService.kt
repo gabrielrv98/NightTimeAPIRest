@@ -52,7 +52,7 @@ class EventService : IEventService {
      * This will save a new bar, if not, will throw an Exception
      */
     override fun save(event: EventDTOInsert): Long {
-        val bar = barRepository.findBarById(event.barId)
+        val bar = barRepository.findById(event.barId)
             .orElseThrow { NotFoundException("Bar with id ${event.barId} couldn't be found")  }
         return eventRepository.save(
             Event(
