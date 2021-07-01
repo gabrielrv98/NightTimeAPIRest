@@ -13,7 +13,6 @@ import java.util.*
  */
 @Repository
 interface DateCityRepository : JpaRepository<DateCity, Long> {
-    fun countAllByNextCity_IdAndNextDate(nextCity_id: Long, nextDate: LocalDate): Int
 
     fun findAllByUser_IdAndNextCity_IdAndNextDateAfter(user_id: Long, nextCity_id: Long, nextDate: LocalDate): List<DateCityReducedProjection>
 
