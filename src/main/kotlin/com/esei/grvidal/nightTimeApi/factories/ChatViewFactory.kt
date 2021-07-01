@@ -23,8 +23,10 @@ class ChatViewFactory {
                 user = if (friendship.userAsk.id == userId) friendship.userAnswer
                 else friendship.userAsk,
                 messages = friendship.messages!!
-                    .sortedBy { message -> message.date }//sets on index 0 the most recent
-                    .sortedBy { message -> message.hour }
+                    .sortedBy { message ->
+                        message.hour
+                        message.date
+                    }//sets on index 0 the most recent
                     .toMutableSet().apply {
                         if (isSnap) {
                             this.removeAll(
