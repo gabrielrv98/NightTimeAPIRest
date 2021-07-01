@@ -14,10 +14,7 @@ import java.time.LocalDate
 
 @Repository
 interface EventRepository : JpaRepository<Event, Long> {
-    fun findAllBy(): List<EventProjection>
 
     fun findAllByDateAndBar_City_Id(date: LocalDate, bar_city_id: Long): List<EventProjection>
-
-    fun findAllByBar_Id(barId: Long): List<EventProjection>
 }
 

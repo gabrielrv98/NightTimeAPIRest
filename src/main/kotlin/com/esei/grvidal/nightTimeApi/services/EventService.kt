@@ -29,20 +29,6 @@ class EventService : IEventService {
     @Autowired
     private lateinit var barRepository: BarRepository
 
-
-    /**
-     * This will list all the events, if not, will throw a BusinessException
-     */
-    override fun list(): List<EventProjection> {
-        return eventRepository.findAllBy()
-    }
-
-
-
-    override fun listEventByBar(idBar: Long): List<EventProjection> {
-        return eventRepository.findAllByBar_Id(idBar)
-    }
-
     override fun listEventByDayAndCity(date: LocalDate, idCity: Long): List<EventProjection> {
         return eventRepository.findAllByDateAndBar_City_Id(date,idCity)
     }

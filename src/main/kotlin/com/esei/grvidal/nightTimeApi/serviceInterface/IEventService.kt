@@ -13,12 +13,6 @@ import kotlin.jvm.Throws
  */
 interface IEventService {
 
-    //List all the events
-    fun list(): List<EventProjection>
-
-    //List all the events of an event
-    fun listEventByBar(idBar: Long): List<EventProjection>
-
     //List all the events of an event
     fun listEventByDayAndCity(date: LocalDate, idCity:Long): List<EventProjection>
 
