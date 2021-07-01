@@ -31,28 +31,23 @@ class DateCityService : IDateCityService {
     lateinit var cityRepository: CityRepository
 
 
-
-
     override fun addDate(idUser: Long, dateCity: DateCityDTO): Long {
         if (!cityRepository.existsById(dateCity.nextCityId))
             throw NotFoundException("No city with id ${dateCity.nextCityId} found")
 
-        if( dateCity.nextDate.isBefore(LocalDate.now()))
+        if (dateCity.nextDate.isBefore(LocalDate.now()))
             throw ServiceException("Only dates after today ( ${LocalDate.now()} can be added")
 
-        return dateCityRepository.save(dateCity.toDateCity(idUser)).id
+        return dateCityRepository.save(
+            DateCity(
+                dateCity.nextDate,
+                nextCity = City(dateCity.nextCityId),
+                user = User(idUser)
+            )
+        ).id
     }
-
-
 }
 
-
-fun DateCityDTO.toDateCity( userId: Long): DateCity {
-    return DateCity(nextDate,
-            nextCity = City(nextCityId),
-            user = User(userId)
-    )
-}
 
 
 
