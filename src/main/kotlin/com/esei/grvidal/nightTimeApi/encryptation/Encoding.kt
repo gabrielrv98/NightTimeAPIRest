@@ -15,9 +15,7 @@ const val algorithm = "AES"
 
 class Encoding {
 
-
-
-    companion object getInstance {
+    companion object {
 
         private fun to16Chars(pass: String): String{
 
