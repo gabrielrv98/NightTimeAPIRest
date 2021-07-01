@@ -17,6 +17,7 @@ interface BarRepository : JpaRepository<Bar, Long>{
     //return all the bars that has the city in common
     fun findByCity_Id(city_id: Long, pageable: Pageable) : List<BarProjection>
     fun getBarDetailsById(id: Long): Optional<BarDetailsProjection>
+    fun findBarById(id: Long): Optional<Bar>
 
 }
 

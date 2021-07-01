@@ -2,9 +2,11 @@ package com.esei.grvidal.nightTimeApi.services
 
 import com.esei.grvidal.nightTimeApi.repository.EventRepository
 import com.esei.grvidal.nightTimeApi.dto.EventDTOEdit
+import com.esei.grvidal.nightTimeApi.dto.EventDTOInsert
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Event
 import com.esei.grvidal.nightTimeApi.projections.EventProjection
+import com.esei.grvidal.nightTimeApi.repository.BarRepository
 import com.esei.grvidal.nightTimeApi.serviceInterface.IEventService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -22,7 +24,10 @@ class EventService : IEventService {
      *Dependency injection with autowired
      */
     @Autowired
-    lateinit var eventRepository: EventRepository
+    private lateinit var eventRepository: EventRepository
+
+    @Autowired
+    private lateinit var barRepository: BarRepository
 
 
     /**
@@ -46,8 +51,16 @@ class EventService : IEventService {
     /**
      * This will save a new bar, if not, will throw an Exception
      */
-    override fun save(event: Event): Long {
-        return eventRepository.save(event).id
+    override fun save(event: EventDTOInsert): Long {
+        val bar = barRepository.findBarById(event.barId)
+            .orElseThrow { NotFoundException("Bar with id ${event.barId} couldn't be found")  }
+        return eventRepository.save(
+            Event(
+                description = event.description,
+                date = event.date,
+                bar = bar
+            )
+        ).id
     }
 
     @Throws(NotFoundException::class)
@@ -64,7 +77,7 @@ class EventService : IEventService {
             date = eventDTO.date ?: date
         }
 
-        save(event)
+        eventRepository.save(event)
 
     }
 

@@ -1,7 +1,5 @@
 package com.esei.grvidal.nightTimeApi.dto
 
-import com.esei.grvidal.nightTimeApi.model.Bar
-import com.esei.grvidal.nightTimeApi.model.Event
 import java.time.LocalDate
 
 data class EventDTOInsert(
@@ -9,7 +7,3 @@ data class EventDTOInsert(
         val date: LocalDate,
         val barId: Long
 )
-
-fun EventDTOInsert.toEvent(bar: Bar): Event {
-    return Event(description,date,bar)
-}

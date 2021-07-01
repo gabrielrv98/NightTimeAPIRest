@@ -2,10 +2,8 @@ package com.esei.grvidal.nightTimeApi.controllers
 
 import com.esei.grvidal.nightTimeApi.dto.EventDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.EventDTOInsert
-import com.esei.grvidal.nightTimeApi.dto.toEvent
 import com.esei.grvidal.nightTimeApi.serviceInterface.IEventService
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
-import com.esei.grvidal.nightTimeApi.serviceInterface.IBarService
 import com.esei.grvidal.nightTimeApi.utils.Constants.Companion.URL_BASE_EVENT
 import com.esei.grvidal.nightTimeApi.utils.Constants.Companion.ERROR_HEADER_TAG
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,9 +22,6 @@ class EventRestController {
     @Autowired
     private lateinit var eventService: IEventService
 
-    @Autowired
-    private lateinit var barService: IBarService
-
     /**
      * Listen to a Post with the [URL_BASE_EVENT] and a requestBody with a Event to create a Event
      */
@@ -37,9 +32,8 @@ class EventRestController {
         val responseHeader = HttpHeaders()
 
         return try{//check if bar exists, if it does, save via DTO
-            val eventId = eventService.save(
-                    eventDTO.toEvent(barService.load(eventDTO.barId))
-            )
+            val eventId = eventService.save(eventDTO)
+
             responseHeader.set("location", "$URL_BASE_EVENT/$eventId")
             ResponseEntity(responseHeader, HttpStatus.CREATED)
 
