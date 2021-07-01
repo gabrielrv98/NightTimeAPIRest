@@ -108,7 +108,7 @@ class NightTimeApiApplication : CommandLineRunner {
         var event = Event("copas a menos de 1 euro", date = LocalDate.now(), bar = bar)
         eventRepository.save(event)
 
-        event = Event("Fardos gratis", date = LocalDate.now(), bar = bar)
+        event = Event("Pins gratis", date = LocalDate.now(), bar = bar)
         eventRepository.save(event)
 
         event = Event("Musica en vivo", date = LocalDate.now().plusDays(1), bar = bar)
@@ -227,13 +227,13 @@ class NightTimeApiApplication : CommandLineRunner {
         barRepository.save(bar)
 
 
-        event = Event("Oferta 2 x 1", date = LocalDate.now().plusDays(1), bar = bar)
+        event = Event("Oferta 2 x 1.", date = LocalDate.now().plusDays(1), bar = bar)
         eventRepository.save(event)
 
-        event = Event("Fiesta de la espuma", date = LocalDate.now().plusDays(2), bar = bar)
+        event = Event("Fiesta de la espuma.", date = LocalDate.now().plusDays(2), bar = bar)
         eventRepository.save(event)
 
-        event = Event("Hoy cerrado por fiesta infantil, nos vemos gente", date = LocalDate.now().plusDays(2), bar = bar)
+        event = Event("Hoy cerrado por fiesta infantil, se dará un nuevo aviso pronto.", date = LocalDate.now().plusDays(2), bar = bar)
         eventRepository.save(event)
 
         bar = Bar(
@@ -256,12 +256,12 @@ class NightTimeApiApplication : CommandLineRunner {
         event = Event("Musica en vivo", date = LocalDate.now().plusDays(1), bar = bar)
         eventRepository.save(event)
         event = Event(
-            "Hoy cerrado por defuncion, esperemos que todos se pongan mejor, gracias por su atencion",
+            "Hoy cerrado por defuncion, esperemos que todos se pongan mejor, gracias por su atencion.",
             date = LocalDate.now().plusDays(3),
             bar = bar
         )
         eventRepository.save(event)
-        event = Event("Copas a 3 euros", date = LocalDate.now().plusDays(3), bar = bar)
+        event = Event("Copas a 3 euros.", date = LocalDate.now().plusDays(3), bar = bar)
         eventRepository.save(event)
 
 
@@ -270,7 +270,7 @@ class NightTimeApiApplication : CommandLineRunner {
             name = "Requiem",
             owner = "Nuria Sotelo",
             address = "Rua Concordia",
-            description = "Un lugar libre para gente libre",
+            description = "Un lugar libre para gente libre.",
             city = cityOu,
             mondaySchedule = "12:00-22:00",
             tuesdaySchedule = null,
@@ -287,7 +287,7 @@ class NightTimeApiApplication : CommandLineRunner {
                 name = "Bar$i",
                 owner = "Nuria Sotelo",
                 address = "Rua Concordia",
-                description = "Un lugar libre para gente libre",
+                description = "Un lugar libre para gente libre.",
                 city = cityOu,
                 mondaySchedule = "12:00-22:00",
                 tuesdaySchedule = null,
