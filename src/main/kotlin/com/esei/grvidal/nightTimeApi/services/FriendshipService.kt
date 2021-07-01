@@ -48,7 +48,7 @@ class FriendshipService : IFriendshipService {
      */
     override fun listChatByUser(userId: Long): List<ChatView> {
         return friendshipRepository.getChatsWithMessages(userId)
-            .map { ChatViewFactory().createChatView(it, userId, true) }
+            .map { ChatViewFactory.createChatView(it, userId, true) }
             .sortedByDescending { it.messages[0].date }
             .sortedByDescending { it.messages[0].time }
     }

@@ -38,29 +38,29 @@ import java.time.LocalTime
 @RequestMapping(Constants.URL_BASE_USER)
 class UserRestController {
 
-    val logger = LoggerFactory.getLogger(NightTimeApiApplication::class.java)!!
+    private val logger = LoggerFactory.getLogger(NightTimeApiApplication::class.java)!!
 
     //Service injections
     @Autowired
-    lateinit var userService: IUserService
+    private lateinit var userService: IUserService
 
     @Autowired
-    lateinit var friendshipService: IFriendshipService
+    private lateinit var friendshipService: IFriendshipService
 
     @Autowired
-    lateinit var dateCityService: IDateCityService
+    private lateinit var dateCityService: IDateCityService
 
     @Autowired
-    lateinit var messageService: IMessageService
+    private lateinit var messageService: IMessageService
 
     @Autowired
-    lateinit var cityService: ICityService
+    private lateinit var cityService: ICityService
 
     @Autowired
-    lateinit var eventService: IEventService
+    private lateinit var eventService: IEventService
 
     @Autowired
-    lateinit var storeService: IStoreService
+    private lateinit var storeService: IStoreService
 
 
     /**
@@ -157,7 +157,7 @@ class UserRestController {
                 val user = UserProfileView(
                     user = userService.loadProjection(searchedUserId),
                     friendshipState = if (searchedUserId != clientId) //If the user is not looking for himself check if they are friends
-                        friendshipService.friendShipState(searchedUserId, clientId)
+                        friendshipService.friendshipState(searchedUserId, clientId)
                     else AnswerOptions.NO
                 )
 
@@ -579,7 +579,7 @@ class UserRestController {
 
                 responseHeader.set("total",friendshipService.getCountFriends(idUser).toString())
                 ResponseEntity(
-                    friendshipService.listUsersFromFriendsByUser(idUser,page,size),
+                    friendshipService.listFriendsSnapByUser(idUser,page,size),
                     responseHeader,
                     HttpStatus.OK
                 )
@@ -626,7 +626,7 @@ class UserRestController {
     fun insertRequestFriendShip(
         @PathVariable("id") idUser: Long,
         @RequestHeader("auth") auth: String,
-        @PathVariable("idFriend") idFriend: Long,
+        @PathVariable("idFriend") idFriend: Long
     ): ResponseEntity<Boolean> {
         val responseHeader = HttpHeaders()
 
@@ -723,7 +723,7 @@ class UserRestController {
                 return ResponseEntity(false, responseHeader, HttpStatus.UNAUTHORIZED)
             }
 
-            val friendRequestDB = friendshipService.load(friendRequest.id)
+            val friendRequestDB= friendshipService.loadById(friendRequest.id)
 
             //only non accepted requests can be updated
             if (friendRequestDB.getAnswer() != AnswerOptions.NOT_ANSWERED) {
@@ -796,7 +796,7 @@ class UserRestController {
                 responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
                 ResponseEntity(false, responseHeader, HttpStatus.UNAUTHORIZED)
             } else {
-                val friends = friendshipService.load(idUser, idFriend)
+                val friends = friendshipService.loadByUsers(idUser, idFriend)
 
                 friendshipService.remove(friends.getId())
 
@@ -842,7 +842,7 @@ class UserRestController {
                 logger.info("user $idUser is cheking his chats")
                 ResponseEntity(
                     friendshipService
-                        .listUsersWithChatFromFriendsByUser(idUser)
+                        .listChatByUser(idUser)
                         .sortedByDescending { it.messages[0].date }
                         .sortedByDescending { it.messages[0].time },
                     HttpStatus.OK

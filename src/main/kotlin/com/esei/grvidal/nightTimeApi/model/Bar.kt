@@ -8,8 +8,6 @@ import javax.persistence.*
 
 /**
  * Entity of the Bar, this holds the data that the DB can save
- * @param owner is the owner of the bar
- * @param address is the address of the bar
  *
  *
  */

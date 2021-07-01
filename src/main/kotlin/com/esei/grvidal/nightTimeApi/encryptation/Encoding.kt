@@ -19,7 +19,7 @@ class Encoding {
 
     companion object getInstance {
 
-        fun to16Chars(pass: String): String{
+        private fun to16Chars(pass: String): String{
 
             var string = pass
             while (string.length < 16 ){
@@ -33,12 +33,12 @@ class Encoding {
             Security.addProvider(BouncyCastleProvider())
             val keyBytes: ByteArray
 
-            val sub_secret_key = to16Chars(secret_key)
+            val subSecretKey = to16Chars(secret_key)
 
 
             try {
 
-                keyBytes = sub_secret_key.toByteArray(charset("UTF8"))
+                keyBytes = subSecretKey.toByteArray(charset("UTF8"))
                 val skey = SecretKeySpec(keyBytes, algorithm)
                 val input = strToEncrypt.toByteArray(charset("UTF8"))
 
@@ -86,10 +86,10 @@ class Encoding {
             Security.addProvider(BouncyCastleProvider())
             val keyBytes: ByteArray
 
-            val sub_secret_key = to16Chars(secret_key)
+            val subSecretKey = to16Chars(secret_key)
 
             try {
-                keyBytes = sub_secret_key.toByteArray(charset("UTF8"))
+                keyBytes = subSecretKey.toByteArray(charset("UTF8"))
                 val skey = SecretKeySpec(keyBytes, algorithm)
                 val input = Base64
                     .decode(strToDecrypt.trim { it <= ' ' }.toByteArray(charset("UTF8")))

@@ -51,7 +51,7 @@ class MessageService : IMessageService {
         }
 
         //adds the Message
-        return MessageViewFactory().createMessageView(
+        return MessageViewFactory.createMessageView(
             messageRepository.save(
                 Message(
                     text = msg.text,
@@ -77,7 +77,7 @@ class MessageService : IMessageService {
 
         messageRepository.markAllAsReadByFriendshipId(idFriendship, idUser)
 
-        return ChatViewFactory().createChatView(
+        return ChatViewFactory.createChatView(
             friendship = friendship,
             userId = idUser,
             isSnap = false
