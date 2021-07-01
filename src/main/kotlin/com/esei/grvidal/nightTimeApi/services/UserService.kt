@@ -5,12 +5,15 @@ import com.esei.grvidal.nightTimeApi.dto.UserDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.UserDTOInsert
 import com.esei.grvidal.nightTimeApi.encryptation.Encoding
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
-import com.esei.grvidal.nightTimeApi.repository.UserRepository
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.User
 import com.esei.grvidal.nightTimeApi.model.nicknameLength
-import com.esei.grvidal.nightTimeApi.projections.*
+import com.esei.grvidal.nightTimeApi.projections.DateCityReducedProjection
+import com.esei.grvidal.nightTimeApi.projections.UserEditView
+import com.esei.grvidal.nightTimeApi.projections.UserProjection
+import com.esei.grvidal.nightTimeApi.projections.UserSnapView
+import com.esei.grvidal.nightTimeApi.repository.UserRepository
 import com.esei.grvidal.nightTimeApi.repository.DateCityRepository
 import com.esei.grvidal.nightTimeApi.serviceInterface.IUserService
 import org.springframework.beans.factory.annotation.Autowired
@@ -31,12 +34,10 @@ class UserService : IUserService {
      *Dependency injection with autowired
      */
     @Autowired
-    lateinit var userRepository: UserRepository
+    private lateinit var userRepository: UserRepository
 
     @Autowired
-    lateinit var dateCityRepository: DateCityRepository
-
-    //val logger = LoggerFactory.getLogger(NightTimeApiApplication::class.java)!!
+    private lateinit var dateCityRepository: DateCityRepository
 
 
     /**
@@ -68,18 +69,21 @@ class UserService : IUserService {
      *
      * @param idUser id of the user
      */
-    override fun loadEditProjection(idUser: Long): UserDTOEdit {
+    override fun loadEditProjection(idUser: Long): UserEditView {
         val user = userRepository.findUserById(idUser)
+            .orElseThrow { NotFoundException("Couldn't find the user with id $idUser") }
 
-        if (!user.isPresent)
-            throw  NotFoundException("Couldn't find the user with id $idUser")
-        else {
-            return user.get().toUserDTOEdit().also { userDTOEdit ->
-                userDTOEdit.password = Encoding.decrypt(
-                    strToDecrypt = userDTOEdit.password!!,//Should always have password
-                    secret_key = user.get().getNickname()
-                )
-            }
+        return UserEditView(
+            id = user.getId(),
+            name = user.getName(),
+            password = user.getPassword(),
+            email = user.getEmail(),
+            state = user.getState()
+        ).also { userDTOEdit ->
+            userDTOEdit.password = Encoding.decrypt(
+                strToDecrypt = userDTOEdit.password,
+                secret_key = user.getNickname()
+            )
         }
     }
 

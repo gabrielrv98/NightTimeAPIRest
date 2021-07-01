@@ -187,7 +187,7 @@ class UserRestController {
     fun loadPrivateProjection(
         @PathVariable("id") idUser: Long,
         @RequestHeader("auth") auth: String
-    ): ResponseEntity<UserDTOEdit?> {
+    ): ResponseEntity<UserEditView?> {
         val responseHeader = HttpHeaders()
         return try {
             if (!securityCheck(idUser, auth)) {//if authentication fails
@@ -345,7 +345,7 @@ class UserRestController {
                 val newName = storeService.store(
                     img,
                     "user_${user.getNickname()}_${LocalDate.now()}_${LocalTime.now()}.jpg",
-                    PhotoType.userPhoto
+                    PhotoType.USER_PHOTO
                 )
                 //delete old image
                 oldName?.let {
@@ -912,6 +912,9 @@ class UserRestController {
                 ResponseEntity(null, responseHeader, HttpStatus.UNAUTHORIZED)
             } else {
                 val chat = messageService.getChat(idFriendship, idUser)
+                chat.messages.forEach {
+                    logger.info(it.toString() )
+                }
                 ResponseEntity(chat, HttpStatus.OK)
             }
 
