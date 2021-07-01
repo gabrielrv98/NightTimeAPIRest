@@ -12,8 +12,8 @@ import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 
 enum class PhotoType{
-    barPhoto,
-    userPhoto
+    BAR_PHOTO,
+    USER_PHOTO
 }
 
 @Service
@@ -31,7 +31,7 @@ class StoreService: IStoreService {
             .replace(" ".toRegex(), "-")
             .replace(":","-")
 
-        if(photoType == PhotoType.userPhoto)
+        if(photoType == PhotoType.USER_PHOTO)
             formattedFilename = formattedFilename.replaceFirst(".","-")
 
 
@@ -48,7 +48,7 @@ class StoreService: IStoreService {
 
         val storedLocation: String = try {
 
-            val type = if(photoType == PhotoType.barPhoto) "barpics" else "userpics"
+            val type = if(photoType == PhotoType.BAR_PHOTO) "barpics" else "userpics"
             val location = Paths.get("$uploadPath/$type/$formattedFilename")
             if( !Files.exists(location) ) {
                 logger.info("Creating file")
