@@ -146,7 +146,7 @@ class BarRestController {
             val newName = storeService.store(
                 img,
                 "bar${idBar}_$idNewPhoto.jpg",
-                PhotoType.barPhoto
+                PhotoType.BAR_PHOTO
             )
 
             logger.info("New file name $newName, bar $idBar")
