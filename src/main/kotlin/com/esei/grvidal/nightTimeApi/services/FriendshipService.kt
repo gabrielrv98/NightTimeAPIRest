@@ -3,13 +3,13 @@ package com.esei.grvidal.nightTimeApi.services
 import com.esei.grvidal.nightTimeApi.factories.ChatViewFactory
 import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
 import com.esei.grvidal.nightTimeApi.dto.FriendshipDTOUpdate
-import com.esei.grvidal.nightTimeApi.repository.FriendshipRepository
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Friendship
 import com.esei.grvidal.nightTimeApi.model.User
 import com.esei.grvidal.nightTimeApi.projections.*
 import com.esei.grvidal.nightTimeApi.repository.UserRepository
+import com.esei.grvidal.nightTimeApi.repository.FriendshipRepository
 import com.esei.grvidal.nightTimeApi.serviceInterface.IFriendshipService
 import com.esei.grvidal.nightTimeApi.utils.AnswerOptions
 import org.springframework.beans.factory.annotation.Autowired
@@ -27,10 +27,10 @@ class FriendshipService : IFriendshipService {
      *Dependency injection with autowired
      */
     @Autowired
-    lateinit var friendshipRepository: FriendshipRepository
+    private lateinit var friendshipRepository: FriendshipRepository
 
     @Autowired
-    lateinit var userRepository: UserRepository
+    private lateinit var userRepository: UserRepository
 
     /**
      * Lists all the users that where the friendship answer is 1 (YES) ( they are friends)
@@ -39,7 +39,7 @@ class FriendshipService : IFriendshipService {
         return friendshipRepository
             .findFriendshipsFromUser(userId, PageRequest.of(page, size))
             .map {
-                FriendshipSnapView(it,userId)
+                FriendshipSnapView(it, userId)
             }
     }
 
@@ -117,7 +117,7 @@ class FriendshipService : IFriendshipService {
     }
 
     /**
-     * This will remove a CHAT through its id, if not, will throw an Exception, or if it cant find it, it will throw a NotFoundException
+     * This will remove a friendship through its id, if not, will throw an Exception, or if it cant find it, it will throw a NotFoundException
      */
     override fun remove(friendsId: Long) {
         friendshipRepository.deleteById(friendsId)
@@ -177,21 +177,3 @@ class FriendshipService : IFriendshipService {
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -568,7 +568,7 @@ class UserRestController {
         @RequestHeader("auth") auth: String,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "17") size: Int
-     ): ResponseEntity<List<FriendshipSnapView>> {
+    ): ResponseEntity<List<FriendshipSnapView>> {
 
         val responseHeader = HttpHeaders()
         return try {
@@ -577,9 +577,9 @@ class UserRestController {
                 ResponseEntity(listOf(), responseHeader, HttpStatus.UNAUTHORIZED)
             } else {
 
-                responseHeader.set("total",friendshipService.getCountFriends(idUser).toString())
+                responseHeader.set("total", friendshipService.getCountFriends(idUser).toString())
                 ResponseEntity(
-                    friendshipService.listFriendsSnapByUser(idUser,page,size),
+                    friendshipService.listFriendsSnapByUser(idUser, page, size),
                     responseHeader,
                     HttpStatus.OK
                 )
@@ -723,7 +723,7 @@ class UserRestController {
                 return ResponseEntity(false, responseHeader, HttpStatus.UNAUTHORIZED)
             }
 
-            val friendRequestDB= friendshipService.loadById(friendRequest.id)
+            val friendRequestDB = friendshipService.loadById(friendRequest.id)
 
             //only non accepted requests can be updated
             if (friendRequestDB.getAnswer() != AnswerOptions.NOT_ANSWERED) {
@@ -839,7 +839,7 @@ class UserRestController {
                 responseHeader.set(ERROR_HEADER_TAG, "Security error, credentials don't match")
                 ResponseEntity(listOf(), responseHeader, HttpStatus.UNAUTHORIZED)
             } else {
-                logger.info("user $idUser is cheking his chats")
+                logger.info("user $idUser is checking his chats")
                 ResponseEntity(
                     friendshipService
                         .listChatByUser(idUser)
@@ -930,8 +930,6 @@ class UserRestController {
     }
 
 
-
-
     /**
      * Listen to a Get with a [idUser] as id of the asking user,
      * [auth] as Header for authentication,
@@ -986,8 +984,6 @@ class UserRestController {
                             "friends",
                             friendshipService.getCountFriendsOnDate(idUser, dateCity).toString()
                         )
-
-
 
                         ResponseEntity(
                             eventService.listEventByDayAndCity(date = date, idCity = cityId),

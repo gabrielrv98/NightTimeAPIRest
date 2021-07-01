@@ -15,15 +15,23 @@ import java.util.*
  */
 @Repository
 interface UserRepository : JpaRepository<User, Long> {
+
     fun getAllBy(): List<UserProjection>
-    fun getUserById (id: Long): Optional<UserProjection>
-    fun findUserById (id: Long): Optional<UserEditProjection>
-    fun findUsersByNameContainsOrNicknameContains(name: String, nickname: String,pageable: Pageable):List<UserProjection>
-    fun countUsersByNameContainsOrNicknameContains(name: String, nickname: String):Int
+
+    fun getUserById(id: Long): Optional<UserProjection>
+
+    fun findUserById(id: Long): Optional<UserEditProjection>
+
+    fun findUsersByNameContainsOrNicknameContains(
+        name: String,
+        nickname: String,
+        pageable: Pageable
+    ): List<UserProjection>
+
+    fun countUsersByNameContainsOrNicknameContains(name: String, nickname: String): Int
 
     fun findByNickname(nickname: String): Optional<User>
 
-    //SELECT COUNT(U.id) AS TOTAL_PEOPLE FROM User AS U INNER JOIN next_date_city AS DC ON DC.user_id = U.id WHERE DC.city_id = 1 AND DC.next_date = 2021-01-21
     @Query(value = "SELECT COUNT (U.id) AS TOTAL_PEOPLE FROM User AS U INNER JOIN DateCity AS DC ON DC.user.id = U.id WHERE DC.nextCity.id = ?1 AND DC.nextDate = ?2")
-    fun getTotalOnDate(cityId: Long, date: LocalDate) : Int
+    fun getTotalOnDate(cityId: Long, date: LocalDate): Int
 }
