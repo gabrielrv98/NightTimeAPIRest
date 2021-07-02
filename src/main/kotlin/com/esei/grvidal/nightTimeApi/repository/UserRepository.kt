@@ -16,8 +16,6 @@ import java.util.*
 @Repository
 interface UserRepository : JpaRepository<User, Long> {
 
-    fun getAllBy(): List<UserProjection>
-
     fun getUserById(id: Long): Optional<UserProjection>
 
     fun findUserById(id: Long): Optional<UserEditProjection>

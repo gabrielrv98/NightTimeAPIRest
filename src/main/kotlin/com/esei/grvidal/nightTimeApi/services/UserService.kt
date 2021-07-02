@@ -41,16 +41,6 @@ class UserService : IUserService {
 
 
     /**
-     * This will list all the bars, if not, will throw a BusinessException
-     */
-    @Throws(ServiceException::class)
-    override fun list(): List<UserProjection> {
-
-        return userRepository.getAllBy()
-    }
-
-
-    /**
      * This will show one user, if the object cant be found it will throw a NotFoundException
      *
      * @param idUser id of the user

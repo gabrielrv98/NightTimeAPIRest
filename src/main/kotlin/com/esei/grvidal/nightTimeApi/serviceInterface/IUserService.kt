@@ -14,9 +14,6 @@ import kotlin.jvm.Throws
  */
 interface IUserService {
 
-    //List all the user
-    fun list(): List<UserProjection>
-
     //Show one user ( public attributes )
     @Throws(NotFoundException::class)
     fun loadProjection(idUser: Long): UserProjection
