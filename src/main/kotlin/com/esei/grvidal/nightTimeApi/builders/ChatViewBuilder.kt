@@ -1,4 +1,4 @@
-package com.esei.grvidal.nightTimeApi.factories
+package com.esei.grvidal.nightTimeApi.builders
 
 import com.esei.grvidal.nightTimeApi.model.Friendship
 import com.esei.grvidal.nightTimeApi.model.Message
@@ -6,7 +6,7 @@ import com.esei.grvidal.nightTimeApi.model.ReadState
 import com.esei.grvidal.nightTimeApi.model.User
 import com.esei.grvidal.nightTimeApi.projections.ChatView
 
-class ChatViewFactory {
+class ChatViewBuilder {
 
     companion object {
         /**
@@ -57,7 +57,7 @@ class ChatViewFactory {
                 userId = user.id,
                 userNickname = user.nickname,
                 hasImage = user.picture != null,
-                messages = messages.map { MessageViewFactory.createMessageView(it) },
+                messages = messages.map { MessageViewBuilder.createMessageView(it) },
                 unreadMessages = unreadMessages
             )
         }

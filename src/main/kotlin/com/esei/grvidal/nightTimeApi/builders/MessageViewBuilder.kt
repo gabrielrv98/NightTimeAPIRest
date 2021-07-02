@@ -1,9 +1,9 @@
-package com.esei.grvidal.nightTimeApi.factories
+package com.esei.grvidal.nightTimeApi.builders
 
 import com.esei.grvidal.nightTimeApi.model.Message
 import com.esei.grvidal.nightTimeApi.projections.MessageView
 
-class MessageViewFactory {
+class MessageViewBuilder {
 
     companion object {
         /**

@@ -1,13 +1,13 @@
 package com.esei.grvidal.nightTimeApi.services
 
-import com.esei.grvidal.nightTimeApi.factories.ChatViewFactory
+import com.esei.grvidal.nightTimeApi.builders.ChatViewBuilder
 import com.esei.grvidal.nightTimeApi.dto.MessageForm
 import com.esei.grvidal.nightTimeApi.exception.NoAuthorizationException
 import com.esei.grvidal.nightTimeApi.repository.FriendshipRepository
 import com.esei.grvidal.nightTimeApi.repository.MessageRepository
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
-import com.esei.grvidal.nightTimeApi.factories.MessageViewFactory
+import com.esei.grvidal.nightTimeApi.builders.MessageViewBuilder
 import com.esei.grvidal.nightTimeApi.model.Message
 import com.esei.grvidal.nightTimeApi.projections.ChatView
 import com.esei.grvidal.nightTimeApi.projections.MessageView
@@ -51,7 +51,7 @@ class MessageService : IMessageService {
         }
 
         //adds the Message
-        return MessageViewFactory.createMessageView(
+        return MessageViewBuilder.createMessageView(
             messageRepository.save(
                 Message(
                     text = msg.text,
@@ -77,7 +77,7 @@ class MessageService : IMessageService {
 
         messageRepository.markAllAsReadByFriendshipId(idFriendship, idUser)
 
-        return ChatViewFactory.createChatView(
+        return ChatViewBuilder.createChatView(
             friendship = friendship,
             userId = idUser,
             isSnap = false
