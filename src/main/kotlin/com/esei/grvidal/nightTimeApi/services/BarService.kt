@@ -111,61 +111,26 @@ class BarService : IBarService {
             description = barEdit.description ?: this.description
             city = cityEdit
 
-            // if the parameter [mondaySchedule] is null, it won't update
-            this.mondaySchedule = if (barEdit.mondaySchedule == null)
-                this.mondaySchedule
-            else {
-                // if the containing string is null, mondaySchedule will be updated as null
-                if (barEdit.mondaySchedule == "null") null
-                //else it will update with the right value
-                else barEdit.mondaySchedule
-            }
-
-            this.tuesdaySchedule = if (barEdit.tuesdaySchedule == null)
-                this.tuesdaySchedule
-            else {
-                if (barEdit.tuesdaySchedule == "null") null
-                else barEdit.tuesdaySchedule
-            }
-
-            this.wednesdaySchedule = if (barEdit.wednesdaySchedule == null)
-                this.wednesdaySchedule
-            else {
-                if (barEdit.wednesdaySchedule == "null") null
-                else barEdit.wednesdaySchedule
-            }
-
-            this.thursdaySchedule = if (barEdit.thursdaySchedule == null)
-                this.thursdaySchedule
-            else {
-                if (barEdit.thursdaySchedule == "null") null
-                else barEdit.thursdaySchedule
-            }
-
-            this.fridaySchedule = if (barEdit.fridaySchedule == null)
-                this.fridaySchedule
-            else {
-                if (barEdit.fridaySchedule == "null") null
-                else  barEdit.fridaySchedule
-            }
-
-            this.saturdaySchedule = if (barEdit.saturdaySchedule == null)
-                this.saturdaySchedule
-            else {
-                if (barEdit.saturdaySchedule == "null") null
-                else  barEdit.saturdaySchedule
-            }
-
-            this.sundaySchedule = if (barEdit.sundaySchedule == null)
-                this.sundaySchedule
-            else {
-                if (barEdit.sundaySchedule == "null") null
-                else  barEdit.sundaySchedule
-            }
+            this.mondaySchedule = updateField(this.mondaySchedule, barEdit.mondaySchedule)
+            this.tuesdaySchedule = updateField(this.tuesdaySchedule, barEdit.tuesdaySchedule)
+            this.wednesdaySchedule = updateField(this.wednesdaySchedule, barEdit.wednesdaySchedule)
+            this.thursdaySchedule = updateField(this.thursdaySchedule, barEdit.thursdaySchedule)
+            this.fridaySchedule = updateField(this.fridaySchedule, barEdit.fridaySchedule)
+            this.saturdaySchedule = updateField(this.saturdaySchedule, barEdit.saturdaySchedule)
+            this.sundaySchedule = updateField(this.sundaySchedule, barEdit.sundaySchedule)
         }
 
         barRepository.save(barOriginal)
+    }
 
+    private fun updateField(original: String?, new: String?): String?{
+
+        return if (new == null){  // if the parameter [new] is null, it won't update
+            original
+        }else{
+            if ( new =="null") null// if the containing string is null, mondaySchedule will be updated as null
+            else new  //else it will update with the right value
+        }
     }
 
     /**
@@ -174,8 +139,9 @@ class BarService : IBarService {
     @Throws(NotFoundException::class)
     override fun remove(idBar: Long) {
 
-        val bar = load(idBar)
-        barRepository.delete(bar)
+        barRepository.delete(
+            load(idBar)
+        )
 
     }
 

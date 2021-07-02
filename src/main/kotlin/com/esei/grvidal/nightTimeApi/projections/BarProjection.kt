@@ -1,7 +1,5 @@
 package com.esei.grvidal.nightTimeApi.projections
 
-import org.springframework.beans.factory.annotation.Value
-
 interface BarProjection{
 
     fun getId() : Long
