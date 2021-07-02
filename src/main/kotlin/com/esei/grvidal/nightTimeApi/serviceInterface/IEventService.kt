@@ -3,7 +3,6 @@ package com.esei.grvidal.nightTimeApi.serviceInterface
 import com.esei.grvidal.nightTimeApi.dto.EventDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.EventDTOInsert
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
-import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.projections.EventProjection
 import java.time.LocalDate
 import kotlin.jvm.Throws
@@ -21,7 +20,7 @@ interface IEventService {
     fun save(event: EventDTOInsert): Long
 
     //Updates an existing Event
-    @Throws(ServiceException::class)
+    @Throws(NotFoundException::class)
     fun update(eventId: Long, eventDTO: EventDTOEdit)
 
     //remove an event
