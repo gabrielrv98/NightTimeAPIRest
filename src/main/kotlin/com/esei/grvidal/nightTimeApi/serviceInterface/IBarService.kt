@@ -1,6 +1,7 @@
 package com.esei.grvidal.nightTimeApi.serviceInterface
 
 import com.esei.grvidal.nightTimeApi.dto.BarDTOEdit
+import com.esei.grvidal.nightTimeApi.dto.BarDTOInsert
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Bar
 import com.esei.grvidal.nightTimeApi.projections.BarDetailsProjection
@@ -24,7 +25,7 @@ interface IBarService {
     fun getDetails(idBar: Long): BarDetailsProjection
 
     //Saves a new bar
-    fun save(bar: Bar): Long
+    fun save(bar: BarDTOInsert): Long
 
     //Updates a bar
     @Throws(NotFoundException::class)
@@ -34,3 +35,4 @@ interface IBarService {
     @Throws(NotFoundException::class)
     fun remove(idBar: Long)
 }
+

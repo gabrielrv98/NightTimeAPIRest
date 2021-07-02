@@ -3,7 +3,6 @@ package com.esei.grvidal.nightTimeApi.controllers
 import com.esei.grvidal.nightTimeApi.NightTimeApiApplication
 import com.esei.grvidal.nightTimeApi.dto.BarDTOEdit
 import com.esei.grvidal.nightTimeApi.dto.BarDTOInsert
-import com.esei.grvidal.nightTimeApi.dto.toBar
 import com.esei.grvidal.nightTimeApi.serviceInterface.IBarService
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
@@ -41,10 +40,6 @@ class BarRestController {
     //City Service with the logic of photosURL
     @Autowired
     private lateinit var photoService: IPhotoService
-
-    //City Service with the logic of city
-    @Autowired
-    private lateinit var cityService: ICityService
 
     //City Service with the logic of storing images
     @Autowired
@@ -180,7 +175,7 @@ class BarRestController {
         val responseHeader = HttpHeaders()
 
         return try {
-            val barId = barService.save(bar.toBar(cityService.load(bar.cityId)))
+            val barId = barService.save(bar)
             responseHeader.set("location", Constants.URL_BASE_BAR + "/" + barId)
             ResponseEntity(true,responseHeader, HttpStatus.CREATED)
 

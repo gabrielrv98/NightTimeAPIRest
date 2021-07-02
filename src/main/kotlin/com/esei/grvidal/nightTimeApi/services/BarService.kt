@@ -3,6 +3,7 @@ package com.esei.grvidal.nightTimeApi.services
 import com.esei.grvidal.nightTimeApi.repository.BarRepository
 import com.esei.grvidal.nightTimeApi.repository.CityRepository
 import com.esei.grvidal.nightTimeApi.dto.BarDTOEdit
+import com.esei.grvidal.nightTimeApi.dto.BarDTOInsert
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.model.Bar
 import com.esei.grvidal.nightTimeApi.projections.BarDetailsProjection
@@ -57,14 +58,32 @@ class BarService : IBarService {
     @Throws(NotFoundException::class)
     override fun load(idBar: Long): Bar {
         return barRepository.findById(idBar)
-            .orElseThrow { NotFoundException("No bar with id $idBar have been found") }
+            .orElseThrow { NotFoundException("No bar with id $idBar has been found") }
     }
 
     /**
      * This will save a new bar
      */
-    override fun save(bar: Bar): Long {
-        return barRepository.save(bar).id
+    override fun save(bar: BarDTOInsert): Long {
+        val city = cityRepository.findById(bar.cityId)
+            .orElseThrow { NotFoundException("No city with id ${bar.cityId} has been found") }
+
+        return barRepository.save(
+            Bar(
+                name = bar.name,
+                owner = bar.owner,
+                address = bar.address,
+                description = bar.description,
+                mondaySchedule = bar.mondaySchedule,
+                tuesdaySchedule = bar.tuesdaySchedule,
+                wednesdaySchedule = bar.wednesdaySchedule,
+                thursdaySchedule = bar.thursdaySchedule,
+                fridaySchedule = bar.fridaySchedule,
+                saturdaySchedule = bar.saturdaySchedule,
+                sundaySchedule = bar.sundaySchedule,
+                city = city
+            )
+        ).id
     }
 
     /**
