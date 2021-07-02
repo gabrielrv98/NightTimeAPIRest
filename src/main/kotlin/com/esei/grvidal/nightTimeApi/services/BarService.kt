@@ -44,7 +44,6 @@ class BarService : IBarService {
     /**
      * Returns the information that is not in [BarProjection] from the [Bar] with id [idBar]
      */
-    @Throws(NotFoundException::class)
     override fun getDetails(idBar: Long): BarDetailsProjection {
         return barRepository.getBarDetailsById(idBar)
             .orElseThrow { NotFoundException("No bar with id $idBar have been found") }
@@ -55,7 +54,6 @@ class BarService : IBarService {
     /**
      * This will show one bar, if not it will throw a NotFoundException
      */
-    @Throws(NotFoundException::class)
     override fun load(idBar: Long): Bar {
         return barRepository.findById(idBar)
             .orElseThrow { NotFoundException("No bar with id $idBar has been found") }
@@ -89,7 +87,6 @@ class BarService : IBarService {
     /**
      * This will update a bar through [barEdit] and its non-null attributes
      */
-    @Throws(NotFoundException::class)
     override fun update(idBar: Long, barEdit: BarDTOEdit) {
 
         //getting the old Bar
@@ -136,7 +133,6 @@ class BarService : IBarService {
     /**
      * This will remove a bars through its [idBar], if it cant find it, it will throw a NotFoundException
      */
-    @Throws(NotFoundException::class)
     override fun remove(idBar: Long) {
 
         barRepository.delete(
