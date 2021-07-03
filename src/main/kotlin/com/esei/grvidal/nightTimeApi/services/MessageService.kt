@@ -1,13 +1,13 @@
 package com.esei.grvidal.nightTimeApi.services
 
 import com.esei.grvidal.nightTimeApi.builders.ChatViewBuilder
+import com.esei.grvidal.nightTimeApi.builders.MessageViewBuilder
 import com.esei.grvidal.nightTimeApi.dto.MessageForm
-import com.esei.grvidal.nightTimeApi.exception.NoAuthorizationException
 import com.esei.grvidal.nightTimeApi.repository.FriendshipRepository
 import com.esei.grvidal.nightTimeApi.repository.MessageRepository
+import com.esei.grvidal.nightTimeApi.exception.NoAuthorizationException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
 import com.esei.grvidal.nightTimeApi.exception.ServiceException
-import com.esei.grvidal.nightTimeApi.builders.MessageViewBuilder
 import com.esei.grvidal.nightTimeApi.model.Message
 import com.esei.grvidal.nightTimeApi.projections.ChatView
 import com.esei.grvidal.nightTimeApi.projections.MessageView
@@ -29,10 +29,10 @@ class MessageService : IMessageService {
      *Dependency injection with autowired
      */
     @Autowired
-    lateinit var friendshipRepository: FriendshipRepository
+    private lateinit var friendshipRepository: FriendshipRepository
 
     @Autowired
-    lateinit var messageRepository: MessageRepository
+    private lateinit var messageRepository: MessageRepository
 
     /**
      * This will save a new [Message], if not, will throw an AlreadyExistsException

@@ -27,7 +27,10 @@ interface FriendshipRepository : JpaRepository<Friendship, Long> {
     fun findFriendshipsFromUser(user_id: Long,pageable: Pageable) : List<FriendshipProjection>
 
     //Returns a friendShip with the specified users IDs
-    fun findFriendshipByUserAsk_IdAndUserAnswer_Id(userAsk_id: Long, userAnswer_id: Long) : Optional<FriendshipProjection>
+    @Query(
+        value = "SELECT F FROM Friendship AS F WHERE (F.userAsk.id = ?1 AND F.userAnswer.id = ?2) OR ( F.userAsk.id = ?2 AND F.userAnswer.id = ?1 ) "
+    )
+    fun findFriendshipByUsersIds(userAsk_id: Long, userAnswer_id: Long) : Optional<FriendshipProjection>
 
     /**
      * Returns all the Friendships where the user is involved and there is any message

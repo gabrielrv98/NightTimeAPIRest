@@ -1,7 +1,6 @@
 package com.esei.grvidal.nightTimeApi.repository
 
 import com.esei.grvidal.nightTimeApi.model.Message
-import com.esei.grvidal.nightTimeApi.projections.ChatView
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
@@ -13,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Repository
 interface MessageRepository : JpaRepository<Message, Long> {
-    fun findAllByFriendship_Id(chat_id: Long) : List<Message>
 
     @Transactional
     @Modifying

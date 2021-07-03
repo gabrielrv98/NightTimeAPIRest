@@ -74,11 +74,8 @@ class FriendshipService : IFriendshipService {
      */
     override fun loadByUsers(user1Id: Long, user2Id: Long): FriendshipProjection {
 
-        var friends = friendshipRepository.findFriendshipByUserAsk_IdAndUserAnswer_Id(user1Id, user2Id)
-        if (!friends.isPresent) friends =
-            friendshipRepository.findFriendshipByUserAsk_IdAndUserAnswer_Id(user2Id, user1Id)
-
-        return friends.orElseThrow { NotFoundException("Couldn't find relationship between users $user1Id and $user2Id") }
+        return friendshipRepository.findFriendshipByUsersIds(user1Id, user2Id)
+            .orElseThrow { NotFoundException("Couldn't find relationship between users $user1Id and $user2Id") }
     }
 
 
@@ -88,9 +85,7 @@ class FriendshipService : IFriendshipService {
     override fun save(userAsk: Long, userAnswer: Long): Long {
 
         //Check if the relation already exists
-        var friends = friendshipRepository.findFriendshipByUserAsk_IdAndUserAnswer_Id(userAsk, userAnswer)
-        if (!friends.isPresent) friends =
-            friendshipRepository.findFriendshipByUserAsk_IdAndUserAnswer_Id(userAnswer, userAsk)
+        val friends = friendshipRepository.findFriendshipByUsersIds(userAsk, userAnswer)
 
         if (!friends.isPresent) {
 
