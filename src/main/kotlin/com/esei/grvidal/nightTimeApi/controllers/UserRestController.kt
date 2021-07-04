@@ -723,54 +723,23 @@ class UserRestController {
                 return ResponseEntity(false, responseHeader, HttpStatus.UNAUTHORIZED)
             }
 
-            val friendRequestDB = friendshipService.loadById(friendRequest.id)
-
-            //only non accepted requests can be updated
-            if (friendRequestDB.getAnswer() != AnswerOptions.NOT_ANSWERED) {
-                responseHeader.set(ERROR_HEADER_TAG, "Friendship already accepted, can only be deleted")
-                return ResponseEntity(false, responseHeader, HttpStatus.FORBIDDEN)
+            return if(friendRequest.answer == AnswerOptions.YES) {
+                ResponseEntity(HttpStatus.NO_CONTENT)
+            }else {
+                friendshipService.update(idUser, friendRequest)
+                ResponseEntity(true, HttpStatus.OK)
             }
-
-
-            //Only the userAnswer can update the request
-            if (idUser != friendRequestDB.getUserAnswer().getId()) {
-                responseHeader.set(ERROR_HEADER_TAG, "Error: Only userAnswer can update the request")
+        }catch (e: NotLoggedException) {
+                responseHeader.set(ERROR_HEADER_TAG, e.message)
                 return ResponseEntity(false, responseHeader, HttpStatus.FORBIDDEN)
-            } else {
-                return when (friendRequest.answer) {
-                    //Answer yes
-                    AnswerOptions.YES -> {
-
-                        friendshipService.update(friendRequest)
-                        responseHeader.set("Friendship Id", "${friendRequestDB.getId()}")
-
-                        ResponseEntity(true, responseHeader, HttpStatus.OK)
-
-                    }
-                    //answer no
-                    AnswerOptions.NO -> {
-
-                        //remove request
-                        friendshipService.remove(friendRequestDB.getId())
-                        ResponseEntity(true, responseHeader, HttpStatus.OK)
-
-                    }
-                    //any other answer
-                    else -> {
-                        ResponseEntity(HttpStatus.NO_CONTENT)
-                    }
-                }
-
-            }
-
 
         } catch (e: NotFoundException) {
             responseHeader.set(ERROR_HEADER_TAG, e.message)
             return ResponseEntity(false, responseHeader, HttpStatus.NOT_FOUND)
 
-        } catch (e: NotLoggedException) {
+        } catch (e: ServiceException) {
             responseHeader.set(ERROR_HEADER_TAG, e.message)
-            return ResponseEntity(false, responseHeader, HttpStatus.FORBIDDEN)
+            return ResponseEntity(false, responseHeader, HttpStatus.INTERNAL_SERVER_ERROR)
 
         }
 

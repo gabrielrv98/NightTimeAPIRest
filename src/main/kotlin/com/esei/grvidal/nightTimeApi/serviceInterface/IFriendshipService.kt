@@ -4,6 +4,7 @@ import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
 import com.esei.grvidal.nightTimeApi.dto.FriendshipDTOUpdate
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
+import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.projections.*
 import com.esei.grvidal.nightTimeApi.utils.AnswerOptions
 import kotlin.jvm.Throws
@@ -33,8 +34,8 @@ interface IFriendshipService {
     fun save(userAsk: Long, userAnswer: Long): Long
 
     //Updates a  FriendShip
-    @Throws(NotFoundException::class)
-    fun update(friendshipParam: FriendshipDTOUpdate)
+    @Throws(NotFoundException::class, ServiceException::class)
+    fun update(userId:Long, friendshipParam: FriendshipDTOUpdate)
 
     //remove a chat with cascade on delete //api propose
     fun remove(friendsId: Long)

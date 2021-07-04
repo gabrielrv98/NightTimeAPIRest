@@ -5,6 +5,7 @@ import com.esei.grvidal.nightTimeApi.dto.DateCityDTO
 import com.esei.grvidal.nightTimeApi.dto.FriendshipDTOUpdate
 import com.esei.grvidal.nightTimeApi.exception.AlreadyExistsException
 import com.esei.grvidal.nightTimeApi.exception.NotFoundException
+import com.esei.grvidal.nightTimeApi.exception.ServiceException
 import com.esei.grvidal.nightTimeApi.model.Friendship
 import com.esei.grvidal.nightTimeApi.model.User
 import com.esei.grvidal.nightTimeApi.projections.*
@@ -90,7 +91,7 @@ class FriendshipService : IFriendshipService {
         if (!friends.isPresent) {
 
             //Check if the userAnswer exists ( if service has been called, userAsk has to be logged)
-            if (!userRepository.findById(userAnswer).isPresent)
+            if (!userRepository.existsById(userAnswer))
                 throw  NotFoundException("User requested with id $userAnswer not found")
 
             return friendshipRepository.save(
@@ -100,15 +101,33 @@ class FriendshipService : IFriendshipService {
         throw AlreadyExistsException("Relationship already exists")
     }
 
-    override fun update(friendshipParam: FriendshipDTOUpdate) {
+    override fun update(userId: Long, friendshipParam: FriendshipDTOUpdate) {
 
-        // We need to get the Entity Friends
-        val friendshipDB = friendshipRepository.findById(friendshipParam.id)
-            .orElseThrow { NotFoundException("No friendship with id ${friendshipParam.id} were found") }
+        val friendshipRequestDB = friendshipRepository.findById(friendshipParam.id)
+            .orElseThrow { NotFoundException("Couldn't find relationship with id ${friendshipParam.id}") }
 
-        // Edit the entity nad se
-        friendshipDB.answer = friendshipParam.answer
-        friendshipRepository.save(friendshipDB)
+        //only non accepted requests can be updated
+        if (friendshipRequestDB.answer != AnswerOptions.NOT_ANSWERED) {
+            throw ServiceException("Friendship already accepted, can only be deleted")
+        }
+
+        //Only the userAnswer can update the request
+        if (userId != friendshipRequestDB.userAnswer.id) {
+            throw ServiceException("Error: Only userAnswer can update the request")
+        } else {
+            if (friendshipParam.answer == AnswerOptions.YES) {
+
+                //Save accepted request
+                friendshipRequestDB.answer = friendshipParam.answer
+                friendshipRepository.save(friendshipRequestDB)
+
+            } else {
+                //remove request
+                this.remove(friendshipRequestDB.id)
+            }
+
+        }
+
     }
 
     /**
