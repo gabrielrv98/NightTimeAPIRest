@@ -12,7 +12,6 @@ import com.esei.grvidal.nightTimeApi.serviceInterface.IBarService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
-import kotlin.jvm.Throws
 
 /**
  * Bar service, is the implementation of the DAO interface
