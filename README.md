@@ -9,3 +9,6 @@ Also uses Spring Data JPA for persistance and Pusher Framework for chats utils.
 
 Swagger is used for documentation and once the server is operative can be found on  "http://xxx.xxx.xxx.xxx:8080/swagger-ui.html#"
 
+![image](https://user-images.githubusercontent.com/25320719/125988942-969eb60b-28fa-4d20-b423-e442d8737b92.png)
+
+
