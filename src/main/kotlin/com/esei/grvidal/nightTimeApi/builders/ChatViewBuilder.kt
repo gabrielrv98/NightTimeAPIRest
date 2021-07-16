@@ -1,5 +1,6 @@
 package com.esei.grvidal.nightTimeApi.builders
 
+import com.esei.grvidal.nightTimeApi.builders.MessageViewBuilder.Companion.createMessageView
 import com.esei.grvidal.nightTimeApi.model.Friendship
 import com.esei.grvidal.nightTimeApi.model.Message
 import com.esei.grvidal.nightTimeApi.model.ReadState
@@ -57,7 +58,7 @@ class ChatViewBuilder {
                 userId = user.id,
                 userNickname = user.nickname,
                 hasImage = user.picture != null,
-                messages = messages.map { MessageViewBuilder.createMessageView(it) },
+                messages = messages.map { createMessageView(it) },
                 unreadMessages = unreadMessages
             )
         }

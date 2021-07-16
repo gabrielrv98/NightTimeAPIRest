@@ -127,7 +127,7 @@ class NightTimeApiApplication : CommandLineRunner {
         bar = Bar(
             name = "Patio andaluz",
             owner = "Aida Miguez",
-            address = "Calle turbia",
+            address = "Calle buenavista",
             description = "Un buen lugar para charlar, conocer gente y disfrutar de la vida reunido de buenas compañias",
             city = cityOu,
             mondaySchedule = "12:00-20:30",
@@ -286,7 +286,7 @@ class NightTimeApiApplication : CommandLineRunner {
             bar = Bar(
                 name = "Bar$i",
                 owner = "Nuria Sotelo",
-                address = "Rua Concordia",
+                address = "Rua San Francisco",
                 description = "Un lugar libre para gente libre.",
                 city = cityOu,
                 mondaySchedule = "12:00-22:00",
