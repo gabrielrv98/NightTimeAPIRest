@@ -80,7 +80,7 @@ class NightTimeApiApplication : CommandLineRunner {
         var bar = Bar(
             name = "Luxus",
             owner = "Lara Santas",
-            address = "Mercedes 2º",
+            address = "Rúa Arturo Pérez Serantes, 3, 32005 Ourense",
             description = "Entradas a 6$ pero si llegas antes de las 2 es gratis",
             city = cityOu,
             mondaySchedule = "11:00-20:30",
@@ -161,7 +161,7 @@ class NightTimeApiApplication : CommandLineRunner {
         event = Event("Copas a 3 euros", date = LocalDate.now().plusDays(3), bar = bar)
         eventRepository.save(event)
 
-        event = Event("No lo tenemos muy claro", date = LocalDate.now(), bar = bar)
+        event = Event("Traemos al mejor DJ", date = LocalDate.now(), bar = bar)
         eventRepository.save(event)
 
 
@@ -526,17 +526,17 @@ class NightTimeApiApplication : CommandLineRunner {
 
         // Friends -----------------------------------------------------------------------------------------------------
 
-        val friend1_2 = Friendship(user1, user2)
-        friend1_2.answer = AnswerOptions.YES
-        friendshipRepository.save(friend1_2)// accepted friendship
+        var friendshipRelations = Friendship(user1, user2)
+        friendshipRelations.answer = AnswerOptions.YES
+        friendshipRepository.save(friendshipRelations)// accepted friendship
 
-        val friend1_3 = Friendship(user3, user1)
-        friend1_3.answer = AnswerOptions.YES
-        friendshipRepository.save(friend1_3)// accepted friendship
+        friendshipRelations = Friendship(user3, user1)
+        friendshipRelations.answer = AnswerOptions.YES
+        friendshipRepository.save(friendshipRelations)// accepted friendship
 
-        val friend4_1 = Friendship(user4, user1)
-        friend4_1.answer = AnswerOptions.YES
-        friendshipRepository.save(friend4_1)// accepted friendship
+        friendshipRelations = Friendship(user4, user1)
+        friendshipRelations.answer = AnswerOptions.YES
+        friendshipRepository.save(friendshipRelations)// accepted friendship
 
         friendshipRepository.save(Friendship(user5, user1)) // offered friendship
 
