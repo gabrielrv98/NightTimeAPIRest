@@ -23,11 +23,8 @@ class ChatViewBuilder {
                 friendshipId = friendship.id,
                 user = if (friendship.userAsk.id == userId) friendship.userAnswer
                 else friendship.userAsk,
-                messages = friendship.messages!!
-                    .sortedBy { message ->
-                        message.hour
-                        message.date
-                    }//sets on index 0 the most recent
+                messages = orderMessages(friendship.messages!!)
+                        //if it is snap it will only show the last message
                     .toMutableSet().apply {
                         if (isSnap) {
                             this.removeAll(
@@ -42,7 +39,24 @@ class ChatViewBuilder {
             )
         }
 
+        /**
+         *  Sorting algorithm for messages
+         */
+        private fun orderMessages(messages: Set<Message>):Set<Message>{
+            val finalSet = mutableSetOf<Message>()
 
+            //  First the messages are grouped by dates
+            val map = messages.groupBy { message-> message.date }
+                .toMutableMap()
+            val orderedDays = map.keys.sorted()
+            // After each day sorts its messages and its added to the final Set
+            for(day in orderedDays){
+                finalSet.addAll(map[day]!!.sortedBy { it.hour } )
+            }
+
+            return finalSet
+
+        }
         /**
          *  Private constructor, receives the friendship ID, the set of messages an the oth
          *
