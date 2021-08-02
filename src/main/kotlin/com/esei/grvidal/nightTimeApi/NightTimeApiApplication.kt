@@ -373,7 +373,7 @@ class NightTimeApiApplication : CommandLineRunner {
                 "Maria Vidal",
                 "mvittae",
                 "Gabriel<3",
-                "Que es \"Luxus\"",
+                "Me encanta el bar \"Luxus\"",
                 email = "mjvidal@hotmail.com"
             ),
             daysInFuture = hashMapOf(
